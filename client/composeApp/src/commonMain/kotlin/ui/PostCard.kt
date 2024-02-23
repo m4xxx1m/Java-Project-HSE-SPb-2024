@@ -20,7 +20,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -48,83 +48,75 @@ import model.Post
 
 @Composable
 fun PostCard(post: Post) {
-    Box(
-        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp)).background(Color.White).padding(10.dp)
+    Card(
+        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
+        elevation = 6.dp
     ) {
-        var expanded by remember { mutableStateOf(false) }
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-            IconButton(onClick = { expanded = true }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Show dropdown menu")
-            }
-        }
-        Column {
-            Row {
-                Image(
-                    Icons.Rounded.Person,
-                    contentDescription = "User Image",
-                    modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Red)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text(text = post.user.name)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = post.dateTime.toString())
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(10.dp)
+        ) {
+            var expanded by remember { mutableStateOf(false) }
+            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                IconButton(onClick = { expanded = true }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "Show dropdown menu")
                 }
             }
-            Spacer(Modifier.height(7.dp))
-//            val tagsScrollState = rememberScrollState()
-            val tagsDragState = rememberLazyListState()
-            val tagsDragCoroutineScope = rememberCoroutineScope()
-            LazyRow(
-                state = tagsDragState,
-//                modifier = Modifier.horizontalScroll(tagsScrollState).padding(vertical = 4.dp).fillMaxWidth()
-                modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
-                    .draggable(
-                        orientation = Orientation.Horizontal,
-                        state = rememberDraggableState { delta ->
-                            tagsDragCoroutineScope.launch {
-                                tagsDragState.scrollBy(-delta)
-                            }
-                        })
-            ) {
-                items(post.tags) { tag ->
-                    Box(
-                        modifier = Modifier.clip(RoundedCornerShape(5.dp)).background(Color.Gray)
-                            .padding(3.dp)
-                    ) {
-                        Text(tag.name, color = Color.White)
+            Column {
+                Row {
+                    Image(
+                        Icons.Rounded.Person,
+                        contentDescription = "User Image",
+                        modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Red)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(text = post.user.name)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = post.dateTime.toString())
+                    }
+                }
+                Spacer(Modifier.height(7.dp))
+                val tagsDragState = rememberLazyListState()
+                val tagsDragCoroutineScope = rememberCoroutineScope()
+                LazyRow(
+                    state = tagsDragState,
+                    modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
+                        .draggable(
+                            orientation = Orientation.Horizontal,
+                            state = rememberDraggableState { delta ->
+                                tagsDragCoroutineScope.launch {
+                                    tagsDragState.scrollBy(-delta)
+                                }
+                            })
+                ) {
+                    items(post.tags) { tag ->
+                        Card(
+                            backgroundColor = Color.Gray
+                        ) {
+                            Text(tag.name, color = Color.White, modifier = Modifier.padding(3.dp))
+                        }
+                        Spacer(Modifier.width(5.dp))
+                    }
+                }
+                Text(post.title, style = MaterialTheme.typography.h6)
+                Text(post.text)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = {}) {
+                        Image(Icons.Rounded.KeyboardArrowUp, contentDescription = "Upvote post")
+                    }
+                    Text(post.likesCount.toString())
+                    IconButton(onClick = {}) {
+                        Image(Icons.Rounded.KeyboardArrowDown, contentDescription = "Downvote post")
                     }
                     Spacer(Modifier.width(5.dp))
-                }
-//                post.tags.forEach { tag ->
-//                    Box(
-//                        modifier = Modifier.clip(RoundedCornerShape(5.dp)).background(Color.Gray)
-//                            .padding(3.dp)
-//                    ) {
-//                        Text(tag.name, color = Color.White)
-//                    }
-//                    Spacer(Modifier.width(5.dp))
-//                }
-            }
-            Text(post.title, style = MaterialTheme.typography.h6)
-            Text(post.text)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = {}) {
-                    Image(Icons.Rounded.KeyboardArrowUp, contentDescription = "Upvote post")
-                }
-                Text(post.likesCount.toString())
-                IconButton(onClick = {}) {
-                    Image(Icons.Rounded.KeyboardArrowDown, contentDescription = "Downvote post")
-                }
-                Spacer(Modifier.width(5.dp))
-                IconButton(onClick = {}) {
-                    Image(Icons.Rounded.Email, contentDescription = "Comments")
-                }
-                Text(post.commentsCount.toString())
-                Spacer(Modifier.weight(1f))
-                IconButton(onClick = {}) {
-                    Image(Icons.Rounded.Share, contentDescription = "Share")
+                    IconButton(onClick = {}) {
+                        Image(Icons.Rounded.Email, contentDescription = "Comments")
+                    }
+                    Text(post.commentsCount.toString())
+                    Spacer(Modifier.weight(1f))
+                    IconButton(onClick = {}) {
+                        Image(Icons.Rounded.Share, contentDescription = "Share")
+                    }
                 }
             }
         }
