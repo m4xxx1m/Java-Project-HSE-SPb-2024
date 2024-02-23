@@ -1,4 +1,3 @@
-
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -12,10 +11,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import model.Notification
 import model.Post
 import model.Tag
 import model.User
 import ui.ChooseInterestsForm
+import ui.NotificationWidget
 import ui.PostCard
 import ui.SignInForm
 import ui.SignUpEmail
@@ -24,7 +25,7 @@ import java.time.LocalDateTime
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "KotlinProject") {
-        previewPostCard()
+        previewNotificationWidget()
     }
 }
 
@@ -49,7 +50,15 @@ fun previewSignUpUserDataScreen() {
 @Preview
 @Composable
 fun previewChooseInterestsScreen() {
-    ChooseInterestsForm()
+    val tags = listOf(
+        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")
+    )
+    ChooseInterestsForm(tags)
 }
 
 @Preview
@@ -57,6 +66,7 @@ fun previewChooseInterestsScreen() {
 fun previewPostCard() {
     Column(
         modifier = Modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth()
+//        modifier = Modifier.padding(10.dp).fillMaxWidth()
             .fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -65,17 +75,57 @@ fun previewPostCard() {
                 0,
                 User(0, "User name", ""),
                 LocalDateTime.MIN,
-                listOf(Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+                listOf(
                     Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
                     Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
                     Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
                     Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")),
+                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")
+                ),
                 "Post title",
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
                 emptyList(),
                 1000,
                 100
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+fun previewNotificationWidget() {
+    Column(
+        modifier = Modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth()
+            .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        NotificationWidget(
+            Notification(
+                0,
+                Post(
+                    0,
+                    User(0, "User name", ""),
+                    LocalDateTime.MIN,
+                    emptyList(),
+                    "Post title",
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+                    emptyList(),
+                    1000,
+                    100
+                ),
+                Post(
+                    0,
+                    User(0, "User name", ""),
+                    LocalDateTime.MIN,
+                    emptyList(),
+                    "Post title",
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+                    emptyList(),
+                    1000,
+                    100
+                )
             )
         )
     }
