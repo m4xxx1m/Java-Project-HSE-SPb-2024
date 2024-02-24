@@ -1,6 +1,5 @@
 package ru.hse.project
 
-import App
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +19,7 @@ import model.Post
 import model.Tag
 import model.User
 import ui.ChooseInterestsForm
+import ui.NewPostForm
 import ui.NotificationWidget
 import ui.PostCard
 import ui.SignUpUserDataForm
@@ -29,20 +29,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PreviewNotificationWidget()
+            PreviewNewPostForm()
         }
     }
 }
 
 @Preview
 @Composable
-fun AppAndroidPreview() {
-    App()
-}
-
-@Preview
-@Composable
-fun PreviewAndroid() {
+fun PreviewSignUpUserDataForm() {
     SignUpUserDataForm()
 }
 
@@ -124,4 +118,10 @@ fun PreviewNotificationWidget() {
             )
         )
     }
+}
+
+@Preview
+@Composable
+fun PreviewNewPostForm() {
+    NewPostForm()
 }
