@@ -16,16 +16,18 @@ import model.Post
 import model.Tag
 import model.User
 import ui.ChooseInterestsForm
+import ui.NewPostForm
 import ui.NotificationWidget
 import ui.PostCard
 import ui.SignInForm
 import ui.SignUpEmail
 import ui.SignUpUserDataForm
+import ui.SubscriptionsCard
 import java.time.LocalDateTime
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "KotlinProject") {
-        previewNotificationWidget()
+        previewNewPostForm()
     }
 }
 
@@ -129,4 +131,25 @@ fun previewNotificationWidget() {
             )
         )
     }
+}
+
+@Preview
+@Composable
+fun previewNewPostForm() {
+    NewPostForm()
+}
+
+@Preview
+@Composable
+fun previewSubscriptionsCard() {
+    SubscriptionsCard(
+        listOf(
+            User(0, "User name", ""),
+            User(0, "User name", ""),
+            User(0, "User name", ""),
+            User(0, "User name", ""),
+            User(0, "User name", ""),
+            User(0, "User name", "")
+        )
+    )
 }
