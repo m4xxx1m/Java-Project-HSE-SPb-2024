@@ -11,11 +11,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import model.Comment
 import model.Notification
 import model.Post
 import model.Tag
 import model.User
 import ui.ChooseInterestsForm
+import ui.CommentCard
 import ui.NewPostForm
 import ui.NotificationWidget
 import ui.PostCard
@@ -23,11 +25,12 @@ import ui.SignInForm
 import ui.SignUpEmail
 import ui.SignUpUserDataForm
 import ui.SubscriptionsCard
+import ui.UserProfileCard
 import java.time.LocalDateTime
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "KotlinProject") {
-        previewNewPostForm()
+        previewComment()
     }
 }
 
@@ -151,5 +154,33 @@ fun previewSubscriptionsCard() {
             User(0, "User name", ""),
             User(0, "User name", "")
         )
+    )
+}
+
+@Preview
+@Composable
+fun previewUserProfile() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth().fillMaxHeight().background(Color.LightGray)
+            .padding(10.dp)
+    ) {
+        UserProfileCard(true, User(0, "User name", ""))
+    }
+}
+
+@Preview
+@Composable
+fun previewComment() {
+    CommentCard(
+        Comment(
+            0,
+            User(0, "User name", ""),
+            LocalDateTime.MIN,
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+            emptyList(),
+            1000,
+        ),
+        true
     )
 }
