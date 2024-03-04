@@ -21,6 +21,7 @@ import ui.CommentCard
 import ui.NewPostForm
 import ui.NotificationWidget
 import ui.PostCard
+import ui.SearchWidget
 import ui.SignInForm
 import ui.SignUpEmail
 import ui.SignUpUserDataForm
@@ -28,9 +29,10 @@ import ui.SubscriptionsCard
 import ui.UserProfileCard
 import java.time.LocalDateTime
 
+
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "KotlinProject") {
-        previewComment()
+        App()
     }
 }
 
@@ -38,6 +40,12 @@ fun main() = application {
 @Composable
 fun previewSignInScreen() {
     SignInForm()
+}
+
+@Preview
+@Composable
+fun previewApp() {
+    App()
 }
 
 @Preview
@@ -183,4 +191,10 @@ fun previewComment() {
         ),
         true
     )
+}
+
+@Preview
+@Composable
+fun previewSearchWidget() {
+    SearchWidget()
 }
