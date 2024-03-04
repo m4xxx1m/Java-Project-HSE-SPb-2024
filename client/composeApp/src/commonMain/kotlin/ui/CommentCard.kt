@@ -33,9 +33,6 @@ import model.Comment
 fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
     Card(elevation = 6.dp, modifier = Modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-//            IconButton(onClick = { }, modifier = Modifier.align(Alignment.TopEnd)) {
-//                Image(Icons.Rounded.MoreVert, contentDescription = "Show dropdown menu")
-//            }
             Row() {
                 Image(Icons.Rounded.Person, contentDescription = null,
                     modifier = Modifier.size(35.dp).clip(CircleShape).background(Color.Red)
