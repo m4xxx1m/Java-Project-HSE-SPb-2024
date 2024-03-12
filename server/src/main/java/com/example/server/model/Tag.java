@@ -9,7 +9,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long tagId;
     @Column(length = 50)
-    private String tagName;
+    private final String tagName;
 
     public Tag(String tagName) {
         this.tagName = tagName;

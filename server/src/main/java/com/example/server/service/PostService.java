@@ -19,11 +19,11 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public void deletePost(Integer id) {
+    public void deletePost(long id) {
         postRepository.deleteById(id);
     }
 
-    public Post getPostById(Integer id) {
+    public Post getPostById(long id) {
         return postRepository.findById(id).orElse(null);
     }
 
@@ -33,6 +33,16 @@ public class PostService {
 
     public List<Post> getPosts() {
         return postRepository.findAll();
+    }
+
+    void incrementPostRating(long id) {
+        Post post = getPostById(id);
+        post.incrementRating();
+    }
+
+    void decrementPostRating(long id) {
+        Post post = getPostById(id);
+        post.decrementRating();
     }
 
 }
