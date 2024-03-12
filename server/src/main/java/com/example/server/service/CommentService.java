@@ -8,6 +8,7 @@ import com.example.server.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,24 +20,47 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public void deleteComment(Integer id) {
+    public void deleteComment(long id) {
         commentRepository.deleteById(id);
     }
 
-    public Comment getCommentById(Integer id) {
+    public Comment getCommentById(long id) {
         return commentRepository.findById(id).orElse(null);
     }
 
-    public List<Comment> getCommentsByPostId(Post postId) {
+    public List<Comment> getCommentsByPostId(long postId) {
         return commentRepository.findByPostId(postId);
     }
 
-    public List<Comment> getCommentsByAuthorId(User authorId) {
+    public List<Comment> getCommentsByAuthorId(long authorId) {
         return commentRepository.findByAuthorId(authorId);
+    }
+
+    List<Comment> getCommentsByCommentIds(List<Long> commentIds) {
+        List<Comment> comments = new ArrayList<>();
+        for (Long commentId : commentIds) {
+            Comment comment = getCommentById(commentId);
+            if (comment != null) {
+                comments.add(comment);
+            }
+        }
+        return comments;
     }
 
     public List<Comment> getComments() {
         return commentRepository.findAll();
     }
+
+    void incrementCommentRating(long id) {
+        Comment comment = getCommentById(id);
+        comment.incrementRating();
+    }
+
+    void decrementPostRating(long id) {
+        Comment comment = getCommentById(id);
+        comment.decrementRating();
+    }
+
+
 
 }
