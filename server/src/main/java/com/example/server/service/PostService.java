@@ -1,6 +1,7 @@
 package com.example.server.service;
 
 
+import com.example.server.dto.ContentObjDto;
 import com.example.server.model.Post;
 import com.example.server.model.User;
 import com.example.server.repository.PostRepository;
@@ -15,8 +16,9 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    public void addPost(Post post) {
-        postRepository.save(post);
+    public Post addPost(ContentObjDto postDto) {
+        Post post = new Post(postDto.getAuthorId(), postDto.getContent());
+        return postRepository.save(post);
     }
 
     public void deletePost(long id) {
@@ -35,14 +37,22 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    void incrementPostRating(long id) {
+    public void incrementPostRating(long id) {
         Post post = getPostById(id);
         post.incrementRating();
     }
 
-    void decrementPostRating(long id) {
+    public void decrementPostRating(long id) {
         Post post = getPostById(id);
         post.decrementRating();
+    }
+
+    public void addCommentToPost(long postId, long commentId) {
+        Post post = getPostById(postId);
+        List<Long> comments = post.getComments();
+        comments.add(commentId);
+        post.setComments(comments);
+        postRepository.save(post);
     }
 
 }

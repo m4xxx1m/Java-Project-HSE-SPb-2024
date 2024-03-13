@@ -11,13 +11,14 @@ public class ContentObj {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-    private final long authorId;
+    private long authorId;
     @Temporal(TemporalType.TIMESTAMP)
-    private final Date creationTime;
+    private Date creationTime;
     @Column(length = 4096)
     private String content;
     private long rating;
+
+    public ContentObj() {}
 
     public ContentObj(long authorId, String content) {
         this.authorId = authorId;
@@ -56,6 +57,10 @@ public class ContentObj {
 
     public void decrementRating() {
         this.rating--;
+    }
+
+    public void setAuthorId(long authorId) {
+        this.authorId = authorId;
     }
 
 }

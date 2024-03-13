@@ -8,7 +8,16 @@ import java.util.Date;
 @Table(name = "comments")
 public class Comment extends ContentObj {
 
-    private final long postId;
+    private long postId;
+
+    public Comment() {
+        super();
+    }
+
+    public Comment(long postId) {
+        super();
+        this.postId = postId;
+    }
 
     public Comment(long authorId, String content, long postId) {
         super(authorId, content);
