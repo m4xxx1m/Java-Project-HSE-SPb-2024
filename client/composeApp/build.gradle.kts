@@ -38,6 +38,10 @@ kotlin {
             implementation(libs.voyager.bottomSheetNavigator)
             implementation(libs.voyager.tabNavigator)
             implementation(libs.voyager.transitions)
+            
+            // Retrofit
+            implementation(libs.retrofit)
+            implementation(libs.retrofit.converter.gson)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

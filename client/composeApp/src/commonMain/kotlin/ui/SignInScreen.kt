@@ -10,25 +10,41 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import model.SignInManager
+import navigation.MainNavigation
+
+class SignInScreen : Screen {
+    @Composable
+    override fun Content() {
+        SignInForm(LocalNavigator.currentOrThrow)
+    }
+}
 
 @Composable
-fun SignInForm() {
+fun SignInForm(navigator: Navigator) {
     MaterialTheme {
-        var emailOrUsername by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
+        val emailOrUsername = remember { mutableStateOf("") }
+        val isErrorUsername = remember { mutableStateOf(false) }
+        val password = remember { mutableStateOf("") }
+        val isErrorPassword = remember { mutableStateOf(false) }
         Column(
             modifier = Modifier.padding(35.dp).fillMaxWidth().fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -36,28 +52,77 @@ fun SignInForm() {
         ) {
             OutlinedTextField(
                 modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                value = emailOrUsername,
-                onValueChange = { emailOrUsername = it },
+                value = emailOrUsername.value,
+                onValueChange = {
+                    emailOrUsername.value = it
+                    isErrorUsername.value = false
+                },
+                trailingIcon = {
+                    if (isErrorUsername.value) {
+                        Icon(
+                            Icons.Filled.Warning,
+                            "error",
+                            tint = MaterialTheme.colors.error
+                        )
+                    }
+                },
                 label = { Text("Email or username") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                singleLine = true
+                singleLine = true,
+                isError = isErrorUsername.value
             )
             OutlinedTextField(
                 modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth(),
-                value = password,
-                onValueChange = { password = it },
+                value = password.value,
+                onValueChange = {
+                    password.value = it
+                    isErrorPassword.value = false
+                },
+                trailingIcon = {
+                    if (isErrorPassword.value) {
+                        Icon(
+                            Icons.Filled.Warning,
+                            "error",
+                            tint = MaterialTheme.colors.error
+                        )
+                    }
+                },
                 label = { Text("Password") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true
+                singleLine = true,
+                isError = isErrorPassword.value
             )
             Spacer(modifier = Modifier.height(10.dp))
-            Button(onClick = {}, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
+            Button(onClick = {
+                if (emailOrUsername.value.isEmpty()) {
+                    isErrorUsername.value = true
+                }
+                if (password.value.isEmpty()) {
+                    isErrorPassword.value = true
+                }
+                if (isErrorUsername.value || isErrorPassword.value) {
+                    return@Button
+                }
+                val signInManager = SignInManager(
+                    emailOrUsername.value.trim(),
+                    password.value.trim()
+                )
+                signInManager.signIn {
+                    navigator.popAll()
+                    navigator.push(MainNavigation())
+                }
+            }, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
                 Text("Sign in")
             }
-            Button(onClick = {}, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
+            Button(
+                onClick = {
+                    navigator.push(SignUpEmailScreen())
+                },
+                modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()
+            ) {
                 Text("Register")
             }
         }
     }
-} 
+}
