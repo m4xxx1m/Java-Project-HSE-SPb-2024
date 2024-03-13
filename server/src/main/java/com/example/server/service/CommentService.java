@@ -1,9 +1,9 @@
 package com.example.server.service;
 
 
+import com.example.server.dto.ContentObjDto;
 import com.example.server.model.Comment;
 import com.example.server.model.Post;
-import com.example.server.model.User;
 import com.example.server.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +16,12 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public void addComment(Comment comment) {
-        commentRepository.save(comment);
+    @Autowired
+    private PostService postService;
+
+    public Comment addComment(ContentObjDto commentRequest, long postId) {
+        Comment comment = new Comment(commentRequest.getAuthorId(), commentRequest.getContent(), postId);
+        return commentRepository.save(comment);
     }
 
     public void deleteComment(long id) {
@@ -29,7 +33,13 @@ public class CommentService {
     }
 
     public List<Comment> getCommentsByPostId(long postId) {
-        return commentRepository.findByPostId(postId);
+        Post post = postService.getPostById(postId);
+        if (post == null) {
+            return null;
+        } else {
+            List<Long> commentIds = post.getComments();
+            return getCommentsByCommentIds(commentIds);
+        }
     }
 
     public List<Comment> getCommentsByAuthorId(long authorId) {
@@ -60,7 +70,5 @@ public class CommentService {
         Comment comment = getCommentById(id);
         comment.decrementRating();
     }
-
-
 
 }
