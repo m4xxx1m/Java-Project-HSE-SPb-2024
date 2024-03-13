@@ -1,11 +1,12 @@
+
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
-import navigation.MainNavigation
+import ui.SignInScreen
 
 @Composable
 fun App() {
     MaterialTheme {
-        Navigator(screen = MainNavigation())
+        Navigator(screen = SignInScreen())
     }
 }

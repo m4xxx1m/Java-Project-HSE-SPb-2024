@@ -1,3 +1,4 @@
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -22,13 +23,9 @@ import ui.NewPostForm
 import ui.NotificationWidget
 import ui.PostCard
 import ui.SearchWidget
-import ui.SignInForm
-import ui.SignUpEmail
-import ui.SignUpUserDataForm
 import ui.SubscriptionsCard
 import ui.UserProfileCard
 import java.time.LocalDateTime
-
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "KotlinProject") {
@@ -36,11 +33,11 @@ fun main() = application {
     }
 }
 
-@Preview
-@Composable
-fun previewSignInScreen() {
-    SignInForm()
-}
+//@Preview
+//@Composable
+//fun previewSignInScreen() {
+//    SignInForm()
+//}
 
 @Preview
 @Composable
@@ -48,17 +45,17 @@ fun previewApp() {
     App()
 }
 
-@Preview
-@Composable
-fun previewSignUpEmailScreen() {
-    SignUpEmail()
-}
+//@Preview
+//@Composable
+//fun previewSignUpEmailScreen() {
+//    SignUpEmailForm()
+//}
 
-@Preview
-@Composable
-fun previewSignUpUserDataScreen() {
-    SignUpUserDataForm()
-}
+//@Preview
+//@Composable
+//fun previewSignUpUserDataScreen() {
+//    SignUpUserDataForm()
+//}
 
 @Preview
 @Composable
