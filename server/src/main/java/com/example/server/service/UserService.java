@@ -1,5 +1,6 @@
 package com.example.server.service;
 
+import com.example.server.dto.UserLoginDto;
 import com.example.server.dto.UserRegistrationDto;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
@@ -22,6 +23,11 @@ public class UserService {
     }
 
     public User registerUser(UserRegistrationDto registrationDto) {
+        User existingUser = userRepository.findByUsername(registrationDto.getUsername());
+        if (existingUser != null) {
+            throw new RuntimeException("Username already in use");
+        }
+
         User user = new User();
         user.setUsername(registrationDto.getUsername());
         user.setEmail(registrationDto.getEmail());
@@ -30,6 +36,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User loginUser(UserLoginDto loginDto) {
+        User user = userRepository.findByUsername(loginDto.getUsername());
+        if (user != null && user.getPassword().equals(hashPassword(loginDto.getPassword()))) {
+            return user;
+        }
+        throw new RuntimeException("Invalid username or password");
+    }
 
     private String hashPassword(String password) {
         try {
