@@ -26,24 +26,33 @@ public class CommentController {
     }
 
     @RequestMapping("/comments")
-    ResponseEntity<List<Comment>> getComments(@PathVariable long postId) {
+    ResponseEntity<List<Comment>> getComments(@PathVariable int postId) {
         return new ResponseEntity<>(commentService.getCommentsByPostId(postId), HttpStatus.OK);
     }
 
     @RequestMapping("/addComment")
-    ResponseEntity<Comment> addComment(@PathVariable long postId, @RequestBody ContentObjDto commentRequest) {
+    ResponseEntity<Comment> addComment(@PathVariable int postId, @RequestBody ContentObjDto commentRequest) {
         Comment comment = commentService.addComment(commentRequest, postId);
-        postService.addCommentToPost(postId, comment.getId());
+        postService.addCommentId(postId, comment.getId());
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
+    @RequestMapping("/comments/{commentId}/delete")
+    ResponseEntity<Void> deleteComment(@PathVariable int postId, @PathVariable int commentId) {
+        postService.deleteCommentId(postId, commentId);
+        commentService.deleteComment(commentId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-    /*@RequestMapping("/addComment0")
-    ResponseEntity<Comment> addComment(@PathVariable long postId, @RequestParam("authorId") long authorId, @RequestParam("content") String content) {
-        ContentObjDto commentRequest = new ContentObjDto(authorId, content);
-        Comment comment = commentService.addComment(commentRequest, postId);
-        postService.addCommentToPost(postId, comment.getId());
-        return new ResponseEntity<>(comment, HttpStatus.OK);
-    }*/
+    @RequestMapping("/comments/{commentId}/edit")
+    ResponseEntity<Comment> editComment(@PathVariable int commentId, @RequestParam String content) {
+        Comment comment = commentService.getCommentById(commentId);
+        if (comment == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            commentService.editComment(comment, new ContentObjDto(10000, content));
+            return new ResponseEntity<>(comment, HttpStatus.OK);
+        }
+    }
 
 }

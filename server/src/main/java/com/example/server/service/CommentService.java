@@ -2,7 +2,9 @@ package com.example.server.service;
 
 
 import com.example.server.dto.ContentObjDto;
+import com.example.server.dto.PostDto;
 import com.example.server.model.Comment;
+import com.example.server.model.ContentObj;
 import com.example.server.model.Post;
 import com.example.server.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,36 +21,36 @@ public class CommentService {
     @Autowired
     private PostService postService;
 
-    public Comment addComment(ContentObjDto commentRequest, long postId) {
+    public Comment addComment(ContentObjDto commentRequest, int postId) {
         Comment comment = new Comment(commentRequest.getAuthorId(), commentRequest.getContent(), postId);
         return commentRepository.save(comment);
     }
 
-    public void deleteComment(long id) {
+    public void deleteComment(int id) {
         commentRepository.deleteById(id);
     }
 
-    public Comment getCommentById(long id) {
+    public Comment getCommentById(int id) {
         return commentRepository.findById(id).orElse(null);
     }
 
-    public List<Comment> getCommentsByPostId(long postId) {
+    public List<Comment> getCommentsByPostId(int postId) {
         Post post = postService.getPostById(postId);
         if (post == null) {
             return null;
         } else {
-            List<Long> commentIds = post.getComments();
+            List<Integer> commentIds = post.getCommentIds();
             return getCommentsByCommentIds(commentIds);
         }
     }
 
-    public List<Comment> getCommentsByAuthorId(long authorId) {
+    public List<Comment> getCommentsByAuthorId(int authorId) {
         return commentRepository.findByAuthorId(authorId);
     }
 
-    List<Comment> getCommentsByCommentIds(List<Long> commentIds) {
+    List<Comment> getCommentsByCommentIds(List<Integer> commentIds) {
         List<Comment> comments = new ArrayList<>();
-        for (Long commentId : commentIds) {
+        for (Integer commentId : commentIds) {
             Comment comment = getCommentById(commentId);
             if (comment != null) {
                 comments.add(comment);
@@ -61,14 +63,19 @@ public class CommentService {
         return commentRepository.findAll();
     }
 
-    void incrementCommentRating(long id) {
+    void incrementCommentRating(int id) {
         Comment comment = getCommentById(id);
         comment.incrementRating();
     }
 
-    void decrementPostRating(long id) {
+    void decrementCommentRating(int id) {
         Comment comment = getCommentById(id);
         comment.decrementRating();
+    }
+
+    public void editComment(Comment comment, ContentObjDto commentDto) {
+        comment.setContent(commentDto.getContent());
+        commentRepository.save(comment);
     }
 
 }
