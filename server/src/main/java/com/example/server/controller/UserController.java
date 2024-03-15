@@ -38,9 +38,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
-
-    //curl -X PUT -H "Content-Type: application/json" \
-    //-d '{
+    // example of usage:
+    // curl -X PUT -H "Content-Type: application/json" \
+    // -d '{
     //    "username": "newUsername",
     //    "email": "newEmail@example.com",
     //    "password": "newPassword",
@@ -53,8 +53,8 @@ public class UserController {
     //    "education": "newEducation",
     //    "bio": "newBio",
     //    "resumeUrl": "newResumeUrl"
-    //}' \
-    //http://localhost:8080/users/1
+    // }' \
+    // http://localhost:8080/users/1
     //                            ^ user id here
     @PutMapping("/users/{userId}")
     public User updateUser(@PathVariable Integer userId, @RequestBody UserUpdateDto updateDto) {

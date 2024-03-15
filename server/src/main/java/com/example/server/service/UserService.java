@@ -64,7 +64,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Обновление полей пользователя
         user.setUsername(updateDto.getUsername());
         user.setEmail(updateDto.getEmail());
         user.setPassword(updateDto.getPassword());
