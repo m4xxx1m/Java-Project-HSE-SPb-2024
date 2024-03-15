@@ -24,7 +24,7 @@ class SignUpManager(private val email: String) {
                 println("failure")
             }
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.code() == 201) {
+                if (response.code() == 200) {
                     println("success")
                     onSuccess()
                 } else {
@@ -33,7 +33,7 @@ class SignUpManager(private val email: String) {
             }
         })
     }
-    
+
     data class UserSignUpBody(
         val username: String,
         val email: String,
