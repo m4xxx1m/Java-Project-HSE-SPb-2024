@@ -20,16 +20,17 @@ import model.Notification
 import model.Post
 import model.Tag
 import model.User
+import platform_depended.AuthStorage
 import ui.ChooseInterestsForm
 import ui.NewPostForm
 import ui.NotificationWidget
 import ui.PostCard
-import ui.SignUpUserDataForm
 import java.time.LocalDateTime
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AuthStorage.init(this)
         setContent {
             MaterialTheme {
                 App()
@@ -38,11 +39,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview
-@Composable
-fun PreviewSignUpUserDataForm() {
-    SignUpUserDataForm()
-}
+//@Preview
+//@Composable
+//fun PreviewSignUpUserDataForm() {
+//    SignUpUserDataForm()
+//}
 
 @Composable
 fun PreviewChooseInterestsScreen() {

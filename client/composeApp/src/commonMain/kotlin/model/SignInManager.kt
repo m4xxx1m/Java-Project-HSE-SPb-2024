@@ -19,8 +19,9 @@ class SignInManager(
                 println("failure")
             }
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.code() == 201) {
+                if (response.code() == 200) {
                     println("success")
+                    AuthManager().saveAuthData(username, password)
                     onSuccess()
                 } else {
                     println("response but wrong code")
