@@ -1,6 +1,7 @@
 package com.example.server.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,21 +11,32 @@ import java.util.List;
 @Table(name = "posts")
 public class Post extends ContentObj {
 
-    private List<Long> comments = new ArrayList<>();
+    private List<Integer> commentIds = new ArrayList<>();
+
+    private List<Integer> tagIds = new ArrayList<>();
 
     public Post() {
         super();
     }
-    public Post(long authorId, String content) {
+    public Post(int authorId, String content, List<Integer> tagIds) {
         super(authorId, content);
+        this.tagIds = tagIds;
     }
 
-    public List<Long> getComments() {
-        return comments;
+    public List<Integer> getCommentIds() {
+        return commentIds;
     }
 
-    public void setComments(List<Long> comments) {
-        this.comments = comments;
+    public void setCommentIds(List<Integer> commentIds) {
+        this.commentIds = commentIds;
+    }
+    
+    public List<Integer> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<Integer> tagIds) {
+        this.tagIds = tagIds;
     }
 
 }

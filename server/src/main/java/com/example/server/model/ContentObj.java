@@ -10,28 +10,28 @@ import java.util.Objects;
 public class ContentObj {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private long authorId;
+    private int id;
+    private int authorId;
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTime;
     @Column(length = 4096)
     private String content;
-    private long rating;
+    private int rating;
 
     public ContentObj() {}
 
-    public ContentObj(long authorId, String content) {
+    public ContentObj(int authorId, String content) {
         this.authorId = authorId;
         this.content = content;
         this.creationTime = new Date();
         this.rating = 0;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public long getAuthorId() {
+    public int getAuthorId() {
         return authorId;
     }
 
@@ -43,7 +43,7 @@ public class ContentObj {
         return content;
     }
 
-    public long getRating() {
+    public int getRating() {
         return rating;
     }
 
@@ -59,7 +59,7 @@ public class ContentObj {
         this.rating--;
     }
 
-    public void setAuthorId(long authorId) {
+    public void setAuthorId(int authorId) {
         this.authorId = authorId;
     }
 

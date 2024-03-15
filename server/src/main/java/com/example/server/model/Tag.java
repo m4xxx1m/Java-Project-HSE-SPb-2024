@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long tagId;
+    private int tagId;
     @Column(length = 50)
     private final String tagName;
 
@@ -15,7 +15,7 @@ public class Tag {
         this.tagName = tagName;
     }
 
-    public long getTagId() {
+    public int getTagId() {
         return tagId;
     }
 
