@@ -2,6 +2,7 @@ package com.example.server.service;
 
 import com.example.server.dto.UserLoginDto;
 import com.example.server.dto.UserRegistrationDto;
+import com.example.server.dto.UserUpdateDto;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,5 +58,26 @@ public class UserService {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public User updateUser(Integer userId, UserUpdateDto updateDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Обновление полей пользователя
+        user.setUsername(updateDto.getUsername());
+        user.setEmail(updateDto.getEmail());
+        user.setPassword(updateDto.getPassword());
+        user.setProfilePictureUrl(updateDto.getProfilePictureUrl());
+        user.setFirstName(updateDto.getFirstName());
+        user.setSecondName(updateDto.getSecondName());
+        user.setDateOfBirth(updateDto.getDateOfBirth());
+        user.setCountry(updateDto.getCountry());
+        user.setCity(updateDto.getCity());
+        user.setEducation(updateDto.getEducation());
+        user.setBio(updateDto.getBio());
+        user.setResumeUrl(updateDto.getResumeUrl());
+
+        return userRepository.save(user);
     }
 }
