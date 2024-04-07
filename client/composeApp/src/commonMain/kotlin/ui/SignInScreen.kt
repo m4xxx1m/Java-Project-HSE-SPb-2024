@@ -114,7 +114,7 @@ fun SignInForm(navigator: Navigator) {
                 )
                 signInManager.signIn {
                     navigator.popAll()
-                    navigator.push(MainNavigation())
+                    navigator.replace(MainNavigation())
                 }
             }, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
                 Text("Sign in")
