@@ -5,7 +5,6 @@ import navigation.MainNavigation
 import platform_depended.AuthStorage
 
 class AuthManager {
-
     fun tryLogin(navigator: Navigator) {
         val token = AuthStorage.getToken()
         if (token != null) {
@@ -16,17 +15,16 @@ class AuthManager {
             val login = tokenList[0]
             val password = tokenList[1]
             val signInManager = SignInManager(login, password)
-            signInManager.signIn { 
+            signInManager.signIn {
                 navigator.popAll()
-                navigator.push(MainNavigation())
+                navigator.replace(MainNavigation())
             }
         }
     }
-    
+
     fun saveAuthData(login: String, password: String) {
         if (AuthStorage.getToken() == null) {
             AuthStorage.saveToken("$login|$password")
         }
     }
-    
 }

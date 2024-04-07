@@ -28,6 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import network.ApiInterface
+import network.RetrofitClient
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun NewPostForm() {
@@ -41,6 +47,7 @@ fun NewPostForm() {
         ) {
             val title = remember { mutableStateOf("") }
             val postText = remember { mutableStateOf("") }
+            val postTags = remember { mutableListOf(0) }
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = title.value,
@@ -82,7 +89,11 @@ fun NewPostForm() {
                     }
                 }
                 Spacer(Modifier.weight(1f))
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    CreatePostManager().createPost(title.value, postText.value, postTags) {
+                        
+                    }
+                }) {
                     Image(
                         Icons.Rounded.Done, contentDescription = "Post is done",
                         modifier = Modifier.size(35.dp)
@@ -91,4 +102,25 @@ fun NewPostForm() {
             }
         }
     }
+}
+
+class CreatePostManager {
+    fun createPost(title: String, text: String, tags: List<Int>, onSuccess: () -> Unit) {
+        val call = RetrofitClient.retrofit.create(ApiInterface::class.java)
+        val createPostInfo = CreatePostBody(0, "$title\n$text", emptyList())
+        call.createPost(createPostInfo).enqueue(object : Callback<ResponseBody> {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                println("failure on creating post")
+            }
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.code() == 201) {
+                    println("successfully created post")
+                    onSuccess()
+                } else {
+                    println("response but wrong code on creating post")
+                }
+            }
+        })
+    }
+    data class CreatePostBody(val authorId: Int, val content: String, val tagIds: List<Int>)
 }

@@ -1,5 +1,6 @@
 package platform_depended
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -9,8 +10,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -27,7 +32,7 @@ import ui.SearchWidget
 actual fun MainScreenScaffold(content: @Composable (PaddingValues) -> Unit) {
     Scaffold(
         topBar = {
-            Row(Modifier.widthIn(min = 500.dp)) {
+            Row(Modifier.widthIn(min = 500.dp), verticalAlignment = Alignment.CenterVertically) {
                 BottomNavigation(
                     backgroundColor = Color.White,
                     contentColor = Color.Black,
@@ -41,6 +46,11 @@ actual fun MainScreenScaffold(content: @Composable (PaddingValues) -> Unit) {
                     TabItem(ProfileTab)
                 }
                 Spacer(Modifier.weight(1f))
+                IconButton(
+                    onClick = {},
+                ) {
+                    Image(Icons.Rounded.Refresh, contentDescription = "refresh")
+                }
                 Box(Modifier.weight(2f)) {
                     SearchWidget()
                 }
