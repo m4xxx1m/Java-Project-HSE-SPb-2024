@@ -11,16 +11,26 @@ import java.util.List;
 @Table(name = "posts")
 public class Post extends ContentObj {
 
+    @Column(length = 255)
+    private String title;
     private List<Integer> commentIds = new ArrayList<>();
-
     private List<Integer> tagIds = new ArrayList<>();
 
     public Post() {
         super();
     }
-    public Post(int authorId, String content, List<Integer> tagIds) {
+    public Post(int authorId, String title, String content, List<Integer> tagIds) {
         super(authorId, content);
+        this.title = title;
         this.tagIds = tagIds;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public List<Integer> getCommentIds() {
