@@ -39,8 +39,7 @@ public class CommentService {
         if (post == null) {
             return null;
         } else {
-            List<Integer> commentIds = post.getCommentIds();
-            return getCommentsByCommentIds(commentIds);
+            return commentRepository.findByPostId(postId);
         }
     }
 
@@ -63,14 +62,16 @@ public class CommentService {
         return commentRepository.findAll();
     }
 
-    void incrementCommentRating(int id) {
+    public void incrementCommentRating(int id) {
         Comment comment = getCommentById(id);
         comment.incrementRating();
+        commentRepository.save(comment);
     }
 
-    void decrementCommentRating(int id) {
+    public void decrementCommentRating(int id) {
         Comment comment = getCommentById(id);
         comment.decrementRating();
+        commentRepository.save(comment);
     }
 
     public void editComment(Comment comment, ContentObjDto commentDto) {

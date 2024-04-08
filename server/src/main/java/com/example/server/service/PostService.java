@@ -1,13 +1,14 @@
 package com.example.server.service;
 
 
-import com.example.server.dto.ContentObjDto;
 import com.example.server.dto.PostDto;
+import com.example.server.model.Comment;
 import com.example.server.model.Post;
 import com.example.server.model.Tag;
 import com.example.server.model.User;
 import com.example.server.repository.CommentRepository;
 import com.example.server.repository.PostRepository;
+import com.example.server.repository.SavedPostRepository;
 import com.example.server.repository.TagRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class PostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private SavedPostService savedPostService;
     
     @Autowired
     private TagRepository tagRepository;
@@ -34,10 +38,11 @@ public class PostService {
     }
 
     public void deletePost(int id) {
-        List<Integer> commentIds = getPostById(id).getCommentIds();
-        for (int commentId : commentIds) {
-            commentRepository.deleteById(commentId);
+        List<Comment> comments = commentRepository.findByPostId(id);
+        for (Comment comment : comments) {
+            commentRepository.delete(comment);
         }
+        savedPostService.deleteSavedPostForAllUsers(id);
         postRepository.deleteById(id);
     }
 
@@ -70,24 +75,12 @@ public class PostService {
     public void incrementPostRating(int id) {
         Post post = getPostById(id);
         post.incrementRating();
+        postRepository.save(post);
     }
 
     public void decrementPostRating(int id) {
         Post post = getPostById(id);
         post.decrementRating();
-    }
-
-    public void addCommentId(int postId, int commentId) {
-        Post post = getPostById(postId);
-        List<Integer> commentIds = post.getCommentIds();
-        commentIds.add(commentId);
-        post.setCommentIds(commentIds);
-        postRepository.save(post);
-    }
-
-    public void deleteCommentId(int postId, int commentId) {
-        Post post = getPostById(postId);
-        post.getCommentIds().removeIf(x -> x == commentId);
         postRepository.save(post);
     }
 
