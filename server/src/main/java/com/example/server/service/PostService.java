@@ -29,7 +29,8 @@ public class PostService {
     private CommentRepository commentRepository;
 
     public Post addPost(PostDto postDto) {
-        Post post = new Post(postDto.getAuthorId(), postDto.getContent(), postDto.getTagIds());
+        Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
+                postDto.getContent(), postDto.getTagIds());
         return postRepository.save(post);
     }
 
