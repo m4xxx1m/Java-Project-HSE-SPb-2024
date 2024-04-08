@@ -2,31 +2,40 @@ package network
 
 import model.SignInManager
 import model.SignUpManager
+import navigation.CreatePostManager
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
-import ui.CreatePostManager
+import retrofit2.http.Path
 
 interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("register")
     fun registerUser(@Body info: SignUpManager.UserSignUpBody): 
             Call<ResponseBody>
-    
+
     @Headers("Content-Type:application/json")
     @POST("login")
     fun loginUser(@Body info: SignInManager.UserSignInBody):
             Call<ResponseBody>
-    
+
     @Headers("Content-Type:application/json")
     @POST("post/add")
     fun createPost(@Body info: CreatePostManager.CreatePostBody):
             Call<ResponseBody>
-    
+
     @Headers("Content-Type:application/json")
     @GET("post/getAll")
-    fun getAllPosts(): Call<ResponseBody>
+    fun getAllPosts(): Call<List<Post>>
+
+    @Headers("Content-Type:application/json")
+    @GET("user/{userId}")
+    fun getUser(@Path("userId") userId: Int): Call<User>
+    
+    @Headers("Content-Type:application/json")
+    @POST("users/getUsersList")
+    fun getUsersList(@Body userIds: Set<Int>): Call<List<User>>
 }
