@@ -10,9 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 public class Post extends ContentObj {
-
-    private List<Integer> commentIds = new ArrayList<>();
-
     private List<Integer> tagIds = new ArrayList<>();
 
     public Post() {
@@ -23,14 +20,6 @@ public class Post extends ContentObj {
         this.tagIds = tagIds;
     }
 
-    public List<Integer> getCommentIds() {
-        return commentIds;
-    }
-
-    public void setCommentIds(List<Integer> commentIds) {
-        this.commentIds = commentIds;
-    }
-    
     public List<Integer> getTagIds() {
         return tagIds;
     }

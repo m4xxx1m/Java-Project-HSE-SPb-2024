@@ -4,12 +4,12 @@ package com.example.server.controller;
 import com.example.server.dto.PostDto;
 import com.example.server.model.Post;
 import com.example.server.service.PostService;
+import com.example.server.service.SavedPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -18,9 +18,12 @@ public class PostController {
 
     private final PostService postService;
 
+    private final SavedPostService savedPostService;
+
     @Autowired
-    public PostController(PostService postService) {
+    public PostController(PostService postService, SavedPostService savedPostService) {
         this.postService = postService;
+        this.savedPostService = savedPostService;
     }
 
     @GetMapping("/getAll")
@@ -36,7 +39,7 @@ public class PostController {
     @RequestMapping("/add")
     ResponseEntity<Post> addPost(@RequestBody PostDto postDto) {
         Post post = postService.addPost(postDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/{id}")
@@ -63,6 +66,24 @@ public class PostController {
     @RequestMapping("/{id}/delete")
     ResponseEntity<Void> deletePost(@PathVariable Integer id) {
         postService.deletePost(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/like")
+    ResponseEntity<Void> likePost(@PathVariable Integer id) {
+        postService.incrementPostRating(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/dislike")
+    ResponseEntity<Void> dislikePost(@PathVariable Integer id) {
+        postService.decrementPostRating(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/save")
+    ResponseEntity<Void> savePost(@PathVariable Integer id, @RequestParam("userId") int userId) {
+        savedPostService.savePost(userId, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

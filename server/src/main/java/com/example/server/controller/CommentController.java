@@ -17,12 +17,10 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
-    private final PostService postService;
 
     @Autowired
-    public CommentController(CommentService commentService, PostService postService) {
+    public CommentController(CommentService commentService) {
         this.commentService = commentService;
-        this.postService = postService;
     }
 
     @RequestMapping("/comments")
@@ -33,13 +31,11 @@ public class CommentController {
     @RequestMapping("/addComment")
     ResponseEntity<Comment> addComment(@PathVariable int postId, @RequestBody ContentObjDto commentRequest) {
         Comment comment = commentService.addComment(commentRequest, postId);
-        postService.addCommentId(postId, comment.getId());
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
     @RequestMapping("/comments/{commentId}/delete")
-    ResponseEntity<Void> deleteComment(@PathVariable int postId, @PathVariable int commentId) {
-        postService.deleteCommentId(postId, commentId);
+    ResponseEntity<Void> deleteComment(@PathVariable int commentId) {
         commentService.deleteComment(commentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -50,9 +46,21 @@ public class CommentController {
         if (comment == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            commentService.editComment(comment, new ContentObjDto(10000, content));
+            commentService.editComment(comment, new ContentObjDto(comment.getAuthorId(), content));
             return new ResponseEntity<>(comment, HttpStatus.OK);
         }
+    }
+
+    @RequestMapping(value = "/comments/{commentId}/like")
+    ResponseEntity<Void> likeComment(@PathVariable Integer id) {
+        commentService.incrementCommentRating(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/comments/{commentId}/dislike")
+    ResponseEntity<Void> dislikeComment(@PathVariable Integer id) {
+        commentService.decrementCommentRating(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
