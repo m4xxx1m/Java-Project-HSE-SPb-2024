@@ -70,7 +70,7 @@ fun PostCard(post: Post) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
-                        Text(text = post.user.name)
+                        Text(text = post.user?.name ?: "")
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(text = post.dateTime.toString())
                     }
@@ -78,27 +78,35 @@ fun PostCard(post: Post) {
                 Spacer(Modifier.height(7.dp))
                 val tagsDragState = rememberLazyListState()
                 val tagsDragCoroutineScope = rememberCoroutineScope()
-                LazyRow(
-                    state = tagsDragState,
-                    modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
-                        .draggable(
-                            orientation = Orientation.Horizontal,
-                            state = rememberDraggableState { delta ->
-                                tagsDragCoroutineScope.launch {
-                                    tagsDragState.scrollBy(-delta)
-                                }
-                            })
-                ) {
-                    items(post.tags) { tag ->
-                        Card(
-                            backgroundColor = Color.Gray
-                        ) {
-                            Text(tag.name, color = Color.White, modifier = Modifier.padding(3.dp))
+                if (post.tags.isNotEmpty()) {
+                    LazyRow(
+                        state = tagsDragState,
+                        modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
+                            .draggable(
+                                orientation = Orientation.Horizontal,
+                                state = rememberDraggableState { delta ->
+                                    tagsDragCoroutineScope.launch {
+                                        tagsDragState.scrollBy(-delta)
+                                    }
+                                })
+                    ) {
+                        items(post.tags) { tag ->
+                            Card(
+                                backgroundColor = Color.Gray
+                            ) {
+                                Text(
+                                    tag.name,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(3.dp)
+                                )
+                            }
+                            Spacer(Modifier.width(5.dp))
                         }
-                        Spacer(Modifier.width(5.dp))
                     }
                 }
-                Text(post.title, style = MaterialTheme.typography.h6)
+                if (post.title.isNotEmpty()) {
+                    Text(post.title, style = MaterialTheme.typography.h6)
+                }
                 Text(post.text)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = {}) {

@@ -41,7 +41,7 @@ fun NotificationWidget(notification: Notification) {
             )
             Spacer(Modifier.size(13.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(notification.answerPost.user.name, 
+                Text(notification.answerPost.user?.name ?: "", 
                     fontSize = TextUnit(16f, TextUnitType.Sp))
                 Spacer(Modifier.size(3.dp))
                 Column(

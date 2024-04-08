@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 data class Post(
     val id: Int,
-    val user: User,
+    val userId: Int,
     val dateTime: LocalDateTime,
     val tags: List<Tag>,
     val title: String,
@@ -12,4 +12,6 @@ data class Post(
     val imagesUrl: List<String>,
     val likesCount: Int,
     val commentsCount: Int
-)
+) {
+    var user: User? = null
+}

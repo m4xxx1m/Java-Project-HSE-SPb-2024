@@ -83,7 +83,7 @@ fun previewPostCard() {
         PostCard(
             Post(
                 0,
-                User(0, "User name", ""),
+                0,
                 LocalDateTime.MIN,
                 listOf(
                     Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
@@ -116,7 +116,7 @@ fun previewNotificationWidget() {
                 0,
                 Post(
                     0,
-                    User(0, "User name", ""),
+                    0,
                     LocalDateTime.MIN,
                     emptyList(),
                     "Post title",
@@ -127,7 +127,7 @@ fun previewNotificationWidget() {
                 ),
                 Post(
                     0,
-                    User(0, "User name", ""),
+                    0,
                     LocalDateTime.MIN,
                     emptyList(),
                     "Post title",
