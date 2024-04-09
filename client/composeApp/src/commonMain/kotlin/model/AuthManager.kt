@@ -5,6 +5,12 @@ import navigation.MainNavigation
 import platform_depended.AuthStorage
 
 class AuthManager {
+    companion object {
+        private var currentUser_: User? = null
+        val currentUser: User
+            get() = currentUser_!!
+    }
+
     fun tryLogin(navigator: Navigator) {
         val token = AuthStorage.getToken()
         if (token != null) {
@@ -22,9 +28,10 @@ class AuthManager {
         }
     }
 
-    fun saveAuthData(login: String, password: String) {
+    fun saveAuthData(login: String, password: String, user: User?) {
         if (AuthStorage.getToken() == null) {
             AuthStorage.saveToken("$login|$password")
         }
+        currentUser_ = user
     }
 }
