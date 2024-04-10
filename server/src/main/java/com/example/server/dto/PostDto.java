@@ -10,7 +10,6 @@ public class PostDto extends ContentObjDto {
 
     public PostDto(int authorId, String title, String content, List<Integer> tagIds) {
         super(authorId, content);
-        this.title = title;
         this.tagIds = tagIds;
         this.title = title;
     }
@@ -21,10 +20,6 @@ public class PostDto extends ContentObjDto {
 
     public List<Integer> getTagIds() {
         return tagIds;
-    }
-
-    public String getTitle() {
-        return title;
     }
 
 }
