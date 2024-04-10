@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PostDto extends ContentObjDto {
-    private List<Integer> tagIds = new ArrayList<>();
-    private String title = "";
+
+    private final List<Integer> tagIds;
+    private final String title;
 
     public PostDto(int authorId, String title, String content, List<Integer> tagIds) {
         super(authorId, content);
         this.title = title;
         this.tagIds = tagIds;
+        this.title = title;
     }
 
     public String getTitle() {
@@ -19,6 +21,10 @@ public class PostDto extends ContentObjDto {
 
     public List<Integer> getTagIds() {
         return tagIds;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
 }
