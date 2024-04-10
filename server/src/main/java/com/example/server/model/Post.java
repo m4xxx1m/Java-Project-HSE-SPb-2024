@@ -8,6 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 public class Post extends ContentObj {
+
     private List<Integer> tagIds = new ArrayList<>();
 
     @Column(length = 255)
