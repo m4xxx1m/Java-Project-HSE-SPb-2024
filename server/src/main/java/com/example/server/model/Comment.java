@@ -2,7 +2,6 @@ package com.example.server.model;
 
 
 import jakarta.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "comments")
