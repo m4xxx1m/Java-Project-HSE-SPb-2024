@@ -1,32 +1,36 @@
 package com.example.server.service;
 
 
-import com.example.server.dto.ContentObjDto;
 import com.example.server.dto.PostDto;
-import com.example.server.model.Post;
-import com.example.server.model.Tag;
-import com.example.server.model.User;
+import com.example.server.model.*;
 import com.example.server.repository.CommentRepository;
 import com.example.server.repository.PostRepository;
 import com.example.server.repository.TagRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private SavedObjectService savedObjectService;
     
     @Autowired
     private TagRepository tagRepository;
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private RatedObjectService ratedObjectService;
 
     public Post addPost(PostDto postDto) {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
@@ -35,10 +39,14 @@ public class PostService {
     }
 
     public void deletePost(int id) {
-        List<Integer> commentIds = getPostById(id).getCommentIds();
-        for (int commentId : commentIds) {
-            commentRepository.deleteById(commentId);
+        List<Comment> comments = commentRepository.findByPostId(id);
+        for (Comment comment : comments) {
+            ratedObjectService.deleteRatingsOfObject(comment.getId());
+            savedObjectService.deleteSavedObjectForAllUsers(comment.getId());
+            commentRepository.delete(comment);
         }
+        ratedObjectService.deleteRatingsOfObject(id);
+        savedObjectService.deleteSavedObjectForAllUsers(id);
         postRepository.deleteById(id);
     }
 
@@ -52,6 +60,21 @@ public class PostService {
 
     public List<Post> getPosts() {
         return postRepository.findAll();
+    }
+
+    public List<Post> getPostsByPostIds(List<Integer> postIds) {
+        List<Post> posts = new ArrayList<>();
+        for (int postId : postIds) {
+            posts.add(postRepository.getReferenceById(postId));
+        }
+        return posts;
+    }
+
+    public List<Post> getPostsBySelectedTags(List<Integer> tagIds) {
+        List<Post> posts = getPosts();
+        return posts.stream()
+                .filter(post -> post.getTagIds().stream().anyMatch(tagIds::contains))
+                .collect(Collectors.toList());
     }
     
     public List<Tag> getPostTags(int id) {
@@ -68,27 +91,37 @@ public class PostService {
         }
     }
 
-    public void incrementPostRating(int id) {
+    public void incrementPostRating(int id, int userId) {
         Post post = getPostById(id);
-        post.incrementRating();
-    }
-
-    public void decrementPostRating(int id) {
-        Post post = getPostById(id);
-        post.decrementRating();
-    }
-
-    public void addCommentId(int postId, int commentId) {
-        Post post = getPostById(postId);
-        List<Integer> commentIds = post.getCommentIds();
-        commentIds.add(commentId);
-        post.setCommentIds(commentIds);
+        Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, id);
+        if (rating.isEmpty()) {
+            ratedObjectService.rateObject(userId, id, RatedObject.Type.LIKE);
+            post.incrementRating();
+        } else if (rating.get() == RatedObject.Type.LIKE) {
+            ratedObjectService.deleteObjectRating(userId, id);
+            post.decrementRating();
+        } else {
+            ratedObjectService.changeRating(userId, id);
+            post.incrementRating();
+            post.incrementRating();
+        }
         postRepository.save(post);
     }
 
-    public void deleteCommentId(int postId, int commentId) {
-        Post post = getPostById(postId);
-        post.getCommentIds().removeIf(x -> x == commentId);
+    public void decrementPostRating(int id, int userId) {
+        Post post = getPostById(id);
+        Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, id);
+        if (rating.isEmpty()) {
+            ratedObjectService.rateObject(userId, id, RatedObject.Type.DISLIKE);
+            post.decrementRating();
+        } else if (rating.get() == RatedObject.Type.DISLIKE) {
+            ratedObjectService.deleteObjectRating(userId, id);
+            post.incrementRating();
+        } else {
+            ratedObjectService.changeRating(userId, id);
+            post.decrementRating();
+            post.decrementRating();
+        }
         postRepository.save(post);
     }
 
