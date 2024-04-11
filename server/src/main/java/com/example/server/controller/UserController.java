@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Set;
+
 @RestController
 public class UserController {
 
@@ -59,9 +62,9 @@ public class UserController {
     //    "bio": "newBio",
     //    "resumeUrl": "newResumeUrl"
     // }' \
-    // http://localhost:8080/users/1
-    //                            ^ user id here
-    @PutMapping("/users/{userId}")
+    // http://localhost:8080/users/update/1
+    //                                    ^ user id here
+    @PutMapping("/users/update/{userId}")
     public User updateUser(@PathVariable Integer userId, @RequestBody UserUpdateDto updateDto) {
         return userService.updateUser(userId, updateDto);
     }
@@ -69,5 +72,15 @@ public class UserController {
     @PostMapping("/users/{subscriberId}/subscribe/{subscribeToId}")
     public Subscription subscribe(@PathVariable Integer subscriberId, @PathVariable Integer subscribeToId) {
         return subscriptionService.subscribe(subscriberId, subscribeToId);
+    }
+
+    @GetMapping("/users/getUser/{userId}")
+    public User getUser(@PathVariable Integer userId) {
+        return userService.getUser(userId);
+    }
+
+    @PostMapping("/users/getUsersList")
+    public List<User> getUsersList(@RequestBody Set<Integer> userIds) {
+        return userService.getUsersList(userIds);
     }
 }

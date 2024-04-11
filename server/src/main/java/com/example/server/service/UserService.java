@@ -12,6 +12,8 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -78,5 +80,13 @@ public class UserService {
         user.setResumeUrl(updateDto.getResumeUrl());
 
         return userRepository.save(user);
+    }
+
+    public User getUser(Integer userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    public List<User> getUsersList(Set<Integer> userIds) {
+        return userRepository.findAllById(userIds);
     }
 }
