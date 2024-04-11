@@ -3,7 +3,9 @@ package com.example.server.controller;
 import com.example.server.dto.UserLoginDto;
 import com.example.server.dto.UserRegistrationDto;
 import com.example.server.dto.UserUpdateDto;
+import com.example.server.model.Subscription;
 import com.example.server.model.User;
+import com.example.server.service.SubscriptionService;
 import com.example.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,10 +19,12 @@ import java.util.Set;
 public class UserController {
 
     private final UserService userService;
+    private final SubscriptionService subscriptionService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, SubscriptionService subscriptionService) {
         this.userService = userService;
+        this.subscriptionService = subscriptionService;
     }
 
     // example of usage:
@@ -41,6 +45,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
     // example of usage:
     // curl -X PUT -H "Content-Type: application/json" \
     // -d '{
@@ -62,6 +67,11 @@ public class UserController {
     @PutMapping("/users/update/{userId}")
     public User updateUser(@PathVariable Integer userId, @RequestBody UserUpdateDto updateDto) {
         return userService.updateUser(userId, updateDto);
+    }
+
+    @PostMapping("/users/{subscriberId}/subscribe/{subscribeToId}")
+    public Subscription subscribe(@PathVariable Integer subscriberId, @PathVariable Integer subscribeToId) {
+        return subscriptionService.subscribe(subscriberId, subscribeToId);
     }
 
     @GetMapping("/users/getUser/{userId}")
