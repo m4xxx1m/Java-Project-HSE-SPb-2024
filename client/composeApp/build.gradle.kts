@@ -89,7 +89,8 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
+            modules("java.instrument", "java.prefs", "java.sql", "jdk.unsupported")
             packageName = "ru.hse.project"
             packageVersion = "1.0.0"
         }

@@ -11,12 +11,13 @@ class AuthManager {
             get() = currentUser_!!
     }
 
-    fun tryLogin(navigator: Navigator) {
+    fun tryLogin(navigator: Navigator) : Boolean {
         val token = AuthStorage.getToken()
         if (token != null) {
             val tokenList = token.split('|')
             if (tokenList.size != 2) {
-                return
+                AuthStorage.clearToken()
+                return false
             }
             val login = tokenList[0]
             val password = tokenList[1]
@@ -25,7 +26,9 @@ class AuthManager {
                 navigator.popAll()
                 navigator.replace(MainNavigation())
             }
+            return true
         }
+        return false
     }
 
     fun saveAuthData(login: String, password: String, user: User?) {

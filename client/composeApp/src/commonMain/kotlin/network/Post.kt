@@ -11,8 +11,8 @@ data class Post(
     val title: String,
     val content: String,
     val rating: Int,
-    val commentIds: List<Int>,
-    val tagIds: List<Int>
+    val tagIds: List<Int>,
+    val commentsCount: Int
 ) {
     fun convertPost(): Post {
         return Post(
@@ -24,7 +24,7 @@ data class Post(
             content,
             emptyList(),
             rating,
-            commentIds.size
+            commentsCount
         )
     }
 }

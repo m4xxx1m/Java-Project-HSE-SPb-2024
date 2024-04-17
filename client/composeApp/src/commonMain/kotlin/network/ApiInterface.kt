@@ -34,7 +34,7 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @GET("user/{userId}")
     fun getUser(@Path("userId") userId: Int): Call<User>
-    
+
     @Headers("Content-Type:application/json")
     @POST("users/getUsersList")
     fun getUsersList(@Body userIds: Set<Int>): Call<List<User>>
