@@ -10,17 +10,18 @@ import java.util.List;
 public class Post extends ContentObj {
 
     private List<Integer> tagIds = new ArrayList<>();
-
     @Column(length = 255)
     private String title;
+    private int commentsCount;
 
     public Post() {
         super();
     }
-    public Post(int authorId, String title, String content, List<Integer> tagIds) {
+    public Post(int authorId, String title, String content, List<Integer> tagIds, int commentsCount) {
         super(authorId, content);
         this.title = title;
         this.tagIds = tagIds;
+        this.commentsCount = commentsCount;
     }
 
     public List<Integer> getTagIds() {
