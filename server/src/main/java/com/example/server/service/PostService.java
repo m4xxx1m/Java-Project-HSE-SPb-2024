@@ -34,7 +34,7 @@ public class PostService {
 
     public Post addPost(PostDto postDto) {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
-                postDto.getContent(), postDto.getTagIds());
+                postDto.getContent(), postDto.getTagIds(), postDto.getCommentsCount());
         return postRepository.save(post);
     }
 
