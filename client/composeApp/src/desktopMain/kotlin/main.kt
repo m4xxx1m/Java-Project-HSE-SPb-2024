@@ -28,7 +28,7 @@ import ui.UserProfileCard
 import java.time.LocalDateTime
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "KotlinProject") {
+    Window(onCloseRequest = ::exitApplication, title = "Internfon") {
         App()
     }
 }

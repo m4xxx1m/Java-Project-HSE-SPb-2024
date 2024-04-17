@@ -28,7 +28,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import model.AuthManager
 import model.SignInManager
 import navigation.MainNavigation
 
@@ -37,8 +36,6 @@ class SignInScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         SignInForm(navigator)
-        val authManager = AuthManager()
-        authManager.tryLogin(navigator)
     }
 }
 
