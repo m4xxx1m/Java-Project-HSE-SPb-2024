@@ -11,7 +11,7 @@ class AuthManager {
             get() = currentUser_!!
     }
 
-    fun tryLogin(navigator: Navigator) : Boolean {
+    fun tryLogin(navigator: Navigator, onError: (() -> Unit)?) : Boolean {
         val token = AuthStorage.getToken()
         if (token != null) {
             val tokenList = token.split('|')
@@ -22,7 +22,7 @@ class AuthManager {
             val login = tokenList[0]
             val password = tokenList[1]
             val signInManager = SignInManager(login, password)
-            signInManager.signIn {
+            signInManager.signIn(onError) {
                 navigator.popAll()
                 navigator.replace(MainNavigation())
             }

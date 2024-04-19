@@ -43,11 +43,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import model.Post
+import navigation.CommentScreen
 
 @Composable
-fun PostCard(post: Post) {
+fun PostCard(post: Post, isInCommentsScreen: Boolean = false) {
+    val navigator = LocalNavigator.currentOrThrow.parent
     Card(
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
         elevation = 6.dp
@@ -116,14 +120,18 @@ fun PostCard(post: Post) {
                     IconButton(onClick = {}) {
                         Image(Icons.Rounded.KeyboardArrowDown, contentDescription = "Downvote post")
                     }
-                    Spacer(Modifier.width(5.dp))
-                    IconButton(onClick = {}) {
-                        Image(Icons.Rounded.Email, contentDescription = "Comments")
-                    }
-                    Text(post.commentsCount.toString())
-                    Spacer(Modifier.weight(1f))
-                    IconButton(onClick = {}) {
-                        Image(Icons.Rounded.Share, contentDescription = "Share")
+                    if (!isInCommentsScreen) {
+                        Spacer(Modifier.width(5.dp))
+                        IconButton(onClick = {
+                            navigator?.push(CommentScreen(post.id))
+                        }) {
+                            Image(Icons.Rounded.Email, contentDescription = "Comments")
+                        }
+                        Text(post.commentsCount.toString())
+                        Spacer(Modifier.weight(1f))
+                        IconButton(onClick = {}) {
+                            Image(Icons.Rounded.Share, contentDescription = "Share")
+                        }
                     }
                 }
             }

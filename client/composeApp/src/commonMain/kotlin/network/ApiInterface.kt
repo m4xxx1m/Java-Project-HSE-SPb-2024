@@ -38,4 +38,16 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("users/getUsersList")
     fun getUsersList(@Body userIds: Set<Int>): Call<List<User>>
+    
+    @Headers("Content-Type:application/json")
+    @GET("/post/{postId}/comments")
+    fun getComments(@Path("postId") postId: Int): Call<List<Comment>>
+
+    @Headers("Content-Type:application/json")
+    @GET("/post/{postId}")
+    fun getPost(@Path("postId") postId: Int): Call<Post>
+
+    @Headers("Content-Type:application/json")
+    @POST("/post/{postId}/addComment")
+    fun addComment(@Path("postId") postId: Int, @Body comment: CommentCreate): Call<Comment>
 }

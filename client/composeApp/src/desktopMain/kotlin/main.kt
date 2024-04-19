@@ -12,13 +12,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import model.Comment
 import model.Notification
 import model.Post
 import model.Tag
 import model.User
 import ui.ChooseInterestsForm
-import ui.CommentCard
 import ui.NewPostForm
 import ui.NotificationWidget
 import ui.PostCard
@@ -174,21 +172,21 @@ fun previewUserProfile() {
     }
 }
 
-@Preview
-@Composable
-fun previewComment() {
-    CommentCard(
-        Comment(
-            0,
-            User(0, "User name", ""),
-            LocalDateTime.MIN,
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-            emptyList(),
-            1000,
-        ),
-        true
-    )
-}
+//@Preview
+//@Composable
+//fun previewComment() {
+//    CommentCard(
+//        Comment(
+//            0,
+//            User(0, "User name", ""),
+//            LocalDateTime.MIN,
+//            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+//            emptyList(),
+//            1000,
+//        ),
+//        true
+//    )
+//}
 
 @Preview
 @Composable
