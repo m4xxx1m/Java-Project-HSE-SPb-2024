@@ -41,7 +41,7 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
                 Column() {
                     Row() {
                         Column(Modifier.weight(1f)) {
-                            Text(comment.user.name, fontSize = 18.sp)
+                            Text(comment.user?.name ?: "", fontSize = 18.sp)
                             Text(comment.text, fontSize = 14.sp)
                         }
                         Column() {
