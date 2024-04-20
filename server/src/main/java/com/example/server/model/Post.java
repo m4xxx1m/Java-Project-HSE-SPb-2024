@@ -1,6 +1,7 @@
 package com.example.server.model;
 
 import jakarta.persistence.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +14,16 @@ public class Post extends ContentObj {
     @Column(length = 255)
     private String title;
     private int commentsCount;
+    private String filePath;
 
     public Post() {
         super();
     }
-    public Post(int authorId, String title, String content, List<Integer> tagIds, int commentsCount) {
+    public Post(int authorId, String title, String content, List<Integer> tagIds) {
         super(authorId, content);
         this.title = title;
         this.tagIds = tagIds;
-        this.commentsCount = commentsCount;
+        this.commentsCount = 0;
     }
 
     public List<Integer> getTagIds() {
@@ -38,6 +40,30 @@ public class Post extends ContentObj {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
+
+    public void incrementCommentsCount() {
+        commentsCount++;
+    }
+
+    public void decrementCommentsCount() {
+        commentsCount--;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
 }

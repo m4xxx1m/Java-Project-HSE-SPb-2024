@@ -29,10 +29,13 @@ public class CommentService {
 
     public Comment addComment(ContentObjDto commentRequest, int postId) {
         Comment comment = new Comment(commentRequest.getAuthorId(), commentRequest.getContent(), postId);
+        postService.incrementCommentsCount(postId);
         return commentRepository.save(comment);
     }
 
     public void deleteComment(int id) {
+        Comment comment = getCommentById(id);
+        postService.decrementCommentsCount(comment.getPostId());
         ratedObjectService.deleteRatingsOfObject(id);
         savedObjectService.deleteSavedObjectForAllUsers(id);
         commentRepository.deleteById(id);
