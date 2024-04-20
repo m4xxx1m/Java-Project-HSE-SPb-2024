@@ -34,7 +34,8 @@ public class PostService {
 
     public Post addPost(PostDto postDto) {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
-                postDto.getContent(), postDto.getTagIds(), postDto.getCommentsCount());
+                postDto.getContent(), postDto.getTagIds());
+
         return postRepository.save(post);
     }
 
@@ -128,6 +129,18 @@ public class PostService {
     public void editPost(Post post, PostDto postDto) {
         post.setContent(postDto.getContent());
         post.setTagIds(postDto.getTagIds());
+        postRepository.save(post);
+    }
+
+    public void incrementCommentsCount(int id) {
+        Post post = getPostById(id);
+        post.incrementCommentsCount();
+        postRepository.save(post);
+    }
+
+    public void decrementCommentsCount(int id) {
+        Post post = getPostById(id);
+        post.decrementCommentsCount();
         postRepository.save(post);
     }
 
