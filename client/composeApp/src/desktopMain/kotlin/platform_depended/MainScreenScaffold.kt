@@ -21,6 +21,7 @@ import navigation.CreatePostTab
 import navigation.HomeTab
 import navigation.NotificationsTab
 import navigation.ProfileTab
+import navigation.RefreshButton
 import navigation.SubscriptionsTab
 import ui.SearchWidget
 
@@ -42,6 +43,7 @@ actual fun MainScreenScaffold(content: @Composable (PaddingValues) -> Unit) {
                     TabItem(ProfileTab)
                 }
                 Spacer(Modifier.weight(1f))
+                RefreshButton.Content()
                 Box(Modifier.weight(2f)) {
                     SearchWidget()
                 }
