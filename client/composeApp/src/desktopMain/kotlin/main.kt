@@ -26,7 +26,10 @@ import ui.UserProfileCard
 import java.time.LocalDateTime
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "Internfon") {
+    Window(
+        onCloseRequest = ::exitApplication, 
+        title = "Internfon"
+    ) {
         App()
     }
 }
@@ -168,7 +171,7 @@ fun previewUserProfile() {
         modifier = Modifier.fillMaxWidth().fillMaxHeight().background(Color.LightGray)
             .padding(10.dp)
     ) {
-        UserProfileCard(true, User(0, "User name", ""))
+        UserProfileCard(User(0, "User name", ""))
     }
 }
 

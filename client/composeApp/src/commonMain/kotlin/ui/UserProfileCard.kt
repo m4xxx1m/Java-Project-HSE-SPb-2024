@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,29 +41,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import model.AuthManager
 import model.User
 
 @Composable
-fun UserProfileCard(thisUser: Boolean, user: User) {
+fun UserProfileCard(user: User) {
+    val thisUser = user.id == AuthManager.currentUser.id
     val userProfile = user.getProfile()
     Card(
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
         elevation = 6.dp
     ) {
-        Column(Modifier.padding(10.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.clip(RoundedCornerShape(7.dp)).clickable { }) {
                     Image(
                         Icons.Rounded.Person, contentDescription = "User profile image",
-                        modifier = Modifier.size(80.dp).clip(CircleShape).background(Color.Red)
+                        modifier = Modifier.size(65.dp).clip(CircleShape).background(Color.Red)
                     )
                     Image(
                         Icons.Rounded.Edit, contentDescription = null,
-                        modifier = Modifier.size(18.dp).align(Alignment.BottomEnd)
+                        modifier = Modifier.size(15.dp).align(Alignment.BottomEnd)
                     )
                 }
                 Spacer(Modifier.size(20.dp))
-                Text(user.name, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                Text(user.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
             OutlinedCard("Contacts") {
                 Text(userProfile.contacts)
