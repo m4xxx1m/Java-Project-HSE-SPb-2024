@@ -14,7 +14,7 @@ public class Post extends ContentObj {
     @Column(length = 255)
     private String title;
     private int commentsCount;
-    private String filePath;
+    private int fileInfoId;
 
     public Post() {
         super();
@@ -24,6 +24,7 @@ public class Post extends ContentObj {
         this.title = title;
         this.tagIds = tagIds;
         this.commentsCount = 0;
+        this.fileInfoId = 0;
     }
 
     public List<Integer> getTagIds() {
@@ -58,12 +59,12 @@ public class Post extends ContentObj {
         commentsCount--;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public int getFileInfoId() {
+        return fileInfoId;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setFileInfoId(int fileInfoId) {
+        this.fileInfoId = fileInfoId;
     }
 
 }
