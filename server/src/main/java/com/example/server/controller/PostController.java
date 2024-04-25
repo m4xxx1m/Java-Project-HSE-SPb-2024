@@ -75,8 +75,12 @@ public class PostController {
 
     @RequestMapping("/post/{id}/delete")
     ResponseEntity<Void> deletePost(@PathVariable Integer id) {
-        postService.deletePost(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            postService.deletePost(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+        }
     }
 
     @RequestMapping(value = "/post/{id}/like")

@@ -2,6 +2,8 @@ package com.example.server.service;
 
 import com.example.server.model.FileInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import com.example.server.repository.FileInfoRepository;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +21,14 @@ import org.springframework.util.DigestUtils;
 @Service
 public class FileInfoService {
 
+    private final String DIRECTORY_PATH = "src/main/resources/files/";
+
     @Autowired
     private FileInfoRepository fileInfoRepository;
+
+    public FileInfo findById(int id) {
+        return fileInfoRepository.findById(id).orElse(null);
+    }
 
     public FileInfo upload(MultipartFile resource, int postId) throws IOException {
         String key = generateKey(resource.getName());
@@ -35,12 +43,31 @@ public class FileInfoService {
     }
 
     private void uploadFileData(byte[] fileData, String keyName) throws IOException {
-        String DIRECTORY_PATH = "src/main/resources/files/";
         Path path = Paths.get(DIRECTORY_PATH, keyName);
         Path file = Files.createFile(path);
         try (FileOutputStream stream = new FileOutputStream(file.toString())) {
             stream.write(fileData);
         }
     }
+
+    public Resource download(String key) throws IOException {
+        Path path = Paths.get(DIRECTORY_PATH + key);
+        Resource resource = new UrlResource(path.toUri());
+        if (resource.exists() || resource.isReadable()) {
+            return resource;
+        } else {
+            throw new IOException();
+        }
+    }
+
+    public void delete(int fileInfoId) throws IOException {
+        FileInfo fileInfo = fileInfoRepository.findById(fileInfoId).orElse(null);
+        assert fileInfo != null;
+        Path path = Paths.get(DIRECTORY_PATH + fileInfo.getKey());
+        Files.delete(path);
+    }
+
+    // TODO - requests
+    // TODO - connection with posts
 
 }

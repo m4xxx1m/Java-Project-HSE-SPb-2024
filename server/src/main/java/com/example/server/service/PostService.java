@@ -9,6 +9,7 @@ import com.example.server.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,14 +33,17 @@ public class PostService {
     @Autowired
     private RatedObjectService ratedObjectService;
 
+    @Autowired
+    FileInfoService fileInfoService;
+
     public Post addPost(PostDto postDto) {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
                 postDto.getContent(), postDto.getTagIds());
-
+        // TODO - file
         return postRepository.save(post);
     }
 
-    public void deletePost(int id) {
+    public void deletePost(int id) throws IOException {
         List<Comment> comments = commentRepository.findByPostId(id);
         for (Comment comment : comments) {
             ratedObjectService.deleteRatingsOfObject(comment.getId());
@@ -48,6 +52,10 @@ public class PostService {
         }
         ratedObjectService.deleteRatingsOfObject(id);
         savedObjectService.deleteSavedObjectForAllUsers(id);
+        int fileInfoId = getPostById(id).getFileInfoId();
+        if (fileInfoId != 0) {
+            fileInfoService.delete(fileInfoId);
+        }
         postRepository.deleteById(id);
     }
 
@@ -129,6 +137,7 @@ public class PostService {
     public void editPost(Post post, PostDto postDto) {
         post.setContent(postDto.getContent());
         post.setTagIds(postDto.getTagIds());
+        // TODO - file
         postRepository.save(post);
     }
 
