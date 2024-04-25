@@ -41,6 +41,8 @@ import model.User
 import network.ApiInterface
 import network.CommentCreate
 import network.RetrofitClient
+import platform_depended.Platform
+import platform_depended.getPlatform
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,7 +59,13 @@ class CommentScreen(private val postId: Int) : Screen {
         val coroutineScope = rememberCoroutineScope()
         Scaffold(
             topBar = {
-                BackButton(LocalNavigator.currentOrThrow)
+                Row(Modifier.fillMaxWidth()) {
+                    BackButton(LocalNavigator.currentOrThrow)
+                    if (getPlatform() == Platform.DESKTOP) {
+                        Spacer(Modifier.weight(1f))
+                        RefreshButton.Content()
+                    }
+                }
             },
             bottomBar = {
                 Box(
