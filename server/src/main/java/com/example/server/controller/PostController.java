@@ -4,6 +4,7 @@ package com.example.server.controller;
 import com.example.server.dto.PostDto;
 import com.example.server.model.Post;
 import com.example.server.model.SavedObject;
+import com.example.server.model.Tag;
 import com.example.server.service.PostService;
 import com.example.server.service.SavedObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 public class PostController {
@@ -80,15 +83,15 @@ public class PostController {
     }
 
     @RequestMapping(value = "/post/{id}/like")
-    ResponseEntity<Void> likePost(@PathVariable Integer id, @RequestParam("userId") int userId) {
-        postService.incrementPostRating(id, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    ResponseEntity<Integer> likePost(@PathVariable Integer id, @RequestParam("userId") int userId) {
+        int rating = postService.incrementPostRating(id, userId);
+        return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/post/{id}/dislike")
-    ResponseEntity<Void> dislikePost(@PathVariable Integer id,  @RequestParam("userId") int userId) {
-        postService.decrementPostRating(id, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    ResponseEntity<Integer> dislikePost(@PathVariable Integer id, @RequestParam("userId") int userId) {
+        int rating = postService.decrementPostRating(id, userId);
+        return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/post/{id}/save")
@@ -116,4 +119,14 @@ public class PostController {
         return new ResponseEntity<>(postService.getPostsByAuthorId(userId), HttpStatus.OK);
     }
 
+    @GetMapping("/getTags")
+    public List<Tag> getTags() {
+        return Stream.of(
+                        "C++", "Python", "Java",
+                        "JavaScript", "Go", "Yandex",
+                        "C++", "Python", "Java",
+                        "Tinkoff", "SberSeasons")
+                .map(Tag::new)
+                .collect(Collectors.toList());
+    }
 }
