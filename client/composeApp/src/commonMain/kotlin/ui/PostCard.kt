@@ -33,6 +33,7 @@ import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,11 +47,22 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
+import model.AuthManager
 import model.Post
 import navigation.CommentScreen
+import network.ApiInterface
+import network.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
-fun PostCard(post: Post, isInCommentsScreen: Boolean = false) {
+fun PostCard(
+    post: Post,
+    rating: Int,
+    isInCommentsScreen: Boolean = false,
+) {
+    val ratingState = remember { mutableStateOf(rating) }
     val navigator = LocalNavigator.currentOrThrow.parent
     Card(
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
@@ -99,7 +111,7 @@ fun PostCard(post: Post, isInCommentsScreen: Boolean = false) {
                                 backgroundColor = Color.Gray
                             ) {
                                 Text(
-                                    tag.name,
+                                    tag.tagName,
                                     color = Color.White,
                                     modifier = Modifier.padding(3.dp)
                                 )
@@ -113,11 +125,15 @@ fun PostCard(post: Post, isInCommentsScreen: Boolean = false) {
                 }
                 Text(post.text)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        likePost(post.id, ratingState)
+                    }) {
                         Image(Icons.Rounded.KeyboardArrowUp, contentDescription = "Upvote post")
                     }
-                    Text(post.likesCount.toString())
-                    IconButton(onClick = {}) {
+                    Text(ratingState.value.toString())
+                    IconButton(onClick = {
+                        dislikePost(post.id, ratingState)
+                    }) {
                         Image(Icons.Rounded.KeyboardArrowDown, contentDescription = "Downvote post")
                     }
                     if (!isInCommentsScreen) {
@@ -137,4 +153,32 @@ fun PostCard(post: Post, isInCommentsScreen: Boolean = false) {
             }
         }
     }
+}
+
+private fun likePost(postId: Int, rating: MutableState<Int>) {
+    val userId = AuthManager.currentUser.id
+    val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+    retrofitCall.likePost(postId, userId).enqueue(object : Callback<Int> {
+        override fun onResponse(call: Call<Int>, response: Response<Int>) {
+            response.body()?.let {
+                rating.value = it
+            }
+        }
+
+        override fun onFailure(call: Call<Int>, t: Throwable) {}
+    })
+}
+
+private fun dislikePost(postId: Int, rating: MutableState<Int>) {
+    val userId = AuthManager.currentUser.id
+    val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+    retrofitCall.dislikePost(postId, userId).enqueue(object : Callback<Int> {
+        override fun onResponse(call: Call<Int>, response: Response<Int>) {
+            response.body()?.let {
+                rating.value = it
+            }
+        }
+
+        override fun onFailure(call: Call<Int>, t: Throwable) {}
+    })
 }

@@ -10,7 +10,7 @@ data class Post(
     val title: String,
     val text: String,
     val imagesUrl: List<String>,
-    val likesCount: Int,
+    var likesCount: Int,
     val commentsCount: Int
 ) {
     var user: User? = null

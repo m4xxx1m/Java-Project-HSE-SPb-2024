@@ -118,7 +118,7 @@ class CommentScreen(private val postId: Int) : Screen {
                         item {
                             refreshHelper.value.post.value?.let { post ->
                                 post.user = refreshHelper.value.users[post.userId]
-                                PostCard(post, true)
+                                PostCard(post, post.likesCount, true)
                                 Spacer(Modifier.size(15.dp))
                             }
                         }
