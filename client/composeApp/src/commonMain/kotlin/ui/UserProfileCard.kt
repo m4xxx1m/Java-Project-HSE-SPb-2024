@@ -40,14 +40,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.User
+import navigation.TagSelectionScreen
 
 @Composable
 fun UserProfileCard(user: User) {
     val thisUser = user.id == AuthManager.currentUser.id
     val userProfile = user.getProfile()
+    val navigator = LocalNavigator.current?.parent
     Card(
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
         elevation = 6.dp
@@ -97,7 +100,7 @@ fun UserProfileCard(user: User) {
                                 backgroundColor = Color.Gray
                             ) {
                                 Text(
-                                    tag.name,
+                                    tag.tagName,
                                     color = Color.White,
                                     modifier = Modifier.padding(3.dp)
                                 )
@@ -106,7 +109,9 @@ fun UserProfileCard(user: User) {
                         }
                     }
                     if (thisUser) {
-                        IconButton(onClick = { }) {
+                        IconButton(onClick = {
+                            navigator?.push(TagSelectionScreen())
+                        }) {
                             Image(
                                 Icons.Rounded.Settings, contentDescription = "Edit tags",
                                 modifier = Modifier.size(25.dp)

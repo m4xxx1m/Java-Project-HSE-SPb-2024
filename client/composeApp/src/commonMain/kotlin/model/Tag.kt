@@ -1,3 +1,3 @@
 package model
 
-data class Tag(val id: Int, val name: String)
+data class Tag(val tagId: Int, val tagName: String)

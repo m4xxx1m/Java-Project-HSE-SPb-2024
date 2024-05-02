@@ -2,6 +2,7 @@ package network
 
 import model.SignInManager
 import model.SignUpManager
+import model.Tag
 import navigation.CreatePostManager
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -10,6 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiInterface {
     @Headers("Content-Type:application/json")
@@ -50,4 +52,16 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("/post/{postId}/addComment")
     fun addComment(@Path("postId") postId: Int, @Body comment: CommentCreate): Call<Comment>
+
+    @Headers("Content-Type:application/json")
+    @GET("/getTags")
+    fun getTags(): Call<List<Tag>>
+
+    @Headers("Content-Type:application/json")
+    @POST("/post/{postId}/like")
+    fun likePost(@Path("postId") postId: Int, @Query("userId") userId: Int): Call<Int>
+
+    @Headers("Content-Type:application/json")
+    @POST("/post/{postId}/dislike")
+    fun dislikePost(@Path("postId") postId: Int, @Query("userId") userId: Int): Call<Int>
 }

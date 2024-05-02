@@ -58,7 +58,7 @@ fun ChooseInterestsForm(tags: List<Tag>) {
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     tags.forEach { tag ->
-                        TagUi(tag)
+                        TagUi(tag, false)
                     }
                 }
             }
@@ -67,14 +67,14 @@ fun ChooseInterestsForm(tags: List<Tag>) {
 }
 
 @Composable
-fun TagUi(tag: Tag) {
-    val clicked = remember { mutableStateOf(false) }
+fun TagUi(tag: Tag, checked: Boolean) {
+    val clicked = remember { mutableStateOf(checked) }
     Row(
         modifier = Modifier.clip(RoundedCornerShape(10.dp))
             .clickable { clicked.value = !clicked.value }.background(Color.LightGray).padding(7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(tag.name, fontSize = TextUnit(18f, TextUnitType.Sp))
+        Text(tag.tagName, fontSize = TextUnit(18f, TextUnitType.Sp))
         if (!clicked.value) {
             Image(
                 Icons.Rounded.Add, contentDescription = "Add tag", modifier = Modifier

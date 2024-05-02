@@ -53,7 +53,7 @@ object HomeTab : Tab {
             ) {
                 items(refreshHelper.value.posts) { post ->
                     post.user = refreshHelper.value.users[post.userId]
-                    PostCard(post)
+                    PostCard(post, post.likesCount)
                     Spacer(Modifier.size(10.dp))
                 }
             }
@@ -82,7 +82,7 @@ private class RefreshHomeHelper : Refreshable() {
                     posts.clear()
                     val userIds = mutableSetOf<Int>()
                     response.body()?.let {
-                        posts.addAll(it.reversed().map { post ->
+                        posts.addAll(it.map { post ->
                             userIds.add(post.authorId)
                             post.convertPost()
                         })
