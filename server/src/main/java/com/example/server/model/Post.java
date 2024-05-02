@@ -40,4 +40,11 @@ public class Post extends ContentObj {
         this.title = title;
     }
 
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
 }

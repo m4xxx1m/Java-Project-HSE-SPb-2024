@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,12 @@ public class CommentService {
     private RatedObjectService ratedObjectService;
 
     public Comment addComment(ContentObjDto commentRequest, int postId) {
-        Comment comment = new Comment(commentRequest.getAuthorId(), commentRequest.getContent(), postId);
+        Comment comment = new Comment(
+                commentRequest.getAuthorId(),
+                commentRequest.getContent(),
+                postId
+        );
+        postService.changeCommentsCount(postId, 1);
         return commentRepository.save(comment);
     }
 
@@ -36,6 +42,10 @@ public class CommentService {
         ratedObjectService.deleteRatingsOfObject(id);
         savedObjectService.deleteSavedObjectForAllUsers(id);
         commentRepository.deleteById(id);
+        Comment comment = getCommentById(id);
+        if (comment != null) {
+            postService.changeCommentsCount(comment.getPostId(), -1);
+        }
     }
 
     public Comment getCommentById(int id) {
@@ -47,7 +57,9 @@ public class CommentService {
         if (post == null) {
             return null;
         } else {
-            return commentRepository.findByPostId(postId);
+            var comments = commentRepository.findByPostId(postId);
+            comments.sort(Comparator.comparing(Comment::getCreationTime));
+            return comments;
         }
     }
 

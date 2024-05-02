@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,7 +60,9 @@ public class PostService {
     }
 
     public List<Post> getPosts() {
-        return postRepository.findAll();
+        var posts = postRepository.findAll();
+        posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
+        return posts;
     }
 
     public List<Post> getPostsByPostIds(List<Integer> postIds) {
@@ -76,7 +79,7 @@ public class PostService {
                 .filter(post -> post.getTagIds().stream().anyMatch(tagIds::contains))
                 .collect(Collectors.toList());
     }
-    
+
     public List<Tag> getPostTags(int id) {
         Post post = getPostById(id);
         if (post == null) {
@@ -91,7 +94,7 @@ public class PostService {
         }
     }
 
-    public void incrementPostRating(int id, int userId) {
+    public int incrementPostRating(int id, int userId) {
         Post post = getPostById(id);
         Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, id);
         if (rating.isEmpty()) {
@@ -106,9 +109,10 @@ public class PostService {
             post.incrementRating();
         }
         postRepository.save(post);
+        return post.getRating();
     }
 
-    public void decrementPostRating(int id, int userId) {
+    public int decrementPostRating(int id, int userId) {
         Post post = getPostById(id);
         Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, id);
         if (rating.isEmpty()) {
@@ -123,6 +127,7 @@ public class PostService {
             post.decrementRating();
         }
         postRepository.save(post);
+        return post.getRating();
     }
 
     public void editPost(Post post, PostDto postDto) {
@@ -131,4 +136,10 @@ public class PostService {
         postRepository.save(post);
     }
 
+    public void changeCommentsCount(int postId, int delta) {
+        Post post = getPostById(postId);
+        if (post != null) {
+            post.setCommentsCount(post.getCommentsCount() + delta);
+        }
+    }
 }

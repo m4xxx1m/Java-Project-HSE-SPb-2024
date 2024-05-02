@@ -25,7 +25,7 @@ public class RatedObjectService {
 
     Optional<RatedObject.Type> getObjectRating(int userId, int objectId) {
         List<RatedObject> rating = ratedObjectRepository.findByUserIdAndObjectId(userId, objectId);
-        return Optional.ofNullable(rating.get(0).getType());
+        return Optional.ofNullable(!rating.isEmpty() ? rating.get(0).getType() : null);
     }
 
     void deleteObjectRating(int userId, int objectId) {
