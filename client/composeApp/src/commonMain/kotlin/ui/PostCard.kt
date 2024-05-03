@@ -45,7 +45,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.Post
@@ -59,11 +58,10 @@ import retrofit2.Response
 @Composable
 fun PostCard(
     post: Post,
-    rating: Int,
     isInCommentsScreen: Boolean = false,
 ) {
-    val ratingState = remember { mutableStateOf(rating) }
-    val navigator = LocalNavigator.currentOrThrow.parent
+    val ratingState = remember { mutableStateOf(post.likesCount) }
+    val navigator = LocalNavigator.current?.parent
     Card(
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
         elevation = 6.dp

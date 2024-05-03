@@ -20,7 +20,6 @@ import model.Notification
 import model.Post
 import model.Tag
 import platform_depended.AuthStorage
-import ui.ChooseInterestsForm
 import ui.NewPostForm
 import ui.NotificationWidget
 import ui.PostCard
@@ -44,17 +43,17 @@ class MainActivity : ComponentActivity() {
 //    SignUpUserDataForm()
 //}
 
-@Composable
-fun PreviewChooseInterestsScreen() {
-    val tags = listOf(Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")
-    )
-    ChooseInterestsForm(tags)
-}
+//@Composable
+//fun PreviewChooseInterestsScreen() {
+//    val tags = listOf(Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")
+//    )
+//    ChooseInterestsForm(tags)
+//}
 
 @Preview
 @Composable
