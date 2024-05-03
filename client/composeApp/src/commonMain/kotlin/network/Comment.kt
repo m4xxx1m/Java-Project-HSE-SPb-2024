@@ -19,7 +19,8 @@ data class Comment(
             creationTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
             content,
             emptyList(),
-            rating
+            rating,
+            postId
         )
     }
 }

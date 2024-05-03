@@ -16,7 +16,7 @@ import retrofit2.http.Query
 interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("register")
-    fun registerUser(@Body info: SignUpManager.UserSignUpBody): 
+    fun registerUser(@Body info: SignUpManager.UserSignUpBody):
             Call<User>
 
     @Headers("Content-Type:application/json")
@@ -40,7 +40,7 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("users/getUsersList")
     fun getUsersList(@Body userIds: Set<Int>): Call<List<User>>
-    
+
     @Headers("Content-Type:application/json")
     @GET("/post/{postId}/comments")
     fun getComments(@Path("postId") postId: Int): Call<List<Comment>>
@@ -64,4 +64,20 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("/post/{postId}/dislike")
     fun dislikePost(@Path("postId") postId: Int, @Query("userId") userId: Int): Call<Int>
+
+    @Headers("Content-Type:application/json")
+    @POST("/post/{postId}/comments/{commentId}/like")
+    fun likeComment(
+        @Path("postId") postId: Int,
+        @Path("commentId") commentId: Int,
+        @Query("userId") userId: Int
+    ): Call<Int>
+
+    @Headers("Content-Type:application/json")
+    @POST("/post/{postId}/comments/{commentId}/dislike")
+    fun dislikeComment(
+        @Path("postId") postId: Int,
+        @Path("commentId") commentId: Int,
+        @Query("userId") userId: Int
+    ): Call<Int>
 }

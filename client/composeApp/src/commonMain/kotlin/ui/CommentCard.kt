@@ -22,16 +22,26 @@ import androidx.compose.material.icons.rounded.MailOutline
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import model.AuthManager
 import model.Comment
+import network.ApiInterface
+import network.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
+    val rating = remember { mutableStateOf(comment.likesCount) }
     Card(elevation = 6.dp, modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
         Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
             Spacer(Modifier.width(35.dp))
@@ -39,13 +49,13 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
                 modifier = Modifier.size(35.dp).clip(CircleShape).background(Color.Red)
                     .clickable { })
             Spacer(Modifier.size(10.dp))
-            Column() {
-                Row() {
+            Column {
+                Row {
                     Column(Modifier.weight(1f)) {
                         Text(comment.user?.name ?: "", fontSize = 18.sp)
                         Text(comment.text, fontSize = 14.sp)
                     }
-                    Column() {
+                    Column {
                         Image(
                             Icons.Rounded.MoreVert,
                             contentDescription = "Show dropdown menu",
@@ -76,17 +86,53 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
                         Icons.Rounded.KeyboardArrowUp,
                         contentDescription = "Upvote comment",
                         modifier = Modifier.size(31.dp).padding(3.dp).clip(CircleShape)
-                            .clickable { }
+                            .clickable {
+                                likeComment(comment, rating)
+                            }
                     )
-                    Text(comment.likesCount.toString())
+                    Text(rating.value.toString())
                     Image(
                         Icons.Rounded.KeyboardArrowDown,
                         contentDescription = "Downvote comment",
                         modifier = Modifier.size(31.dp).padding(3.dp).clip(CircleShape)
-                            .clickable { }
+                            .clickable {
+                                dislikeComment(comment, rating)
+                            }
                     )
                 }
             }
         }
     }
+}
+
+private fun likeComment(comment: Comment, rating: MutableState<Int>) {
+    val userId = AuthManager.currentUser.id
+    val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+    retrofitCall.likeComment(comment.postId, comment.id, userId).enqueue(object : Callback<Int> {
+        override fun onResponse(call: Call<Int>, response: Response<Int>) {
+            if (response.code() == 200) {
+                response.body()?.let {
+                    rating.value = it
+                }
+            }
+        }
+
+        override fun onFailure(call: Call<Int>, t: Throwable) {}
+    })
+}
+
+private fun dislikeComment(comment: Comment, rating: MutableState<Int>) {
+    val userId = AuthManager.currentUser.id
+    val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+    retrofitCall.dislikeComment(comment.postId, comment.id, userId).enqueue(object : Callback<Int> {
+        override fun onResponse(call: Call<Int>, response: Response<Int>) {
+            if (response.code() == 200) {
+                response.body()?.let {
+                    rating.value = it
+                }
+            }
+        }
+
+        override fun onFailure(call: Call<Int>, t: Throwable) {}
+    })
 }

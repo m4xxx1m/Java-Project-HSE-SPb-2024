@@ -8,7 +8,8 @@ data class Comment(
     val dateTime: LocalDateTime,
     val text: String,
     val imagesUrl: List<String>,
-    val likesCount: Int
+    val likesCount: Int,
+    val postId: Int
 ) {
     var user: User? = null
 }

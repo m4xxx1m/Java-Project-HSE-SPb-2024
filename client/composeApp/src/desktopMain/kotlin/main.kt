@@ -14,9 +14,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import model.Notification
 import model.Post
-import model.Tag
 import model.User
-import ui.ChooseInterestsForm
 import ui.NewPostForm
 import ui.NotificationWidget
 import ui.SearchWidget
@@ -57,19 +55,19 @@ fun previewApp() {
 //    SignUpUserDataForm()
 //}
 
-@Preview
-@Composable
-fun previewChooseInterestsScreen() {
-    val tags = listOf(
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")
-    )
-    ChooseInterestsForm(tags)
-}
+//@Preview
+//@Composable
+//fun previewChooseInterestsScreen() {
+//    val tags = listOf(
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//        Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")
+//    )
+//    ChooseInterestsForm(tags)
+//}
 
 //@Preview
 //@Composable

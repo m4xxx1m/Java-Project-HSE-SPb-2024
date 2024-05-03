@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,8 +41,20 @@ object HomeTab : Tab {
             return TabOptions(index, title, icon)
         }
 
+    private var scrollState: Pair<Int, Int> = Pair(0, 0)
+
     @Composable
     override fun Content() {
+        val lazyListState =
+            rememberLazyListState(scrollState.first, scrollState.second)
+        DisposableEffect(scrollState) {
+            onDispose {
+                scrollState = Pair(
+                    lazyListState.firstVisibleItemIndex,
+                    lazyListState.firstVisibleItemScrollOffset
+                )
+            }
+        }
         val refreshHelper = remember { mutableStateOf(RefreshHomeHelper()) }
         RefreshableContent(refreshHelper) {
             LazyColumn(
@@ -49,11 +63,12 @@ object HomeTab : Tab {
                 contentPadding = PaddingValues(
                     top = 10.dp,
                     bottom = 10.dp
-                )
+                ),
+                state = lazyListState
             ) {
                 items(refreshHelper.value.posts) { post ->
                     post.user = refreshHelper.value.users[post.userId]
-                    PostCard(post, post.likesCount)
+                    PostCard(post)
                     Spacer(Modifier.size(10.dp))
                 }
             }
