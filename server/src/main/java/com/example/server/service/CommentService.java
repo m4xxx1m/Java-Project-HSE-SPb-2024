@@ -82,7 +82,7 @@ public class CommentService {
         return commentRepository.findAll();
     }
 
-    public void incrementCommentRating(int commentId, int userId) {
+    public int incrementCommentRating(int commentId, int userId) {
         Comment comment = getCommentById(commentId);
         Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, commentId);
         if (rating.isEmpty()) {
@@ -97,9 +97,10 @@ public class CommentService {
             comment.incrementRating();
         }
         commentRepository.save(comment);
+        return comment.getRating();
     }
 
-    public void decrementCommentRating(int commentId, int userId) {
+    public int decrementCommentRating(int commentId, int userId) {
         Comment comment = getCommentById(commentId);
         Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, commentId);
         if (rating.isEmpty()) {
@@ -114,6 +115,7 @@ public class CommentService {
             comment.decrementRating();
         }
         commentRepository.save(comment);
+        return comment.getRating();
     }
 
     public void editComment(Comment comment, ContentObjDto commentDto) {
