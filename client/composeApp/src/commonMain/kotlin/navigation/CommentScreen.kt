@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
@@ -38,7 +40,6 @@ import model.AuthManager
 import model.Comment
 import model.Post
 import model.User
-import network.ApiInterface
 import network.CommentCreate
 import network.RetrofitClient
 import platform_depended.Platform
@@ -52,80 +53,88 @@ import ui.PostCard
 class CommentScreen(private val postId: Int) : Screen {
     private var commentText: MutableState<String>? = null
 
+    private var lazyColumnState: LazyListState? = null
+
     @Composable
     override fun Content() {
-        commentText = remember { mutableStateOf("") }
-        val refreshHelper = remember { mutableStateOf(RefreshCommentsHelper()) }
-        val coroutineScope = rememberCoroutineScope()
-        Scaffold(
-            topBar = {
-                Row(Modifier.fillMaxWidth()) {
-                    BackButton(LocalNavigator.currentOrThrow)
-                    if (getPlatform() == Platform.DESKTOP) {
-                        Spacer(Modifier.weight(1f))
-                        RefreshButton.Content()
+        if (lazyColumnState == null) {
+            lazyColumnState = rememberLazyListState()
+        }
+        lazyColumnState?.let {
+            commentText = remember { mutableStateOf("") }
+            val refreshHelper = remember { mutableStateOf(RefreshCommentsHelper()) }
+            val coroutineScope = rememberCoroutineScope()
+            Scaffold(
+                topBar = {
+                    Row(Modifier.fillMaxWidth()) {
+                        BackButton(LocalNavigator.currentOrThrow)
+                        if (getPlatform() == Platform.DESKTOP) {
+                            Spacer(Modifier.weight(1f))
+                            RefreshButton.Content()
+                        }
                     }
-                }
-            },
-            bottomBar = {
-                Box(
-                    modifier = Modifier.fillMaxWidth().background(Color.White).padding(7.dp),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    Row(
-                        modifier = Modifier.widthIn(max = 500.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                },
+                bottomBar = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().background(Color.White).padding(7.dp),
+                        contentAlignment = Alignment.BottomCenter
                     ) {
-                        OutlinedTextField(
-                            modifier = Modifier.weight(1f),
-                            value = commentText?.value ?: "",
-                            onValueChange = {
-                                commentText?.value = it
-                            },
-                            label = {
-                                Text("Comment")
-                            }
-                        )
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    refreshHelper.value.sendComment()
-                                }
-                            },
-                            enabled = commentText?.value?.isNotEmpty() ?: false
+                        Row(
+                            modifier = Modifier.widthIn(max = 500.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Image(Icons.Rounded.Send, contentDescription = "Send comment")
+                            OutlinedTextField(
+                                modifier = Modifier.weight(1f),
+                                value = commentText?.value ?: "",
+                                onValueChange = {
+                                    commentText?.value = it
+                                },
+                                label = {
+                                    Text("Comment")
+                                }
+                            )
+                            IconButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        refreshHelper.value.sendComment()
+                                    }
+                                },
+                                enabled = commentText?.value?.isNotEmpty() ?: false
+                            ) {
+                                Image(Icons.Rounded.Send, contentDescription = "Send comment")
+                            }
                         }
                     }
                 }
-            }
-        ) { innerPadding ->
-            Box(
-                Modifier.padding(
-                    bottom = innerPadding.calculateBottomPadding(),
-                    top = innerPadding.calculateTopPadding()
-                )
-            ) {
-                RefreshableContent(refreshHelper) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        contentPadding = PaddingValues(
-                            top = 10.dp,
-                            bottom = 10.dp
-                        )
-                    ) {
-                        item {
-                            refreshHelper.value.post.value?.let { post ->
-                                post.user = refreshHelper.value.users[post.userId]
-                                PostCard(post, true)
-                                Spacer(Modifier.size(15.dp))
+            ) { innerPadding ->
+                Box(
+                    Modifier.padding(
+                        bottom = innerPadding.calculateBottomPadding(),
+                        top = innerPadding.calculateTopPadding()
+                    )
+                ) {
+                    RefreshableContent(refreshHelper) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            contentPadding = PaddingValues(
+                                top = 10.dp,
+                                bottom = 10.dp
+                            ),
+                            state = it
+                        ) {
+                            item {
+                                refreshHelper.value.post.value?.let { post ->
+                                    post.user = refreshHelper.value.users[post.userId]
+                                    PostCard(post, true)
+                                    Spacer(Modifier.size(15.dp))
+                                }
                             }
-                        }
-                        items(refreshHelper.value.comments) { comment ->
-                            comment.user = refreshHelper.value.users[comment.authorId]
-                            CommentCard(comment)
-                            Spacer(Modifier.size(10.dp))
+                            items(refreshHelper.value.comments) { comment ->
+                                comment.user = refreshHelper.value.users[comment.authorId]
+                                CommentCard(comment)
+                                Spacer(Modifier.size(10.dp))
+                            }
                         }
                     }
                 }
@@ -137,7 +146,9 @@ class CommentScreen(private val postId: Int) : Screen {
         val post = mutableStateOf<Post?>(null)
         val comments = mutableStateListOf<Comment>()
         val users = mutableStateMapOf<Int, User>()
-        val retrofitCall: ApiInterface = RetrofitClient.retrofit.create(ApiInterface::class.java)
+
+        // val retrofitCall: ApiInterface = RetrofitClient.retrofit.create(ApiInterface::class.java)
+        val retrofitCall = RetrofitClient.retrofitCall
 
         fun sendComment() {
             if (commentText == null) {

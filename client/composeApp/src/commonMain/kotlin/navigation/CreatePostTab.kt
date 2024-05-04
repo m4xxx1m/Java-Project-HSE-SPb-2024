@@ -7,7 +7,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import model.AuthManager
-import network.ApiInterface
 import network.RetrofitClient
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -33,9 +32,10 @@ object CreatePostTab: Tab {
 
 class CreatePostManager {
     fun createPost(title: String, text: String, tags: List<Int>, clearFields: () -> Unit) {
-        val call = RetrofitClient.retrofit.create(ApiInterface::class.java)
+//        val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+        val retrofitCall = RetrofitClient.retrofitCall
         val createPostInfo = CreatePostBody(AuthManager.currentUser.id, title, text, emptyList())
-        call.createPost(createPostInfo).enqueue(object : Callback<ResponseBody> {
+        retrofitCall.createPost(createPostInfo).enqueue(object : Callback<ResponseBody> {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 println("failure on creating post")
             }

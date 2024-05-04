@@ -1,6 +1,5 @@
 package model
 
-import network.ApiInterface
 import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -11,9 +10,10 @@ class SignInManager(
     private val password: String
 ) {
     fun signIn(onError: (() -> Unit)? = null, onSuccess: () -> Unit) {
-        val call = RetrofitClient.retrofit.create(ApiInterface::class.java)
+//        val call = RetrofitClient.retrofit.create(ApiInterface::class.java)
+        val retrofitCall = RetrofitClient.retrofitCall
         val registerInfo = UserSignInBody(username, password)
-        call.loginUser(registerInfo).enqueue(object : Callback<network.User> {
+        retrofitCall.loginUser(registerInfo).enqueue(object : Callback<network.User> {
             override fun onFailure(call: Call<network.User>, t: Throwable) {
                 println("failure")
                 onError?.let { 

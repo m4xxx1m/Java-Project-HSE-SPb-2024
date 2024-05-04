@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -32,6 +33,8 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,99 +43,149 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.User
+import model.UserProfile
 import navigation.TagSelectionScreen
+import network.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
-fun UserProfileCard(user: User) {
+fun UserProfileCard(user: User, navigator: Navigator? = null) {
     val thisUser = user.id == AuthManager.currentUser.id
-    val userProfile = user.getProfile()
-    val navigator = LocalNavigator.current?.parent
-    Card(
-        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
-        elevation = 6.dp
-    ) {
-        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.clip(RoundedCornerShape(7.dp)).clickable { }) {
-                    Image(
-                        Icons.Rounded.Person, contentDescription = "User profile image",
-                        modifier = Modifier.size(65.dp).clip(CircleShape).background(Color.Red)
-                    )
-                    Image(
-                        Icons.Rounded.Edit, contentDescription = null,
-                        modifier = Modifier.size(15.dp).align(Alignment.BottomEnd)
-                    )
+    val userProfile = remember { mutableStateOf<UserProfile?>(null) }
+    if (userProfile.value == null) {
+        user.setProfile(userProfile)
+    }
+    userProfile.value?.let { profile ->
+        Card(
+            modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
+            elevation = 6.dp
+        ) {
+            Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.clip(RoundedCornerShape(7.dp)).clickable { }) {
+                        Image(
+                            Icons.Rounded.Person, contentDescription = "User profile image",
+                            modifier = Modifier.size(65.dp).clip(CircleShape).background(Color.Red)
+                        )
+                        Image(
+                            Icons.Rounded.Edit, contentDescription = null,
+                            modifier = Modifier.size(15.dp).align(Alignment.BottomEnd)
+                        )
+                    }
+                    Spacer(Modifier.size(20.dp))
+                    Text(user.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 }
-                Spacer(Modifier.size(20.dp))
-                Text(user.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            }
-            OutlinedCard("Contacts") {
-                Text(userProfile.contacts)
-            }
-            OutlinedCard("About me") {
-                Text(userProfile.about)
-            }
-            SubscriptionsCard(userProfile.subscriptions)
-            OutlinedCard("Tags") {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    val tagsDragState = rememberLazyListState()
-                    val tagsDragCoroutineScope = rememberCoroutineScope()
-                    LazyRow(
-                        state = tagsDragState,
-                        modifier = Modifier.weight(1f)
-                            .draggable(
-                                orientation = Orientation.Horizontal,
-                                state = rememberDraggableState { delta ->
-                                    tagsDragCoroutineScope.launch {
-                                        tagsDragState.scrollBy(-delta)
+                if (thisUser) {
+                    TextFieldCard("Contacts", profile.contacts) {
+                        RetrofitClient.retrofitCall.updateCity(user.id, it)
+                            .enqueue(object : Callback<Void> {
+                                override fun onResponse(
+                                    call: Call<Void>,
+                                    response: Response<Void>
+                                ) {
+                                    if (response.code() != 200) {
+                                        println("Wrong code while updating contacts")
                                     }
-                                })
+                                }
+
+                                override fun onFailure(call: Call<Void>, t: Throwable) {
+                                    println("Failure while updating contacts")
+                                }
+                            })
+                    }
+                    TextFieldCard("About me", profile.about) {
+                        RetrofitClient.retrofitCall.updateBio(user.id, it)
+                            .enqueue(object : Callback<Void> {
+                                override fun onResponse(
+                                    call: Call<Void>,
+                                    response: Response<Void>
+                                ) {
+                                    if (response.code() != 200) {
+                                        println("Wrong code while updating bio")
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<Void>, t: Throwable) {
+                                    println("Wrong code while updating bio")
+                                }
+                            })
+                    }
+                } else {
+                    OutlinedCard("Contacts") {
+                        SelectionContainer {
+                            Text(profile.contacts)
+                        }
+                    }
+                    OutlinedCard("About me") {
+                        SelectionContainer {
+                            Text(profile.about)
+                        }
+                    }
+                }
+                SubscriptionsCard(profile.subscriptions, thisUser)
+                OutlinedCard("Tags") {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        items(userProfile.tags) { tag ->
-                            Card(
-                                backgroundColor = Color.Gray
-                            ) {
-                                Text(
-                                    tag.tagName,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(3.dp)
+                        val tagsDragState = rememberLazyListState()
+                        val tagsDragCoroutineScope = rememberCoroutineScope()
+                        LazyRow(
+                            state = tagsDragState,
+                            modifier = Modifier.weight(1f)
+                                .draggable(
+                                    orientation = Orientation.Horizontal,
+                                    state = rememberDraggableState { delta ->
+                                        tagsDragCoroutineScope.launch {
+                                            tagsDragState.scrollBy(-delta)
+                                        }
+                                    })
+                        ) {
+                            items(profile.tags) { tag ->
+                                Card(
+                                    backgroundColor = Color.Gray
+                                ) {
+                                    Text(
+                                        tag.tagName,
+                                        color = Color.White,
+                                        modifier = Modifier.padding(3.dp)
+                                    )
+                                }
+                                Spacer(Modifier.width(5.dp))
+                            }
+                        }
+                        if (thisUser) {
+                            IconButton(onClick = {
+                                navigator?.push(TagSelectionScreen())
+                            }) {
+                                Image(
+                                    Icons.Rounded.Settings, contentDescription = "Edit tags",
+                                    modifier = Modifier.size(25.dp)
                                 )
                             }
-                            Spacer(Modifier.width(5.dp))
-                        }
-                    }
-                    if (thisUser) {
-                        IconButton(onClick = {
-                            navigator?.push(TagSelectionScreen())
-                        }) {
-                            Image(
-                                Icons.Rounded.Settings, contentDescription = "Edit tags",
-                                modifier = Modifier.size(25.dp)
-                            )
                         }
                     }
                 }
-            }
-            OutlinedCard("") {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("My CV", modifier = Modifier.weight(1f))
-                    if (thisUser) {
-                        IconButton(onClick = { }) {
-                            Image(Icons.Rounded.Edit, contentDescription = null)
+                OutlinedCard("") {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("My CV", modifier = Modifier.weight(1f))
+                        if (thisUser) {
+                            IconButton(onClick = { }) {
+                                Image(Icons.Rounded.Edit, contentDescription = null)
+                            }
+                            IconButton(onClick = { }) {
+                                Image(Icons.Rounded.Add, contentDescription = null)
+                            }
                         }
                         IconButton(onClick = { }) {
-                            Image(Icons.Rounded.Add, contentDescription = null)
+                            Image(Icons.Rounded.Info, contentDescription = null)
                         }
-                    }
-                    IconButton(onClick = { }) {
-                        Image(Icons.Rounded.Info, contentDescription = null)
                     }
                 }
             }

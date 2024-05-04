@@ -27,7 +27,7 @@ fun OutlinedCard(label: String?, content: @Composable () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             border = BorderStroke(2.dp, Color.Black)
         ) {
-            Box(modifier = Modifier.padding(10.dp)) {
+            Box(modifier = Modifier.padding(10.dp).fillMaxWidth()) {
                 content()
             }
         }
