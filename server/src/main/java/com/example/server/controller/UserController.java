@@ -83,4 +83,14 @@ public class UserController {
     public List<User> getUsersList(@RequestBody Set<Integer> userIds) {
         return userService.getUsersList(userIds);
     }
+
+    @PostMapping("/users/{userId}/updateCity")
+    public void updateCity(@PathVariable Integer userId, @RequestParam("city") String city) {
+        userService.updateUserCity(userId, city);
+    }
+
+    @PostMapping("/users/{userId}/updateBio")
+    public void updateBio(@PathVariable Integer userId, @RequestParam("bio") String bio) {
+        userService.updateUserBio(userId, bio);
+    }
 }
