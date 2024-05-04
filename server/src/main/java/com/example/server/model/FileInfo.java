@@ -10,18 +10,18 @@ public class FileInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String fileName;
-    private long size;
     private String key;
     private int postId;
+    private String fileType;
 
     public FileInfo() {
     }
 
-    public FileInfo(String fileName, long size, String key, int postId) {
+    public FileInfo(String fileName, String key, int postId, String fileType) {
         this.fileName = fileName;
-        this.size = size;
         this.key = key;
         this.postId = postId;
+        this.fileType = fileType;
     }
 
     public int getId() {
@@ -35,15 +35,6 @@ public class FileInfo {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
     public String getKey() {
         return key;
     }
@@ -58,5 +49,8 @@ public class FileInfo {
 
     public void setPostId(int postId) {
         this.postId = postId;
+    }
+    public String getFileType() {
+        return fileType;
     }
 }

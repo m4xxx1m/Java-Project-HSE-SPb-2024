@@ -1,7 +1,6 @@
 package com.example.server.model;
 
 import jakarta.persistence.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,20 +10,22 @@ import java.util.List;
 public class Post extends ContentObj {
 
     private List<Integer> tagIds = new ArrayList<>();
-    @Column(length = 255)
+
     private String title;
     private int commentsCount;
-    private int fileInfoId;
+
+    @OneToOne
+    private FileInfo fileInfo;
 
     public Post() {
         super();
     }
-    public Post(int authorId, String title, String content, List<Integer> tagIds) {
+    public Post(int authorId, String title, String content, List<Integer> tagIds, FileInfo fileInfo) {
         super(authorId, content);
         this.title = title;
         this.tagIds = tagIds;
         this.commentsCount = 0;
-        this.fileInfoId = 0;
+        this.fileInfo = fileInfo;
     }
 
     public List<Integer> getTagIds() {
@@ -59,12 +60,12 @@ public class Post extends ContentObj {
         commentsCount--;
     }
 
-    public int getFileInfoId() {
-        return fileInfoId;
+    public FileInfo getFileInfo() {
+        return fileInfo;
     }
 
-    public void setFileInfoId(int fileInfoId) {
-        this.fileInfoId = fileInfoId;
+    public void setFileInfo(FileInfo fileInfo) {
+        this.fileInfo = fileInfo;
     }
 
 }

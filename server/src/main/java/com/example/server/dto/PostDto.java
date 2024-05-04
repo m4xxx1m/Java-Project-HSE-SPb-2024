@@ -10,7 +10,6 @@ public class PostDto extends ContentObjDto {
     private final List<Integer> tagIds;
     private final String title;
     private final int commentsCount;
-
     private final MultipartFile file;
 
     public PostDto(int authorId, String title, String content, List<Integer> tagIds, int commentsCount, MultipartFile file) {

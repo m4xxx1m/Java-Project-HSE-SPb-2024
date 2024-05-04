@@ -2,15 +2,21 @@ package com.example.server.controller;
 
 
 import com.example.server.dto.PostDto;
+import com.example.server.model.FileInfo;
 import com.example.server.model.Post;
 import com.example.server.model.SavedObject;
 import com.example.server.service.PostService;
 import com.example.server.service.SavedObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -47,7 +53,7 @@ public class PostController {
     }
 
     @RequestMapping("/post/add")
-    ResponseEntity<Post> addPost(@RequestBody PostDto postDto) {
+    ResponseEntity<Post> addPost(@ModelAttribute PostDto postDto) throws IOException {
         Post post = postService.addPost(postDto);
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
@@ -62,8 +68,19 @@ public class PostController {
         }
     }
 
+    @GetMapping(value = "/post/{id}/file")
+    ResponseEntity<?> getPostFile(@PathVariable Integer id) throws IOException {
+        Post post = postService.getPostById(id);
+        FileInfo fileInfo = post.getFileInfo();
+        byte[] fileData = postService.getPostFileData(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.valueOf(fileInfo.getFileType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileInfo.getFileName() + "\"")
+                .body(fileData);
+    }
+
     @RequestMapping("/post/{id}/edit")
-    ResponseEntity<Post> editPost(@PathVariable Integer id, @RequestBody PostDto postDto) {
+    ResponseEntity<Post> editPost(@PathVariable Integer id, @RequestBody PostDto postDto) throws IOException {
         Post post = postService.getPostById(id);
         if (post == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
