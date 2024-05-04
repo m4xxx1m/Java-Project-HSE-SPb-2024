@@ -82,6 +82,22 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public void updateUserCity(Integer userId, String city) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setCity(city);
+
+        userRepository.save(user);
+    }
+
+    public void updateUserBio(Integer userId, String bio) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setBio(bio);
+
+        userRepository.save(user);
+    }
+
     public User getUser(Integer userId) {
         return userRepository.findById(userId).orElse(null);
     }
