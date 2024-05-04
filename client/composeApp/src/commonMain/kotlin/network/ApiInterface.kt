@@ -34,7 +34,7 @@ interface ApiInterface {
     fun getAllPosts(): Call<List<Post>>
 
     @Headers("Content-Type:application/json")
-    @GET("user/{userId}")
+    @GET("users/getUser/{userId}")
     fun getUser(@Path("userId") userId: Int): Call<User>
 
     @Headers("Content-Type:application/json")
@@ -80,4 +80,12 @@ interface ApiInterface {
         @Path("commentId") commentId: Int,
         @Query("userId") userId: Int
     ): Call<Int>
+    
+    @Headers("Content-Type:application/json")
+    @POST("/users/{userId}/updateCity")
+    fun updateCity(@Path("userId") userId: Int, @Query("city") city: String): Call<Void>
+
+    @Headers("Content-Type:application/json")
+    @POST("/users/{userId}/updateBio")
+    fun updateBio(@Path("userId") userId: Int, @Query("bio") bio: String): Call<Void>
 }

@@ -24,7 +24,6 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import model.Post
 import model.User
-import network.ApiInterface
 import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -81,7 +80,8 @@ private class RefreshHomeHelper : Refreshable() {
     val users = mutableStateMapOf<Int, User>()
 
     override fun load() {
-        val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+//        val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+        val retrofitCall = RetrofitClient.retrofitCall
         retrofitCall.getAllPosts().enqueue(object : Callback<List<network.Post>> {
             override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
                 println("refresh home tab failure")

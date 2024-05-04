@@ -21,7 +21,7 @@ data class User(
         return model.User(
             userId,
             username,
-            ""
+            profilePictureUrl
         )
     }
 }

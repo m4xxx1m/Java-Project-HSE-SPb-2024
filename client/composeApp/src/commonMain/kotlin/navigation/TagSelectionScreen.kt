@@ -41,7 +41,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import kotlinx.coroutines.launch
 import model.Tag
-import network.ApiInterface
 import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -109,7 +108,8 @@ class TagSelectionScreen(private val isOnRegistration: Boolean = false) : Screen
     }
 
     private fun load(onSuccess: (tags: List<Tag>) -> Unit) {
-        val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+//        val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
+        val retrofitCall = RetrofitClient.retrofitCall
         retrofitCall.getTags().enqueue(object: Callback<List<Tag>> {
             override fun onResponse(call: Call<List<Tag>>, response: Response<List<Tag>>) {
                 if (response.code() == 200) {

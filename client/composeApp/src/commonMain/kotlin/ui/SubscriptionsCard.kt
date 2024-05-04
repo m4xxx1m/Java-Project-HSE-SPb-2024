@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import model.User
 
 @Composable
-fun SubscriptionsCard(subscriptions: List<User>) {
+fun SubscriptionsCard(subscriptions: List<User>, thisUser: Boolean = false) {
     OutlinedCard("Subscriptions") {
         val tagsDragState = rememberLazyListState()
         val tagsDragCoroutineScope = rememberCoroutineScope()
@@ -56,11 +56,14 @@ fun SubscriptionsCard(subscriptions: List<User>) {
                     }
                 }
             }
-            IconButton(onClick = {}) {
-                Image(
-                    Icons.Rounded.ArrowForward, contentDescription = "Manage subscriptions",
-                    modifier = Modifier.size(25.dp)
-                )
+            if (thisUser) {
+                IconButton(onClick = {}) {
+                    Image(
+                        Icons.Rounded.ArrowForward, 
+                        contentDescription = "Manage subscriptions",
+                        modifier = Modifier.size(25.dp)
+                    )
+                }
             }
         }
     }
