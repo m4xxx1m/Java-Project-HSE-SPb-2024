@@ -24,23 +24,8 @@ public class User {
     @Column(length = 2000)
     private String profilePictureUrl;
 
-    @Column(length = 50)
-    private String firstName;
-
-    @Column(length = 50)
-    private String secondName;
-
-    @Temporal(TemporalType.DATE)
-    private Date dateOfBirth;
-
-    @Column(length = 50)
-    private String country;
-
-    @Column(length = 100)
-    private String city;
-
     @Column(length = 200)
-    private String education;
+    private String contacts;
 
     @Column(length = 200)
     private String bio;
@@ -89,52 +74,12 @@ public class User {
         this.profilePictureUrl = profilePictureUrl;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getContacts() {
+        return contacts;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getSecondName() {
-        return secondName;
-    }
-
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getEducation() {
-        return education;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
+    public void setContacts(String contacts) {
+        this.contacts = contacts;
     }
 
     public String getBio() {

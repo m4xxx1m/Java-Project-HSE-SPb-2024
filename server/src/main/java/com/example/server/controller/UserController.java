@@ -70,8 +70,24 @@ public class UserController {
     }
 
     @PostMapping("/users/{subscriberId}/subscribe/{subscribeToId}")
-    public Subscription subscribe(@PathVariable Integer subscriberId, @PathVariable Integer subscribeToId) {
+    public Subscription subscribe(
+            @PathVariable Integer subscriberId,
+            @PathVariable Integer subscribeToId
+    ) {
         return subscriptionService.subscribe(subscriberId, subscribeToId);
+    }
+
+    @PostMapping("/users/{subscriberId}/unsubscribe/{subscribeToId}")
+    public void unsubscribe(@PathVariable Integer subscriberId, @PathVariable Integer subscribeToId) {
+        subscriptionService.unsubscribe(subscriberId, subscribeToId);
+    }
+
+    @GetMapping("/users/{subscriberId}/checkSubscription/{subscribeToId}")
+    public boolean checkSubscription(
+            @PathVariable Integer subscriberId,
+            @PathVariable Integer subscribeToId
+    ) {
+        return subscriptionService.checkSubscription(subscriberId, subscribeToId);
     }
 
     @GetMapping("/users/getUser/{userId}")
@@ -84,9 +100,9 @@ public class UserController {
         return userService.getUsersList(userIds);
     }
 
-    @PostMapping("/users/{userId}/updateCity")
-    public void updateCity(@PathVariable Integer userId, @RequestParam("city") String city) {
-        userService.updateUserCity(userId, city);
+    @PostMapping("/users/{userId}/updateContacts")
+    public void updateContacts(@PathVariable Integer userId, @RequestParam("contacts") String contacts) {
+        userService.updateUserContacts(userId, contacts);
     }
 
     @PostMapping("/users/{userId}/updateBio")

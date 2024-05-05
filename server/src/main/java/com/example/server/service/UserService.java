@@ -70,22 +70,17 @@ public class UserService {
         user.setEmail(updateDto.getEmail());
         user.setPassword(updateDto.getPassword());
         user.setProfilePictureUrl(updateDto.getProfilePictureUrl());
-        user.setFirstName(updateDto.getFirstName());
-        user.setSecondName(updateDto.getSecondName());
-        user.setDateOfBirth(updateDto.getDateOfBirth());
-        user.setCountry(updateDto.getCountry());
-        user.setCity(updateDto.getCity());
-        user.setEducation(updateDto.getEducation());
+        user.setContacts(updateDto.getContacts());
         user.setBio(updateDto.getBio());
         user.setResumeUrl(updateDto.getResumeUrl());
 
         return userRepository.save(user);
     }
 
-    public void updateUserCity(Integer userId, String city) {
+    public void updateUserContacts(Integer userId, String contacts) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setCity(city);
+        user.setContacts(contacts);
 
         userRepository.save(user);
     }
