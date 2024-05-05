@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SubscriptionService {
@@ -28,7 +29,8 @@ public class SubscriptionService {
                 .orElseThrow(() -> new RuntimeException("User to subscribe to not found"));
 
         if (subscriptionRepository.existsBySubscriberAndSubscribeTo(subscriber, subscribeTo)) {
-            throw new RuntimeException("Already subscribed");
+//            throw new RuntimeException("Already subscribed");
+            return null;
         }
 
         Subscription subscription = new Subscription();
@@ -44,10 +46,21 @@ public class SubscriptionService {
         User subscribeTo = userRepository.findById(subscribeToId)
                 .orElseThrow(() -> new RuntimeException("User to unsubscribe from not found"));
 
-        Subscription subscription = subscriptionRepository.findBySubscriberAndSubscribeTo(subscriber, subscribeTo)
-                .orElseThrow(() -> new RuntimeException("Subscription not found"));
+//        Subscription subscription = subscriptionRepository.findBySubscriberAndSubscribeTo(subscriber, subscribeTo)
+//                .orElseThrow(() -> new RuntimeException("Subscription not found"));
 
-        subscriptionRepository.delete(subscription);
+        Optional<Subscription> subscription = subscriptionRepository.findBySubscriberAndSubscribeTo(subscriber, subscribeTo);
+
+        subscription.ifPresent(subscriptionRepository::delete);
+    }
+
+    public boolean checkSubscription(Integer subscriberId, Integer subscribeToId) {
+        User subscriber = userRepository.findById(subscriberId)
+                .orElseThrow(() -> new RuntimeException("Subscriber not found"));
+        User subscribeTo = userRepository.findById(subscribeToId)
+                .orElseThrow(() -> new RuntimeException("Subscriber not found"));
+
+        return subscriptionRepository.existsBySubscriberAndSubscribeTo(subscriber, subscribeTo);
     }
 
     public List<Subscription> getSubscriptions(Integer subscriberId) {
