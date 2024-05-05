@@ -80,12 +80,33 @@ interface ApiInterface {
         @Path("commentId") commentId: Int,
         @Query("userId") userId: Int
     ): Call<Int>
-    
+
     @Headers("Content-Type:application/json")
-    @POST("/users/{userId}/updateCity")
-    fun updateCity(@Path("userId") userId: Int, @Query("city") city: String): Call<Void>
+    @POST("/users/{userId}/updateContacts")
+    fun updateContacts(@Path("userId") userId: Int, @Query("contacts") contacts: String): Call<Void>
 
     @Headers("Content-Type:application/json")
     @POST("/users/{userId}/updateBio")
     fun updateBio(@Path("userId") userId: Int, @Query("bio") bio: String): Call<Void>
+
+    @Headers("Content-Type:application/json")
+    @POST("/users/{subscriberId}/subscribe/{subscribeToId}")
+    fun subscribe(
+        @Path("subscriberId") subscriberId: Int,
+        @Path("subscribeToId") subscribeToId: Int
+    ): Call<Any>
+
+    @Headers("Content-Type:application/json")
+    @POST("/users/{subscriberId}/unsubscribe/{subscribeToId}")
+    fun unsubscribe(
+        @Path("subscriberId") subscriberId: Int,
+        @Path("subscribeToId") subscribeToId: Int
+    ): Call<Void>
+
+    @Headers("Content-Type:application/json")
+    @GET("/users/{subscriberId}/checkSubscription/{subscribeToId}")
+    fun checkSubscription(
+        @Path("subscriberId") subscriberId: Int,
+        @Path("subscribeToId") subscribeToId: Int
+    ): Call<Boolean>
 }
