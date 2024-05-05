@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.launch
 import model.AuthManager
+import model.SubscriberManager
 import model.User
 import model.UserProfile
 import navigation.TagSelectionScreen
@@ -58,6 +60,8 @@ import retrofit2.Response
 fun UserProfileCard(user: User, navigator: Navigator? = null) {
     val thisUser = user.id == AuthManager.currentUser.id
     val userProfile = remember { mutableStateOf<UserProfile?>(null) }
+    val subscriptionManager =
+        if (thisUser) null else remember { mutableStateOf(SubscriberManager(user.id)) }
     if (userProfile.value == null) {
         user.setProfile(userProfile)
     }
@@ -81,40 +85,24 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                     Spacer(Modifier.size(20.dp))
                     Text(user.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 }
+                if (!thisUser) {
+                    Button(
+                        onClick = {
+                            subscriptionManager?.value?.changeSubscription()
+                        }
+                    ) {
+                        Text(
+                            if (subscriptionManager?.value?.isSubscribed?.value == true)
+                                "Unsubscribe" else "Subscribe"
+                        )
+                    }
+                }
                 if (thisUser) {
                     TextFieldCard("Contacts", profile.contacts) {
-                        RetrofitClient.retrofitCall.updateCity(user.id, it)
-                            .enqueue(object : Callback<Void> {
-                                override fun onResponse(
-                                    call: Call<Void>,
-                                    response: Response<Void>
-                                ) {
-                                    if (response.code() != 200) {
-                                        println("Wrong code while updating contacts")
-                                    }
-                                }
-
-                                override fun onFailure(call: Call<Void>, t: Throwable) {
-                                    println("Failure while updating contacts")
-                                }
-                            })
+                        updateContacts(user.id, it)
                     }
                     TextFieldCard("About me", profile.about) {
-                        RetrofitClient.retrofitCall.updateBio(user.id, it)
-                            .enqueue(object : Callback<Void> {
-                                override fun onResponse(
-                                    call: Call<Void>,
-                                    response: Response<Void>
-                                ) {
-                                    if (response.code() != 200) {
-                                        println("Wrong code while updating bio")
-                                    }
-                                }
-
-                                override fun onFailure(call: Call<Void>, t: Throwable) {
-                                    println("Wrong code while updating bio")
-                                }
-                            })
+                        updateBio(user.id, it)
                     }
                 } else {
                     OutlinedCard("Contacts") {
@@ -191,4 +179,40 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
             }
         }
     }
+}
+
+private fun updateContacts(userId: Int, contacts: String) {
+    RetrofitClient.retrofitCall.updateContacts(userId, contacts)
+        .enqueue(object : Callback<Void> {
+            override fun onResponse(
+                call: Call<Void>,
+                response: Response<Void>
+            ) {
+                if (response.code() != 200) {
+                    println("Wrong code while updating contacts")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                println("Failure while updating contacts")
+            }
+        })
+}
+
+private fun updateBio(userId: Int, bio: String) {
+    RetrofitClient.retrofitCall.updateBio(userId, bio)
+        .enqueue(object : Callback<Void> {
+            override fun onResponse(
+                call: Call<Void>,
+                response: Response<Void>
+            ) {
+                if (response.code() != 200) {
+                    println("Wrong code while updating bio")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                println("Wrong code while updating bio")
+            }
+        })
 }

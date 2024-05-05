@@ -21,7 +21,7 @@ data class User(
                     response.body()?.let {
                         userProfile.value = UserProfile(
                             user = this@User,
-                            contacts = it.city,
+                            contacts = it.contacts,
                             about = it.bio,
                             subscriptions = emptyList(),
                             tags = emptyList(),
