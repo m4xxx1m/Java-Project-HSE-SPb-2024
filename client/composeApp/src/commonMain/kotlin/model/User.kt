@@ -23,7 +23,6 @@ data class User(
                             user = this@User,
                             contacts = it.contacts,
                             about = it.bio,
-                            subscriptions = emptyList(),
                             tags = emptyList(),
                             cvUrl = it.resumeUrl
                         )

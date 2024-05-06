@@ -73,6 +73,7 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
                         SelectionContainer {
                             Text(comment.text, fontSize = 14.sp)
                         }
+                        SelectionContainer {  }
                     }
                     Column {
                         Image(

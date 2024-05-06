@@ -18,7 +18,6 @@ import model.User
 import ui.NewPostForm
 import ui.NotificationWidget
 import ui.SearchWidget
-import ui.SubscriptionsCard
 import ui.UserProfileCard
 import java.time.LocalDateTime
 
@@ -145,20 +144,20 @@ fun previewNewPostForm() {
     NewPostForm()
 }
 
-@Preview
-@Composable
-fun previewSubscriptionsCard() {
-    SubscriptionsCard(
-        listOf(
-            User(0, "User name", ""),
-            User(0, "User name", ""),
-            User(0, "User name", ""),
-            User(0, "User name", ""),
-            User(0, "User name", ""),
-            User(0, "User name", "")
-        )
-    )
-}
+//@Preview
+//@Composable
+//fun previewSubscriptionsCard() {
+//    SubscriptionsCard(
+//        listOf(
+//            User(0, "User name", ""),
+//            User(0, "User name", ""),
+//            User(0, "User name", ""),
+//            User(0, "User name", ""),
+//            User(0, "User name", ""),
+//            User(0, "User name", "")
+//        )
+//    )
+//}
 
 @Preview
 @Composable

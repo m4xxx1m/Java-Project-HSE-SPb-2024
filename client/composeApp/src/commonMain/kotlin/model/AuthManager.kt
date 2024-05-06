@@ -1,6 +1,7 @@
 package model
 
 import cafe.adriel.voyager.navigator.Navigator
+import navigation.ConnectionErrorScreen
 import navigation.MainNavigation
 import platform_depended.AuthStorage
 
@@ -29,6 +30,13 @@ class AuthManager {
             return true
         }
         return false
+    }
+
+    fun logOut(navigator: Navigator) {
+        AuthStorage.clearToken()
+        currentUser_ = null
+        navigator.popAll()
+        navigator.replace(ConnectionErrorScreen())
     }
 
     fun saveAuthData(login: String, password: String, user: User?) {
