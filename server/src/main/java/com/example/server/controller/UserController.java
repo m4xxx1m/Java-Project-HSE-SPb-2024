@@ -3,6 +3,7 @@ package com.example.server.controller;
 import com.example.server.dto.UserLoginDto;
 import com.example.server.dto.UserRegistrationDto;
 import com.example.server.dto.UserUpdateDto;
+import com.example.server.model.Post;
 import com.example.server.model.Subscription;
 import com.example.server.model.User;
 import com.example.server.service.SubscriptionService;
@@ -90,6 +91,11 @@ public class UserController {
         return subscriptionService.checkSubscription(subscriberId, subscribeToId);
     }
 
+    @GetMapping("/users/{subscriberId}/getSubscriptions")
+    public List<User> getSubscriptions(@PathVariable Integer subscriberId) {
+        return subscriptionService.getSubscriptions(subscriberId);
+    }
+
     @GetMapping("/users/getUser/{userId}")
     public User getUser(@PathVariable Integer userId) {
         return userService.getUser(userId);
@@ -108,5 +114,10 @@ public class UserController {
     @PostMapping("/users/{userId}/updateBio")
     public void updateBio(@PathVariable Integer userId, @RequestParam("bio") String bio) {
         userService.updateUserBio(userId, bio);
+    }
+
+    @GetMapping("/users/{userId}/getPostsFromSubscriptions")
+    public List<Post> getPostsFromSubscriptions(@PathVariable Integer userId) {
+        return subscriptionService.getPostsFromSubscriptions(userId);
     }
 }
