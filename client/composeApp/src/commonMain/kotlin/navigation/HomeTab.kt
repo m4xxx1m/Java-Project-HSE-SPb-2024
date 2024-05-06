@@ -80,7 +80,6 @@ private class RefreshHomeHelper : Refreshable() {
     val users = mutableStateMapOf<Int, User>()
 
     override fun load() {
-//        val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
         val retrofitCall = RetrofitClient.retrofitCall
         retrofitCall.getAllPosts().enqueue(object : Callback<List<network.Post>> {
             override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {

@@ -109,4 +109,14 @@ interface ApiInterface {
         @Path("subscriberId") subscriberId: Int,
         @Path("subscribeToId") subscribeToId: Int
     ): Call<Boolean>
+
+    @Headers("Content-Type:application/json")
+    @GET("/users/{subscriberId}/getSubscriptions")
+    fun getSubscriptions(
+        @Path("subscriberId") subscriberId: Int
+    ): Call<List<User>>
+    
+    @Headers("Content-Type:application/json")
+    @GET("/users/{userId}/getPostsFromSubscriptions")
+    fun getPostsFromSubscriptions(@Path("userId") userId: Int): Call<List<Post>>
 }

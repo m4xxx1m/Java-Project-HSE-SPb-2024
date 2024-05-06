@@ -23,12 +23,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Person
@@ -60,10 +62,44 @@ import retrofit2.Response
 fun UserProfileCard(user: User, navigator: Navigator? = null) {
     val thisUser = user.id == AuthManager.currentUser.id
     val userProfile = remember { mutableStateOf<UserProfile?>(null) }
+    val coroutineScope = rememberCoroutineScope()
     val subscriptionManager =
-        if (thisUser) null else remember { mutableStateOf(SubscriberManager(user.id)) }
+        if (thisUser) null else remember {
+            mutableStateOf(
+                SubscriberManager(
+                    user.id,
+                    coroutineScope
+                )
+            )
+        }
+    val updateSubscriptionsList = remember { mutableStateOf(true) }
     if (userProfile.value == null) {
         user.setProfile(userProfile)
+    }
+    val isDialogOpened = remember { mutableStateOf(false) }
+    if (thisUser && isDialogOpened.value) {
+        AlertDialog(
+            onDismissRequest = {
+                isDialogOpened.value = false
+            },
+            confirmButton = {
+                Button(onClick = {
+                    navigator?.let {
+                        val authManager = AuthManager()
+                        var nav = it
+                        while (nav.parent != null) {
+                            nav = nav.parent!!
+                        }
+                        authManager.logOut(nav)
+                    }
+                }) {
+                    Text("Yes")
+                }
+            },
+            text = {
+                Text("Are you sure you want to log out?")
+            }
+        )
     }
     userProfile.value?.let { profile ->
         Card(
@@ -72,7 +108,7 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
         ) {
             Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.clip(RoundedCornerShape(7.dp)).clickable { }) {
+                    Box(Modifier.clip(RoundedCornerShape(7.dp)).clickable {}) {
                         Image(
                             Icons.Rounded.Person, contentDescription = "User profile image",
                             modifier = Modifier.size(65.dp).clip(CircleShape).background(Color.Red)
@@ -83,7 +119,19 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                         )
                     }
                     Spacer(Modifier.size(20.dp))
-                    Text(user.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        user.name,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (thisUser) {
+                        IconButton(onClick = {
+                            isDialogOpened.value = true
+                        }) {
+                            Image(Icons.Rounded.Close, contentDescription = "Log out")
+                        }
+                    }
                 }
                 if (!thisUser) {
                     Button(
@@ -92,8 +140,7 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                         }
                     ) {
                         Text(
-                            if (subscriptionManager?.value?.isSubscribed?.value == true)
-                                "Unsubscribe" else "Subscribe"
+                            subscriptionManager?.value?.getButtonText() ?: "Subscribe"
                         )
                     }
                 }
@@ -116,7 +163,7 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                         }
                     }
                 }
-                SubscriptionsCard(profile.subscriptions, thisUser)
+                SubscriptionsCard(user.id, navigator, updateSubscriptionsList)
                 OutlinedCard("Tags") {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
