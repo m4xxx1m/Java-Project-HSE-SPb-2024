@@ -5,13 +5,13 @@ import java.util.List;
 
 public class PostDto extends ContentObjDto {
 
-    private final List<Integer> tagIds;
+    private final String tags;
     private final String title;
     private final int commentsCount;
 
-    public PostDto(int authorId, String title, String content, List<Integer> tagIds, int commentsCount) {
+    public PostDto(int authorId, String title, String content, String tags, int commentsCount) {
         super(authorId, content);
-        this.tagIds = tagIds;
+        this.tags = tags;
         this.title = title;
         this.commentsCount = commentsCount;
     }
@@ -20,8 +20,8 @@ public class PostDto extends ContentObjDto {
         return title;
     }
 
-    public List<Integer> getTagIds() {
-        return tagIds;
+    public String getTags() {
+        return tags;
     }
 
     public int getCommentsCount() {
