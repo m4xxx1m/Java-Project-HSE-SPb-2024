@@ -25,15 +25,15 @@ public class User {
     private String profilePictureUrl;
 
     @Column(length = 200)
-    private String contacts;
+    private String contacts = "";
 
     @Column(length = 200)
-    private String bio;
+    private String bio = "";
 
     @Column(length = 2000)
     private String resumeUrl;
 
-    private String tags;
+    private String tags = Tag.defaultTags;
 
     // Геттеры и сеттеры для каждого поля
     public Integer getUserId() {

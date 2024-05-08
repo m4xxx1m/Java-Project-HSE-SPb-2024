@@ -9,6 +9,8 @@ public class Tag {
 
     private static final Map<String, Integer> ids = new HashMap<>();
 
+    public final static String defaultTags = "0".repeat(tagNames.size());
+
     static {
         for (int i = 0; i < tagNames.size(); i++) {
             ids.put(tagNames.get(i), i);
