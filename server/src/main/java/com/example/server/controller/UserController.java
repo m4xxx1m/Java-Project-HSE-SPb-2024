@@ -109,4 +109,9 @@ public class UserController {
     public void updateBio(@PathVariable Integer userId, @RequestParam("bio") String bio) {
         userService.updateUserBio(userId, bio);
     }
+
+    @PostMapping("/users/{userId}/updateTags")
+    public void updateTags(@PathVariable Integer userId, @RequestParam("tags") String tags) {
+        userService.updateUserTags(userId, tags);
+    }
 }

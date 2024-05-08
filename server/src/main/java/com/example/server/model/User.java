@@ -33,6 +33,8 @@ public class User {
     @Column(length = 2000)
     private String resumeUrl;
 
+    private String tags;
+
     // Геттеры и сеттеры для каждого поля
     public Integer getUserId() {
         return userId;
@@ -96,5 +98,13 @@ public class User {
 
     public void setResumeUrl(String resumeUrl) {
         this.resumeUrl = resumeUrl;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

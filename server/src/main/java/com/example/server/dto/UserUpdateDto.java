@@ -10,6 +10,7 @@ public class UserUpdateDto {
     private String contacts;
     private String bio;
     private String resumeUrl;
+    private String tags;
 
     public String getUsername() {
         return username;
@@ -65,5 +66,13 @@ public class UserUpdateDto {
 
     public void setResumeUrl(String resumeUrl) {
         this.resumeUrl = resumeUrl;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public String getTags() {
+        return tags;
     }
 }

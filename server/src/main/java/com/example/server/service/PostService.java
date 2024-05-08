@@ -5,7 +5,6 @@ import com.example.server.dto.PostDto;
 import com.example.server.model.*;
 import com.example.server.repository.CommentRepository;
 import com.example.server.repository.PostRepository;
-import com.example.server.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +22,6 @@ public class PostService {
 
     @Autowired
     private SavedObjectService savedObjectService;
-    
-    @Autowired
-    private TagRepository tagRepository;
 
     @Autowired
     private CommentRepository commentRepository;
@@ -35,7 +31,7 @@ public class PostService {
 
     public Post addPost(PostDto postDto) {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
-                postDto.getContent(), postDto.getTagIds(), postDto.getCommentsCount());
+                postDto.getContent(), postDto.getTags(), postDto.getCommentsCount());
         return postRepository.save(post);
     }
 
@@ -73,22 +69,25 @@ public class PostService {
         return posts;
     }
 
-    public List<Post> getPostsBySelectedTags(List<Integer> tagIds) {
+    public List<Post> getPostsBySelectedTags(String tags) {
+        List<Integer> tagIds = Tag.tagsToTagIds(tags);
         List<Post> posts = getPosts();
         return posts.stream()
-                .filter(post -> post.getTagIds().stream().anyMatch(tagIds::contains))
+                .filter(post -> Tag.tagsToTagIds(post.getTags())
+                        .stream()
+                        .anyMatch(tagIds::contains))
                 .collect(Collectors.toList());
     }
 
-    public List<Tag> getPostTags(int id) {
+    public List<String> getPostTags(int id) {
         Post post = getPostById(id);
         if (post == null) {
             return null;
         } else {
-            List<Integer> tagIds = post.getTagIds();
-            List<Tag> tags = new ArrayList<>();
+            List<Integer> tagIds = Tag.tagsToTagIds(post.getTags());
+            List<String> tags = new ArrayList<>();
             for (Integer tagId : tagIds) {
-                tags.add(tagRepository.getReferenceById(tagId));
+                tags.add(Tag.getTagName(tagId));
             }
             return tags;
         }
@@ -132,7 +131,7 @@ public class PostService {
 
     public void editPost(Post post, PostDto postDto) {
         post.setContent(postDto.getContent());
-        post.setTagIds(postDto.getTagIds());
+        post.setTags(postDto.getTags());
         postRepository.save(post);
     }
 
