@@ -1,12 +1,14 @@
 package com.example.server.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Date;
 
 public class UserUpdateDto {
     private String username;
     private String email;
     private String password;
-    private String profilePictureUrl;
+    private MultipartFile profilePicture;
     private String firstName;
     private String secondName;
     private Date dateOfBirth;
@@ -40,12 +42,12 @@ public class UserUpdateDto {
         this.password = password;
     }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
+    public MultipartFile getProfilePicture() {
+        return profilePicture;
     }
 
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
+    public void setProfilePicture(MultipartFile profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public String getFirstName() {

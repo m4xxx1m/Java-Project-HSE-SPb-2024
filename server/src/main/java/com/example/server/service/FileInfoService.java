@@ -19,7 +19,7 @@ import org.springframework.util.DigestUtils;
 @Service
 public class FileInfoService {
 
-    private final String DIRECTORY_PATH = "server\\src\\main\\resources\\files\\";
+    private static final String DIRECTORY_PATH = "server\\src\\main\\resources\\files\\";
 
     @Autowired
     private FileInfoRepository fileInfoRepository;
@@ -31,17 +31,17 @@ public class FileInfoService {
     public FileInfo upload(MultipartFile resource, int postId) throws IOException {
         String key = generateKey(resource.getOriginalFilename());
         FileInfo createdFile = new FileInfo(resource.getOriginalFilename(), key, postId, resource.getContentType());
-        uploadFileData(resource.getBytes(), key);
+        uploadFileData(resource.getBytes(), DIRECTORY_PATH + key);
         fileInfoRepository.save(createdFile);
         return createdFile;
     }
 
-    private String generateKey(String name) {
+    static String generateKey(String name) {
         return DigestUtils.md5DigestAsHex((name + LocalDateTime.now()).getBytes());
     }
 
-    private void uploadFileData(byte[] fileData, String keyName) throws IOException {
-        Path path = Paths.get(DIRECTORY_PATH + keyName);
+    static void uploadFileData(byte[] fileData, String filePath) throws IOException {
+        Path path = Paths.get(filePath);
         Files.createDirectories(path.getParent());
         Path file = Files.createFile(path);
         try (FileOutputStream stream = new FileOutputStream(file.toString())) {
@@ -49,12 +49,12 @@ public class FileInfoService {
         }
     }
 
-    public byte[] download(String key) throws IOException {
+    static byte[] download(String key) throws IOException {
         Path path = Paths.get(DIRECTORY_PATH + key);
         return Files.readAllBytes(path);
     }
 
-    public void delete(FileInfo fileInfo) throws IOException {
+    void delete(FileInfo fileInfo) throws IOException {
         assert fileInfo != null;
         Path path = Paths.get(DIRECTORY_PATH + fileInfo.getKey());
         Files.delete(path);

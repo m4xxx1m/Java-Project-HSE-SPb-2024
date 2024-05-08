@@ -7,9 +7,15 @@ import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.io.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -17,6 +23,8 @@ import java.util.Set;
 
 @Service
 public class UserService {
+
+    private static final String DIRECTORY_PATH = "server\\src\\main\\resources\\profile_pic\\";
 
     private final UserRepository userRepository;
 
@@ -62,14 +70,33 @@ public class UserService {
         }
     }
 
-    public User updateUser(Integer userId, UserUpdateDto updateDto) {
+    public User updateUser(Integer userId, UserUpdateDto updateDto) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        String newProfilePictureUrl = null;
+        MultipartFile profilePicture = updateDto.getProfilePicture();
+        if (profilePicture != null) {
+            String extension = FilenameUtils.getExtension(profilePicture.getOriginalFilename());
+            String key = FileInfoService.generateKey(profilePicture.getOriginalFilename());
+            newProfilePictureUrl = DIRECTORY_PATH + key + "." + extension;
+            try {
+                FileInfoService.uploadFileData(profilePicture.getBytes(), newProfilePictureUrl);
+            } catch (Exception e) {
+                throw new IOException("Can't upload profile picture");
+            }
+        }
+
+        String profilePictureUrl = user.getProfilePictureUrl();
+        if (profilePictureUrl != null) {
+            Path path = Paths.get(profilePictureUrl);
+            Files.delete(path);
+        }
+
+        user.setProfilePictureUrl(newProfilePictureUrl);
         user.setUsername(updateDto.getUsername());
         user.setEmail(updateDto.getEmail());
         user.setPassword(updateDto.getPassword());
-        user.setProfilePictureUrl(updateDto.getProfilePictureUrl());
         user.setFirstName(updateDto.getFirstName());
         user.setSecondName(updateDto.getSecondName());
         user.setDateOfBirth(updateDto.getDateOfBirth());
@@ -88,5 +115,14 @@ public class UserService {
 
     public List<User> getUsersList(Set<Integer> userIds) {
         return userRepository.findAllById(userIds);
+    }
+
+    public byte[] getUserProfilePicture(Integer userId) throws IOException {
+        User user = getUser(userId);
+        try {
+            return Files.readAllBytes((Paths.get(user.getProfilePictureUrl())));
+        } catch (IOException e) {
+            throw new IOException("Can't download file");
+        }
     }
 }
