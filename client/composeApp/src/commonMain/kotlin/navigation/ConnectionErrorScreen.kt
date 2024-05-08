@@ -17,6 +17,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
 import model.AuthManager
+import model.Tag
 import ui.SignInScreen
 
 class ConnectionErrorScreen : Screen {
@@ -37,6 +38,7 @@ class ConnectionErrorScreen : Screen {
     }
 
     private fun tryConnect() {
+        Tag.initTags()
         navigator?.let {
             val authManager = AuthManager()
             if (!authManager.tryLogin(it, onError)) {

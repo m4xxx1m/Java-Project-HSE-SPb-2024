@@ -18,11 +18,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import model.Notification
 import model.Post
-import model.Tag
 import platform_depended.AuthStorage
 import ui.NewPostForm
 import ui.NotificationWidget
-import ui.PostCard
 import java.time.LocalDateTime
 
 class MainActivity : ComponentActivity() {
@@ -55,35 +53,35 @@ class MainActivity : ComponentActivity() {
 //    ChooseInterestsForm(tags)
 //}
 
-@Preview
-@Composable
-fun PreviewPostCard() {
-    Column(
-        modifier = Modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth()
-//        modifier = Modifier.padding(10.dp).fillMaxWidth()
-            .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        PostCard(
-            Post(
-                0,
-                0,
-                LocalDateTime.MIN,
-                listOf(Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
-                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")),
-                "Post title",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-                emptyList(),
-                1000,
-                100
-            )
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun PreviewPostCard() {
+//    Column(
+//        modifier = Modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth()
+////        modifier = Modifier.padding(10.dp).fillMaxWidth()
+//            .fillMaxHeight(),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        PostCard(
+//            Post(
+//                0,
+//                0,
+//                LocalDateTime.MIN,
+//                listOf(Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm"),
+//                    Tag(0, "asdfghjkl"), Tag(1, "qwerty"), Tag(2, "zxcvbnm")),
+//                "Post title",
+//                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+//                emptyList(),
+//                1000,
+//                100
+//            )
+//        )
+//    }
+//}
 
 @Preview
 @Composable
