@@ -8,10 +8,18 @@ import com.example.server.model.User;
 import com.example.server.service.SubscriptionService;
 import com.example.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
@@ -65,8 +73,12 @@ public class UserController {
     // http://localhost:8080/users/update/1
     //                                    ^ user id here
     @PutMapping("/users/update/{userId}")
-    public User updateUser(@PathVariable Integer userId, @RequestBody UserUpdateDto updateDto) {
-        return userService.updateUser(userId, updateDto);
+    public ResponseEntity<User> updateUser(@PathVariable Integer userId, @ModelAttribute UserUpdateDto updateDto) {
+        try {
+            return ResponseEntity.ok(userService.updateUser(userId, updateDto));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PostMapping("/users/{subscriberId}/subscribe/{subscribeToId}")
@@ -77,6 +89,22 @@ public class UserController {
     @GetMapping("/users/getUser/{userId}")
     public User getUser(@PathVariable Integer userId) {
         return userService.getUser(userId);
+    }
+
+    @GetMapping("/users/getUserProfilePicture/{userId}")
+    public ResponseEntity<?> getUserProfilePicture(@PathVariable Integer userId) {
+        User user = userService.getUser(userId);
+        try {
+            if (user.getProfilePictureUrl() == null) {
+                return ResponseEntity.ok(null);
+            }
+            Path path = Paths.get(user.getProfilePictureUrl());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.valueOf(Files.probeContentType(path)))
+                    .body(userService.getUserProfilePicture(userId));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping("/users/getUsersList")
