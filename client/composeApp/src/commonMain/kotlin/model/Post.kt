@@ -6,7 +6,7 @@ data class Post(
     val id: Int,
     val userId: Int,
     val dateTime: LocalDateTime,
-    val tags: List<Tag>,
+    val tags: List<String>,
     val title: String,
     val text: String,
     val imagesUrl: List<String>,

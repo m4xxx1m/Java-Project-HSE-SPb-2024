@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,11 +43,20 @@ object SubscriptionsTab : Tab {
             return TabOptions(index, title, icon)
         }
 
+    private var scrollState: Pair<Int, Int> = Pair(0, 0)
+
     @Composable
     override fun Content() {
         val lazyColumnState = rememberLazyListState()
         val refreshHelper = remember { mutableStateOf(RefreshSubscriptionsHelper()) }
-
+        DisposableEffect(scrollState) {
+            onDispose {
+                scrollState = Pair(
+                    lazyColumnState.firstVisibleItemIndex,
+                    lazyColumnState.firstVisibleItemScrollOffset
+                )
+            }
+        }
         RefreshableContent(refreshHelper) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),

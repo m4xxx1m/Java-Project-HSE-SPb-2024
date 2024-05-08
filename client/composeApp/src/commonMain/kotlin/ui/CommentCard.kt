@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -50,7 +49,7 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
         Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
             Spacer(Modifier.width(35.dp))
             Image(
-                Icons.Rounded.Person, 
+                Icons.Rounded.Person,
                 contentDescription = null,
                 modifier = Modifier
                     .size(35.dp)
@@ -70,10 +69,7 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
                             comment.user?.name ?: "",
                             fontWeight = FontWeight.SemiBold
                         )
-                        SelectionContainer {
-                            Text(comment.text, fontSize = 14.sp)
-                        }
-                        SelectionContainer {  }
+                        Text(comment.text, fontSize = 14.sp)
                     }
                     Column {
                         Image(
@@ -95,8 +91,9 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = comment.dateTime.format(
-                            DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy")),
-                        color = Color.Gray, 
+                            DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy")
+                        ),
+                        color = Color.Gray,
                         fontSize = 11.sp
                     )
                     Spacer(Modifier.weight(1f))

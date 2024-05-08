@@ -2,7 +2,6 @@ package network
 
 import model.SignInManager
 import model.SignUpManager
-import model.Tag
 import navigation.CreatePostManager
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -55,7 +54,7 @@ interface ApiInterface {
 
     @Headers("Content-Type:application/json")
     @GET("/getTags")
-    fun getTags(): Call<List<Tag>>
+    fun getTags(): Call<ArrayList<String>>
 
     @Headers("Content-Type:application/json")
     @POST("/post/{postId}/like")
@@ -115,8 +114,16 @@ interface ApiInterface {
     fun getSubscriptions(
         @Path("subscriberId") subscriberId: Int
     ): Call<List<User>>
-    
+
     @Headers("Content-Type:application/json")
     @GET("/users/{userId}/getPostsFromSubscriptions")
     fun getPostsFromSubscriptions(@Path("userId") userId: Int): Call<List<Post>>
+
+//    @Headers("Content-Type:application/json")
+//    @GET("/users/{userId}/getUserTags")
+//    fun getUserTags(@Path("userId") userId: Int): Call<String>
+
+    @Headers("Content-Type:application/json")
+    @POST("/users/{userId}/updateTags")
+    fun updateUserTags(@Path("userId") userId: Int, @Query("tags") tags: String): Call<Void>
 }

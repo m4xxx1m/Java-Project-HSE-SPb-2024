@@ -27,6 +27,7 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -74,7 +75,9 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
         }
     val updateSubscriptionsList = remember { mutableStateOf(true) }
     if (userProfile.value == null) {
-        user.setProfile(userProfile)
+        coroutineScope.launch {
+            user.setProfile(userProfile)
+        }
     }
     val isDialogOpened = remember { mutableStateOf(false) }
     if (thisUser && isDialogOpened.value) {
@@ -96,15 +99,22 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                     Text("Yes")
                 }
             },
+            dismissButton = {
+                OutlinedButton(onClick = {
+                    isDialogOpened.value = false
+                }) {
+                    Text("No")
+                }
+            },
             text = {
                 Text("Are you sure you want to log out?")
             }
         )
     }
     userProfile.value?.let { profile ->
-        Card(
+        Box(
             modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
-            elevation = 6.dp
+//            elevation = 6.dp
         ) {
             Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -170,24 +180,27 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         val tagsDragState = rememberLazyListState()
-                        val tagsDragCoroutineScope = rememberCoroutineScope()
+                        val tags = remember { mutableStateOf<ArrayList<String>?>(null) }
+                        coroutineScope.launch {
+                            profile.getTagsList(tags)
+                        }
                         LazyRow(
                             state = tagsDragState,
                             modifier = Modifier.weight(1f)
                                 .draggable(
                                     orientation = Orientation.Horizontal,
                                     state = rememberDraggableState { delta ->
-                                        tagsDragCoroutineScope.launch {
+                                        coroutineScope.launch {
                                             tagsDragState.scrollBy(-delta)
                                         }
                                     })
                         ) {
-                            items(profile.tags) { tag ->
+                            items(tags.value ?: emptyList()) { tag ->
                                 Card(
                                     backgroundColor = Color.Gray
                                 ) {
                                     Text(
-                                        tag.tagName,
+                                        tag,
                                         color = Color.White,
                                         modifier = Modifier.padding(3.dp)
                                     )
@@ -197,7 +210,7 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                         }
                         if (thisUser) {
                             IconButton(onClick = {
-                                navigator?.push(TagSelectionScreen())
+                                navigator?.push(TagSelectionScreen(userProfile.value?.tags))
                             }) {
                                 Image(
                                     Icons.Rounded.Settings, contentDescription = "Edit tags",

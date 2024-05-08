@@ -72,10 +72,12 @@ class SubscriberManager(private val userId: Int, private val coroutineScope: Cor
     }
 
     fun changeSubscription() {
-        if (isSubscribed.value) {
-            unsubscribe()
-        } else {
-            subscribe()
+        coroutineScope.launch {
+            if (isSubscribed.value) {
+                unsubscribe()
+            } else {
+                subscribe()
+            }
         }
     }
 

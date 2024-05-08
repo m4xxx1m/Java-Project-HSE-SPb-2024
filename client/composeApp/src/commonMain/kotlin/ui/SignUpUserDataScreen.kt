@@ -30,7 +30,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import model.SignUpManager
 import navigation.BackButton
-import navigation.MainNavigation
+import navigation.TagSelectionScreen
 
 class SignUpUserDataScreen(private val signUpManager: SignUpManager) : Screen {
     @Composable
@@ -138,7 +138,7 @@ fun SignUpUserDataForm(navigator: Navigator, signUpManager: SignUpManager) {
                 signUpManager.initData(usernameTrimmed, password.value.trim())
                 signUpManager.signUp {
                     navigator.popAll()
-                    navigator.push(MainNavigation())
+                    navigator.push(TagSelectionScreen())
                 }
             }, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
                 Text("Next")

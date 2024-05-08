@@ -10,7 +10,7 @@ import retrofit2.Response
 data class User(
     val id: Int, 
     val name: String, 
-    val imageUrl: String
+    val imageUrl: String?
 ) {
     fun setProfile(userProfile: MutableState<UserProfile?>) {
         val retrofitCall = RetrofitClient.retrofitCall
@@ -23,7 +23,7 @@ data class User(
                             user = this@User,
                             contacts = it.contacts,
                             about = it.bio,
-                            tags = emptyList(),
+                            tags = it.tags,
                             cvUrl = it.resumeUrl
                         )
                     }

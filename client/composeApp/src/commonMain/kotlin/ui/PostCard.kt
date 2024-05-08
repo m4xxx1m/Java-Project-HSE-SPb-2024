@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -132,7 +131,7 @@ fun PostCard(
                                 backgroundColor = Color.Gray
                             ) {
                                 Text(
-                                    tag.tagName,
+                                    tag,
                                     color = Color.White,
                                     modifier = Modifier.padding(3.dp)
                                 )
@@ -141,14 +140,10 @@ fun PostCard(
                         }
                     }
                 }
-                SelectionContainer {
-                    Column {
-                        if (post.title.isNotEmpty()) {
-                            Text(post.title, style = MaterialTheme.typography.h6)
-                        }
-                        Text(post.text)
-                    }
+                if (post.title.isNotEmpty()) {
+                    Text(post.title, style = MaterialTheme.typography.h6)
                 }
+                Text(post.text)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = {
                         likePost(post.id, ratingState)
