@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 public class PostController {
@@ -40,8 +38,8 @@ public class PostController {
     }
 
     @RequestMapping("/post/getAll")
-    ResponseEntity<List<Post>> getPostsByTags(@RequestParam("tagIds") List<Integer> tagIds) {
-        List<Post> list = postService.getPostsBySelectedTags(tagIds);
+    ResponseEntity<List<Post>> getPostsByTags(@RequestParam("tags") String tags) {
+        List<Post> list = postService.getPostsBySelectedTags(tags);
         if (list == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
@@ -120,13 +118,7 @@ public class PostController {
     }
 
     @GetMapping("/getTags")
-    public List<Tag> getTags() {
-        return Stream.of(
-                        "C++", "Python", "Java",
-                        "JavaScript", "Go", "Yandex",
-                        "C++", "Python", "Java",
-                        "Tinkoff", "SberSeasons")
-                .map(Tag::new)
-                .collect(Collectors.toList());
+    public List<String> getTags() {
+        return Tag.getAllTags();
     }
 }

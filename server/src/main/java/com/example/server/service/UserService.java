@@ -73,6 +73,7 @@ public class UserService {
         user.setContacts(updateDto.getContacts());
         user.setBio(updateDto.getBio());
         user.setResumeUrl(updateDto.getResumeUrl());
+        user.setTags(updateDto.getTags());
 
         return userRepository.save(user);
     }
@@ -89,6 +90,14 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setBio(bio);
+
+        userRepository.save(user);
+    }
+
+    public void updateUserTags(Integer userId, String tags) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setTags(tags);
 
         userRepository.save(user);
     }

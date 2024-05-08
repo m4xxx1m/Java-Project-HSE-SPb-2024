@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -116,8 +117,19 @@ public class UserController {
         userService.updateUserBio(userId, bio);
     }
 
+    @PostMapping("/users/{userId}/updateTags")
+    public void updateTags(@PathVariable Integer userId, @RequestParam("tags") String tags) {
+        userService.updateUserTags(userId, tags);
+    }
+
     @GetMapping("/users/{userId}/getPostsFromSubscriptions")
     public List<Post> getPostsFromSubscriptions(@PathVariable Integer userId) {
         return subscriptionService.getPostsFromSubscriptions(userId);
+    }
+
+    @GetMapping("/users/{userId}/getUserTags")
+    public String getUserTags(@PathVariable Integer userId) {
+        User user = userService.getUser(userId);
+        return user == null ? null : user.getTags();
     }
 }
