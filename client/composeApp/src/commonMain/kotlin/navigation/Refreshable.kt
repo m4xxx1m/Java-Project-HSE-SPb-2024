@@ -23,16 +23,16 @@ abstract class Refreshable {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RefreshableContent(
-    refreshHelper: MutableState<out Refreshable>,
+    refreshHelper: MutableState<out Refreshable?>,
     content: @Composable () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     coroutineScope.launch {
-        refreshHelper.value.load()
+        refreshHelper.value?.load()
     }
     val onRefresh: () -> Unit = {
         coroutineScope.launch {
-            refreshHelper.value.load()
+            refreshHelper.value?.load()
         }
     }
     DisposableEffect(onRefresh) {
@@ -42,7 +42,7 @@ fun RefreshableContent(
         }
     }
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = refreshHelper.value.isRefreshing,
+        refreshing = refreshHelper.value?.isRefreshing ?: false,
         onRefresh = {
             onRefresh()
         }
@@ -52,7 +52,7 @@ fun RefreshableContent(
     ) {
         content()
         PullRefreshIndicator(
-            refreshing = refreshHelper.value.isRefreshing,
+            refreshing = refreshHelper.value?.isRefreshing ?: false,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
