@@ -96,18 +96,18 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                         authManager.logOut(nav)
                     }
                 }) {
-                    Text("Yes")
+                    Text("Да")
                 }
             },
             dismissButton = {
                 OutlinedButton(onClick = {
                     isDialogOpened.value = false
                 }) {
-                    Text("No")
+                    Text("Нет")
                 }
             },
             text = {
-                Text("Are you sure you want to log out?")
+                Text("Вы уверены, что хотите выйти из аккаунта?")
             }
         )
     }
@@ -150,31 +150,31 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                         }
                     ) {
                         Text(
-                            subscriptionManager?.value?.getButtonText() ?: "Subscribe"
+                            subscriptionManager?.value?.getButtonText() ?: "Подписаться"
                         )
                     }
                 }
                 if (thisUser) {
-                    TextFieldCard("Contacts", profile.contacts) {
+                    TextFieldCard("Контакты", profile.contacts) {
                         updateContacts(user.id, it)
                     }
-                    TextFieldCard("About me", profile.about) {
+                    TextFieldCard("О себе", profile.about) {
                         updateBio(user.id, it)
                     }
                 } else {
-                    OutlinedCard("Contacts") {
+                    OutlinedCard("Контакты") {
                         SelectionContainer {
                             Text(profile.contacts)
                         }
                     }
-                    OutlinedCard("About me") {
+                    OutlinedCard("О себе") {
                         SelectionContainer {
                             Text(profile.about)
                         }
                     }
                 }
                 SubscriptionsCard(user.id, navigator, updateSubscriptionsList)
-                OutlinedCard("Tags") {
+                OutlinedCard("Теги") {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
@@ -222,7 +222,7 @@ fun UserProfileCard(user: User, navigator: Navigator? = null) {
                 }
                 OutlinedCard("") {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("My CV", modifier = Modifier.weight(1f))
+                        Text("Мое резюме", modifier = Modifier.weight(1f))
                         if (thisUser) {
                             IconButton(onClick = { }) {
                                 Image(Icons.Rounded.Edit, contentDescription = null)

@@ -109,7 +109,7 @@ fun SubscriptionsCard(
                     }) {
                         Image(
                             Icons.Rounded.ArrowForward,
-                            contentDescription = "Manage subscriptions",
+                            contentDescription = "Управлять подписками",
                             modifier = Modifier.size(25.dp)
                         )
                     }
@@ -117,7 +117,6 @@ fun SubscriptionsCard(
             }
         }
     }
-
 }
 
 @Composable
@@ -136,7 +135,7 @@ private fun card(uiOption: Boolean, content: @Composable () -> Unit) {
                 ).fillMaxWidth()
             ) {
                 Text(
-                    "Subscriptions", fontWeight = FontWeight.Light,
+                    "Подписки", fontWeight = FontWeight.Light,
                     fontSize = 12.sp
                 )
                 Spacer(Modifier.size(10.dp))
@@ -144,7 +143,7 @@ private fun card(uiOption: Boolean, content: @Composable () -> Unit) {
             }
         }
     } else {
-        OutlinedCard("Subscriptions", content)
+        OutlinedCard("Подписки", content)
     }
 }
 

@@ -3,6 +3,7 @@ package ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
@@ -42,7 +45,11 @@ import retrofit2.Response
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
+fun CommentCard(
+    comment: Comment,
+    isAnswerToAnswer: Boolean = false,
+    afterDeleteComment: (() -> Unit)? = null
+) {
     val rating = remember { mutableStateOf(comment.likesCount) }
     val navigator = LocalNavigator.current
     Card(elevation = 6.dp, modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
@@ -72,12 +79,33 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
                         Text(comment.text, fontSize = 14.sp)
                     }
                     Column {
-                        Image(
-                            Icons.Rounded.MoreVert,
-                            contentDescription = "Show dropdown menu",
-                            modifier = Modifier.size(31.dp).clip(CircleShape).clickable { }
-                                .padding(3.dp)
-                        )
+                        if (comment.authorId == AuthManager.currentUser.id) {
+                            Box {
+                                val expanded = remember { mutableStateOf(false) }
+                                Image(
+                                    Icons.Rounded.MoreVert,
+                                    contentDescription = "Show dropdown menu",
+                                    modifier = Modifier.size(31.dp).clip(CircleShape).clickable {
+                                        expanded.value = true
+                                    }.padding(3.dp)
+                                )
+                                DropdownMenu(
+                                    expanded = expanded.value,
+                                    onDismissRequest = {
+                                        expanded.value = false
+                                    }
+                                ) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            deleteComment(comment, afterDeleteComment)
+                                            expanded.value = false
+                                        }
+                                    ) {
+                                        Text("Удалить комментарий")
+                                    }
+                                }
+                            }
+                        }
                         if (isAnswerToAnswer) {
                             Image(
                                 Icons.Rounded.KeyboardArrowUp,
@@ -122,6 +150,24 @@ fun CommentCard(comment: Comment, isAnswerToAnswer: Boolean = false) {
             }
         }
     }
+}
+
+private fun deleteComment(comment: Comment, afterDeleteComment: (() -> Unit)?) {
+    RetrofitClient.retrofitCall.deleteComment(comment.postId, comment.id).enqueue(
+        object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.code() == 200) {
+                    afterDeleteComment?.invoke()
+                } else {
+                    println("wrong code on deleting comment")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                println("failure on deleting comment")
+            }
+        }
+    )
 }
 
 private fun likeComment(comment: Comment, rating: MutableState<Int>) {

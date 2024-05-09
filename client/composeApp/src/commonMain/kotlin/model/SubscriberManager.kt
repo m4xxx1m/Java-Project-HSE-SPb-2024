@@ -83,8 +83,8 @@ class SubscriberManager(private val userId: Int, private val coroutineScope: Cor
 
     fun getButtonText(): String {
         return if (isSubscribed.value) 
-            "Unsubscribe"
+            "Отписаться"
         else 
-            "Subscribe"
+            "Подписаться"
     }
 }

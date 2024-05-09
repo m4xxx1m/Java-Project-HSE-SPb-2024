@@ -64,7 +64,7 @@ fun SignUpEmailForm(navigator: Navigator) {
                     )
                 }
             },
-            label = { Text("Email") },
+            label = { Text("Почта") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true
         )
@@ -78,7 +78,7 @@ fun SignUpEmailForm(navigator: Navigator) {
             val signUpManager = SignUpManager(emailTrimmed)
             navigator.push(SignUpUserDataScreen(signUpManager))
         }, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
-            Text("Sign up")
+            Text("Зарегистрироваться")
         }
     }
 }

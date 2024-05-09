@@ -17,7 +17,7 @@ object NotificationsTab: Tab {
         @Composable
         get() {
             val icon = rememberVectorPainter(Icons.Rounded.Notifications)
-            val title = "Notifications"
+            val title = "Уведомления"
             val index: UShort = 1u
             return TabOptions(index, title, icon)
         }
@@ -28,7 +28,7 @@ object NotificationsTab: Tab {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("Notifications")
+            Text("Уведомления")
         }
     }
 }
