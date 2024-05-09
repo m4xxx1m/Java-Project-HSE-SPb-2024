@@ -3,6 +3,7 @@ package com.example.server.service;
 import com.example.server.dto.UserLoginDto;
 import com.example.server.dto.UserRegistrationDto;
 import com.example.server.dto.UserUpdateDto;
+import com.example.server.model.FileInfo;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -74,26 +76,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String newProfilePictureUrl = null;
-        MultipartFile profilePicture = updateDto.getProfilePicture();
-        if (profilePicture != null) {
-            String extension = FilenameUtils.getExtension(profilePicture.getOriginalFilename());
-            String key = FileInfoService.generateKey(profilePicture.getOriginalFilename());
-            newProfilePictureUrl = DIRECTORY_PATH + key + "." + extension;
-            try {
-                FileInfoService.uploadFileData(profilePicture.getBytes(), newProfilePictureUrl);
-            } catch (Exception e) {
-                throw new IOException("Can't upload profile picture");
-            }
-        }
-
-        String profilePictureUrl = user.getProfilePictureUrl();
-        if (profilePictureUrl != null) {
-            Path path = Paths.get(profilePictureUrl);
-            Files.delete(path);
-        }
-
-        user.setProfilePictureUrl(newProfilePictureUrl);
         user.setUsername(updateDto.getUsername());
         user.setEmail(updateDto.getEmail());
         user.setPassword(updateDto.getPassword());
@@ -109,6 +91,36 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User uploadUserProfilePicture(Integer userId, MultipartFile profilePicture) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String extension = FilenameUtils.getExtension(profilePicture.getOriginalFilename());
+        String key = FileInfoService.generateKey(profilePicture.getOriginalFilename());
+        String newProfilePictureUrl = DIRECTORY_PATH + userId + "\\" + key + "." + extension;
+        try {
+            FileInfoService.uploadFileData(profilePicture.getBytes(), newProfilePictureUrl);
+        } catch (Exception e) {
+            throw new IOException("Can't upload profile picture");
+        }
+
+        String profilePictureUrl = user.getProfilePictureUrl();
+        if (profilePictureUrl != null && !Objects.equals(profilePictureUrl, "")) {
+            deleteUserProfilePicture(userId);
+        }
+
+        user.setProfilePictureUrl(newProfilePictureUrl);
+
+        return userRepository.save(user);
+    }
+
+    public User deleteUserProfilePicture(Integer userId) throws IOException {
+        User user = getUser(userId);
+        Files.delete(Paths.get(user.getProfilePictureUrl()));
+        user.setProfilePictureUrl("");
+        return userRepository.save(user);
+    }
+
     public User getUser(Integer userId) {
         return userRepository.findById(userId).orElse(null);
     }
@@ -120,6 +132,9 @@ public class UserService {
     public byte[] getUserProfilePicture(Integer userId) throws IOException {
         User user = getUser(userId);
         try {
+            if (user.getProfilePictureUrl() == null || Objects.equals(user.getProfilePictureUrl(), "")) {
+                return null;
+            }
             return Files.readAllBytes((Paths.get(user.getProfilePictureUrl())));
         } catch (IOException e) {
             throw new IOException("Can't download file");

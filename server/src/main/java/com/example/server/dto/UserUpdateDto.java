@@ -8,7 +8,6 @@ public class UserUpdateDto {
     private String username;
     private String email;
     private String password;
-    private MultipartFile profilePicture;
     private String firstName;
     private String secondName;
     private Date dateOfBirth;
@@ -40,14 +39,6 @@ public class UserUpdateDto {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public MultipartFile getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(MultipartFile profilePicture) {
-        this.profilePicture = profilePicture;
     }
 
     public String getFirstName() {
