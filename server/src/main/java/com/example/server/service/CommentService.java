@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,17 +29,23 @@ public class CommentService {
     private RatedObjectService ratedObjectService;
 
     public Comment addComment(ContentObjDto commentRequest, int postId) {
-        Comment comment = new Comment(commentRequest.getAuthorId(), commentRequest.getContent(), postId);
-        postService.incrementCommentsCount(postId);
+        Comment comment = new Comment(
+                commentRequest.getAuthorId(),
+                commentRequest.getContent(),
+                postId
+        );
+        postService.changeCommentsCount(postId, 1);
         return commentRepository.save(comment);
     }
 
     public void deleteComment(int id) {
-        Comment comment = getCommentById(id);
-        postService.decrementCommentsCount(comment.getPostId());
         ratedObjectService.deleteRatingsOfObject(id);
         savedObjectService.deleteSavedObjectForAllUsers(id);
         commentRepository.deleteById(id);
+        Comment comment = getCommentById(id);
+        if (comment != null) {
+            postService.changeCommentsCount(comment.getPostId(), -1);
+        }
     }
 
     public Comment getCommentById(int id) {
@@ -50,7 +57,9 @@ public class CommentService {
         if (post == null) {
             return null;
         } else {
-            return commentRepository.findByPostId(postId);
+            var comments = commentRepository.findByPostId(postId);
+            comments.sort(Comparator.comparing(Comment::getCreationTime));
+            return comments;
         }
     }
 
@@ -73,7 +82,7 @@ public class CommentService {
         return commentRepository.findAll();
     }
 
-    public void incrementCommentRating(int commentId, int userId) {
+    public int incrementCommentRating(int commentId, int userId) {
         Comment comment = getCommentById(commentId);
         Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, commentId);
         if (rating.isEmpty()) {
@@ -88,9 +97,10 @@ public class CommentService {
             comment.incrementRating();
         }
         commentRepository.save(comment);
+        return comment.getRating();
     }
 
-    public void decrementCommentRating(int commentId, int userId) {
+    public int decrementCommentRating(int commentId, int userId) {
         Comment comment = getCommentById(commentId);
         Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, commentId);
         if (rating.isEmpty()) {
@@ -105,6 +115,7 @@ public class CommentService {
             comment.decrementRating();
         }
         commentRepository.save(comment);
+        return comment.getRating();
     }
 
     public void editComment(Comment comment, ContentObjDto commentDto) {

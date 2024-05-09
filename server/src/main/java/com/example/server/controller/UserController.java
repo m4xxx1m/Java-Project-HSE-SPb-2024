@@ -3,6 +3,7 @@ package com.example.server.controller;
 import com.example.server.dto.UserLoginDto;
 import com.example.server.dto.UserRegistrationDto;
 import com.example.server.dto.UserUpdateDto;
+import com.example.server.model.Post;
 import com.example.server.model.Subscription;
 import com.example.server.model.User;
 import com.example.server.service.SubscriptionService;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -82,8 +84,29 @@ public class UserController {
     }
 
     @PostMapping("/users/{subscriberId}/subscribe/{subscribeToId}")
-    public Subscription subscribe(@PathVariable Integer subscriberId, @PathVariable Integer subscribeToId) {
+    public Subscription subscribe(
+            @PathVariable Integer subscriberId,
+            @PathVariable Integer subscribeToId
+    ) {
         return subscriptionService.subscribe(subscriberId, subscribeToId);
+    }
+
+    @PostMapping("/users/{subscriberId}/unsubscribe/{subscribeToId}")
+    public void unsubscribe(@PathVariable Integer subscriberId, @PathVariable Integer subscribeToId) {
+        subscriptionService.unsubscribe(subscriberId, subscribeToId);
+    }
+
+    @GetMapping("/users/{subscriberId}/checkSubscription/{subscribeToId}")
+    public boolean checkSubscription(
+            @PathVariable Integer subscriberId,
+            @PathVariable Integer subscribeToId
+    ) {
+        return subscriptionService.checkSubscription(subscriberId, subscribeToId);
+    }
+
+    @GetMapping("/users/{subscriberId}/getSubscriptions")
+    public List<User> getSubscriptions(@PathVariable Integer subscriberId) {
+        return subscriptionService.getSubscriptions(subscriberId);
     }
 
     @GetMapping("/users/getUser/{userId}")
@@ -129,5 +152,31 @@ public class UserController {
     @PostMapping("/users/getUsersList")
     public List<User> getUsersList(@RequestBody Set<Integer> userIds) {
         return userService.getUsersList(userIds);
+    }
+
+    @PostMapping("/users/{userId}/updateContacts")
+    public void updateContacts(@PathVariable Integer userId, @RequestParam("contacts") String contacts) {
+        userService.updateUserContacts(userId, contacts);
+    }
+
+    @PostMapping("/users/{userId}/updateBio")
+    public void updateBio(@PathVariable Integer userId, @RequestParam("bio") String bio) {
+        userService.updateUserBio(userId, bio);
+    }
+
+    @PostMapping("/users/{userId}/updateTags")
+    public void updateTags(@PathVariable Integer userId, @RequestParam("tags") String tags) {
+        userService.updateUserTags(userId, tags);
+    }
+
+    @GetMapping("/users/{userId}/getPostsFromSubscriptions")
+    public List<Post> getPostsFromSubscriptions(@PathVariable Integer userId) {
+        return subscriptionService.getPostsFromSubscriptions(userId);
+    }
+
+    @GetMapping("/users/{userId}/getUserTags")
+    public String getUserTags(@PathVariable Integer userId) {
+        User user = userService.getUser(userId);
+        return user == null ? null : user.getTags();
     }
 }

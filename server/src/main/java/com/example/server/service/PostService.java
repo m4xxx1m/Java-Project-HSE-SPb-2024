@@ -5,7 +5,6 @@ import com.example.server.dto.PostDto;
 import com.example.server.model.*;
 import com.example.server.repository.CommentRepository;
 import com.example.server.repository.PostRepository;
-import com.example.server.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.core.io.Resource;
@@ -14,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,9 +26,6 @@ public class PostService {
 
     @Autowired
     private SavedObjectService savedObjectService;
-    
-    @Autowired
-    private TagRepository tagRepository;
 
     @Autowired
     private CommentRepository commentRepository;
@@ -41,7 +38,7 @@ public class PostService {
 
     public Post addPost(PostDto postDto) {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
-                postDto.getContent(), postDto.getTagIds());
+                postDto.getContent(), postDto.getTags(), postDto.getCommentsCount());
         return postRepository.save(post);
     }
 
@@ -77,7 +74,9 @@ public class PostService {
     }
 
     public List<Post> getPosts() {
-        return postRepository.findAll();
+        var posts = postRepository.findAll();
+        posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
+        return posts;
     }
 
     public List<Post> getPostsByPostIds(List<Integer> postIds) {
@@ -88,28 +87,31 @@ public class PostService {
         return posts;
     }
 
-    public List<Post> getPostsBySelectedTags(List<Integer> tagIds) {
+    public List<Post> getPostsBySelectedTags(String tags) {
+        List<Integer> tagIds = Tag.tagsToTagIds(tags);
         List<Post> posts = getPosts();
         return posts.stream()
-                .filter(post -> post.getTagIds().stream().anyMatch(tagIds::contains))
+                .filter(post -> Tag.tagsToTagIds(post.getTags())
+                        .stream()
+                        .anyMatch(tagIds::contains))
                 .collect(Collectors.toList());
     }
-    
-    public List<Tag> getPostTags(int id) {
+
+    public List<String> getPostTags(int id) {
         Post post = getPostById(id);
         if (post == null) {
             return null;
         } else {
-            List<Integer> tagIds = post.getTagIds();
-            List<Tag> tags = new ArrayList<>();
+            List<Integer> tagIds = Tag.tagsToTagIds(post.getTags());
+            List<String> tags = new ArrayList<>();
             for (Integer tagId : tagIds) {
-                tags.add(tagRepository.getReferenceById(tagId));
+                tags.add(Tag.getTagName(tagId));
             }
             return tags;
         }
     }
 
-    public void incrementPostRating(int id, int userId) {
+    public int incrementPostRating(int id, int userId) {
         Post post = getPostById(id);
         Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, id);
         if (rating.isEmpty()) {
@@ -124,9 +126,10 @@ public class PostService {
             post.incrementRating();
         }
         postRepository.save(post);
+        return post.getRating();
     }
 
-    public void decrementPostRating(int id, int userId) {
+    public int decrementPostRating(int id, int userId) {
         Post post = getPostById(id);
         Optional<RatedObject.Type> rating = ratedObjectService.getObjectRating(userId, id);
         if (rating.isEmpty()) {
@@ -141,24 +144,13 @@ public class PostService {
             post.decrementRating();
         }
         postRepository.save(post);
+        return post.getRating();
     }
 
     public void editPost(Post post, PostDto postDto) {
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
-        post.setTagIds(postDto.getTagIds());
-        postRepository.save(post);
-    }
-
-    public void incrementCommentsCount(int id) {
-        Post post = getPostById(id);
-        post.incrementCommentsCount();
-        postRepository.save(post);
-    }
-
-    public void decrementCommentsCount(int id) {
-        Post post = getPostById(id);
-        post.decrementCommentsCount();
+        post.setTags(postDto.getTags());
         postRepository.save(post);
     }
 
@@ -214,4 +206,10 @@ public class PostService {
         return FileInfoService.download(key);
     }
 
+    public void changeCommentsCount(int postId, int delta) {
+        Post post = getPostById(postId);
+        if (post != null) {
+            post.setCommentsCount(post.getCommentsCount() + delta);
+        }
+    }
 }
