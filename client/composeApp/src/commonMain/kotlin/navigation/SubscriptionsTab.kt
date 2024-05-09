@@ -86,7 +86,7 @@ object SubscriptionsTab : Tab {
     }
 }
 
-private class RefreshSubscriptionsHelper() : Refreshable() {
+private class RefreshSubscriptionsHelper : Refreshable() {
     val posts = mutableStateListOf<Post>()
     val users = mutableStateMapOf<Int, User>()
     val updateSubscriptionsList = mutableStateOf(true)

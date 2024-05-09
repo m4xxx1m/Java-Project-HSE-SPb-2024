@@ -71,7 +71,7 @@ class ConnectionErrorScreen : Screen {
                     },
                     enabled = enabled.value
                 ) {
-                    Text("Try again")
+                    Text("Попробовать снова")
                 }
             }
         }

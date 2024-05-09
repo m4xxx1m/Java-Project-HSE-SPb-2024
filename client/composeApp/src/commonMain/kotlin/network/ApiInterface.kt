@@ -138,4 +138,12 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("post/{postId}/comments/{commendId}/delete")
     fun deleteComment(@Path("postId") postId: Int, @Path("commendId") commentId: Int): Call<Void>
+    
+    @Headers("Content-Type:application/json")
+    @GET("/saved/posts")
+    fun getSavedPosts(@Query("userId") userId: Int): Call<List<Post>>
+
+    @Headers("Content-Type:application/json")
+    @GET("/user/posts")
+    fun getUserPosts(@Query("userId") userId: Int): Call<List<Post>>
 }
