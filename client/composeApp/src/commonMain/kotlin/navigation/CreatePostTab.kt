@@ -19,7 +19,7 @@ object CreatePostTab: Tab {
         @Composable
         get() {
             val icon = rememberVectorPainter(Icons.Rounded.AddCircle)
-            val title = "Create Post"
+            val title = "Создать пост"
             val index: UShort = 2u
             return TabOptions(index, title, icon)
         }

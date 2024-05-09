@@ -31,7 +31,6 @@ fun RefreshableContent(
         refreshHelper.value.load()
     }
     val onRefresh: () -> Unit = {
-        refreshHelper.value.isRefreshing = true
         coroutineScope.launch {
             refreshHelper.value.load()
         }

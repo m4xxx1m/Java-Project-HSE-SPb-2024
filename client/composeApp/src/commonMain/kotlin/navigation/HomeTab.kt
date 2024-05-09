@@ -16,12 +16,14 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import kotlinx.coroutines.launch
 import model.Post
 import model.User
 import network.RetrofitClient
@@ -35,7 +37,7 @@ object HomeTab : Tab {
         @Composable
         get() {
             val icon = rememberVectorPainter(Icons.Rounded.Home)
-            val title = "Home"
+            val title = "Главный экран"
             val index: UShort = 0u
             return TabOptions(index, title, icon)
         }
@@ -55,6 +57,7 @@ object HomeTab : Tab {
             }
         }
         val refreshHelper = remember { mutableStateOf(RefreshHomeHelper()) }
+        val coroutineScope = rememberCoroutineScope()
         RefreshableContent(refreshHelper) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
@@ -67,7 +70,14 @@ object HomeTab : Tab {
             ) {
                 items(refreshHelper.value.posts) { post ->
                     post.user = refreshHelper.value.users[post.userId]
-                    PostCard(post)
+                    PostCard(
+                        post,
+                        afterDeletePost = {
+                            coroutineScope.launch {
+                                refreshHelper.value.load()
+                            }
+                        }
+                    )
                     Spacer(Modifier.size(10.dp))
                 }
             }
@@ -80,6 +90,7 @@ private class RefreshHomeHelper : Refreshable() {
     val users = mutableStateMapOf<Int, User>()
 
     override fun load() {
+        isRefreshing = true
         val retrofitCall = RetrofitClient.retrofitCall
         retrofitCall.getAllPosts().enqueue(object : Callback<List<network.Post>> {
             override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {

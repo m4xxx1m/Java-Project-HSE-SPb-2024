@@ -67,7 +67,7 @@ fun SignInForm(navigator: Navigator) {
                         )
                     }
                 },
-                label = { Text("Email or username") },
+                label = { Text("Логин") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 isError = isErrorUsername.value
@@ -88,7 +88,7 @@ fun SignInForm(navigator: Navigator) {
                         )
                     }
                 },
-                label = { Text("Password") },
+                label = { Text("Пароль") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
@@ -114,7 +114,7 @@ fun SignInForm(navigator: Navigator) {
                     navigator.replace(MainNavigation())
                 }
             }, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
-                Text("Sign in")
+                Text("Войти в аккаунт")
             }
             Button(
                 onClick = {
@@ -122,7 +122,7 @@ fun SignInForm(navigator: Navigator) {
                 },
                 modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()
             ) {
-                Text("Register")
+                Text("Зарегистрироваться")
             }
         }
     }

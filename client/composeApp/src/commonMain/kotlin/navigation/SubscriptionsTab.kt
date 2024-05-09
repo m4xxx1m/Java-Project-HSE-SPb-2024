@@ -38,7 +38,7 @@ object SubscriptionsTab : Tab {
         @Composable
         get() {
             val icon = rememberVectorPainter(Icons.Rounded.List)
-            val title = "Subscriptions"
+            val title = "Подписки"
             val index: UShort = 3u
             return TabOptions(index, title, icon)
         }
@@ -93,6 +93,7 @@ private class RefreshSubscriptionsHelper() : Refreshable() {
     val userId = AuthManager.currentUser.id
 
     override fun load() {
+        isRefreshing = true
         updateSubscriptionsList.value = true
         val retrofitCall = RetrofitClient.retrofitCall
         retrofitCall.getPostsFromSubscriptions(userId)

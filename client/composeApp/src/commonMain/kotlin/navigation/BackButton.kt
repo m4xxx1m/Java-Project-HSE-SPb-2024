@@ -32,7 +32,7 @@ fun BackButton(navigator: Navigator) {
         )
         Spacer(Modifier.size(4.dp))
         Text(
-            "Back",
+            "Назад",
             fontSize = 14.sp,
             modifier = Modifier.padding(end = 4.dp)
         )

@@ -1,25 +1,6 @@
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import model.Notification
-import model.Post
-import model.User
-import ui.NewPostForm
-import ui.NotificationWidget
-import ui.SearchWidget
-import ui.UserProfileCard
-import java.time.LocalDateTime
 
 fun main() = application {
     Window(
@@ -36,11 +17,11 @@ fun main() = application {
 //    SignInForm()
 //}
 
-@Preview
-@Composable
-fun previewApp() {
-    App()
-}
+//@Preview
+//@Composable
+//fun previewApp() {
+//    App()
+//}
 
 //@Preview
 //@Composable
@@ -100,49 +81,49 @@ fun previewApp() {
 //    }
 //}
 
-@Preview
-@Composable
-fun previewNotificationWidget() {
-    Column(
-        modifier = Modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth()
-            .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        NotificationWidget(
-            Notification(
-                0,
-                Post(
-                    0,
-                    0,
-                    LocalDateTime.MIN,
-                    emptyList(),
-                    "Post title",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-                    emptyList(),
-                    1000,
-                    100
-                ),
-                Post(
-                    0,
-                    0,
-                    LocalDateTime.MIN,
-                    emptyList(),
-                    "Post title",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-                    emptyList(),
-                    1000,
-                    100
-                )
-            )
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun previewNotificationWidget() {
+//    Column(
+//        modifier = Modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth()
+//            .fillMaxHeight(),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        NotificationWidget(
+//            Notification(
+//                0,
+//                Post(
+//                    0,
+//                    0,
+//                    LocalDateTime.MIN,
+//                    emptyList(),
+//                    "Post title",
+//                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+//                    emptyList(),
+//                    1000,
+//                    100
+//                ),
+//                Post(
+//                    0,
+//                    0,
+//                    LocalDateTime.MIN,
+//                    emptyList(),
+//                    "Post title",
+//                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+//                    emptyList(),
+//                    1000,
+//                    100
+//                )
+//            )
+//        )
+//    }
+//}
 
-@Preview
-@Composable
-fun previewNewPostForm() {
-    NewPostForm()
-}
+//@Preview
+//@Composable
+//fun previewNewPostForm() {
+//    NewPostForm()
+//}
 
 //@Preview
 //@Composable
@@ -159,17 +140,17 @@ fun previewNewPostForm() {
 //    )
 //}
 
-@Preview
-@Composable
-fun previewUserProfile() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth().fillMaxHeight().background(Color.LightGray)
-            .padding(10.dp)
-    ) {
-        UserProfileCard(User(0, "User name", ""))
-    }
-}
+//@Preview
+//@Composable
+//fun previewUserProfile() {
+//    Column(
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        modifier = Modifier.fillMaxWidth().fillMaxHeight().background(Color.LightGray)
+//            .padding(10.dp)
+//    ) {
+//        UserProfileCard(User(0, "User name", ""))
+//    }
+//}
 
 //@Preview
 //@Composable
@@ -187,8 +168,8 @@ fun previewUserProfile() {
 //    )
 //}
 
-@Preview
-@Composable
-fun previewSearchWidget() {
-    SearchWidget()
-}
+//@Preview
+//@Composable
+//fun previewSearchWidget() {
+//    SearchWidget()
+//}

@@ -50,7 +50,7 @@ fun NotificationWidget(notification: Notification) {
                         .background(Color.LightGray)
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
-                    Text("You", fontWeight = FontWeight.SemiBold, 
+                    Text("Вы", fontWeight = FontWeight.SemiBold, 
                         fontSize = TextUnit(14f, TextUnitType.Sp))
                     Text(notification.answerTo.title, maxLines = 1, 
                         fontSize = TextUnit(12f, TextUnitType.Sp))

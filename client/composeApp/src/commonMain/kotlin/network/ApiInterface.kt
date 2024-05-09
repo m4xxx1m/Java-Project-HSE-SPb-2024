@@ -126,4 +126,16 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("/users/{userId}/updateTags")
     fun updateUserTags(@Path("userId") userId: Int, @Query("tags") tags: String): Call<Void>
+
+    @Headers("Content-Type:application/json")
+    @POST("/post/{postId}/save")
+    fun savePost(@Path("postId") postId: Int, @Query("userId") userId: Int): Call<Void>
+
+    @Headers("Content-Type:application/json")
+    @POST("/post/{postId}/delete")
+    fun deletePost(@Path("postId") postId: Int): Call<Void>
+
+    @Headers("Content-Type:application/json")
+    @POST("post/{postId}/comments/{commendId}/delete")
+    fun deleteComment(@Path("postId") postId: Int, @Path("commendId") commentId: Int): Call<Void>
 }

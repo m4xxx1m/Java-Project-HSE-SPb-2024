@@ -63,7 +63,7 @@ class ConnectionErrorScreen : Screen {
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Couldn't connect to the server")
+                Text("Не удалось подключиться к серверу")
                 Button(
                     onClick = {
                         enabled.value = false

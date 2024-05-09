@@ -53,6 +53,7 @@ class CommentScreen(private val postId: Int) : Screen {
 
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.current
         commentText = remember { mutableStateOf("") }
         val refreshHelper = remember { mutableStateOf(RefreshCommentsHelper()) }
         val coroutineScope = rememberCoroutineScope()
@@ -82,7 +83,7 @@ class CommentScreen(private val postId: Int) : Screen {
                                 commentText?.value = it
                             },
                             label = {
-                                Text("Comment")
+                                Text("Комментарий")
                             }
                         )
                         IconButton(
@@ -117,13 +118,23 @@ class CommentScreen(private val postId: Int) : Screen {
                         item {
                             refreshHelper.value.post.value?.let { post ->
                                 post.user = refreshHelper.value.users[post.userId]
-                                PostCard(post, true)
+                                PostCard(
+                                    post,
+                                    true,
+                                    afterDeletePost = {
+                                        navigator?.pop()
+                                    })
                                 Spacer(Modifier.size(15.dp))
                             }
                         }
                         items(refreshHelper.value.comments) { comment ->
                             comment.user = refreshHelper.value.users[comment.authorId]
-                            CommentCard(comment)
+                            CommentCard(
+                                comment,
+                                afterDeleteComment = {
+                                    refreshHelper.value.load()
+                                }
+                            )
                             Spacer(Modifier.size(10.dp))
                         }
                     }
@@ -138,7 +149,6 @@ class CommentScreen(private val postId: Int) : Screen {
         val comments = mutableStateListOf<Comment>()
         val users = mutableStateMapOf<Int, User>()
 
-        // val retrofitCall: ApiInterface = RetrofitClient.retrofit.create(ApiInterface::class.java)
         val retrofitCall = RetrofitClient.retrofitCall
 
         fun sendComment() {
@@ -168,6 +178,7 @@ class CommentScreen(private val postId: Int) : Screen {
         }
 
         override fun load() {
+            isRefreshing = true
             retrofitCall.getComments(postId).enqueue(object : Callback<List<network.Comment>> {
                 override fun onFailure(call: Call<List<network.Comment>>, t: Throwable) {
                     println("refresh comments screen failure")

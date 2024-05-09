@@ -4,24 +4,8 @@ import App
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import model.Notification
-import model.Post
 import platform_depended.AuthStorage
-import ui.NewPostForm
-import ui.NotificationWidget
-import java.time.LocalDateTime
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,46 +67,46 @@ class MainActivity : ComponentActivity() {
 //    }
 //}
 
-@Preview
-@Composable
-fun PreviewNotificationWidget() {
-    Column(
-        modifier = Modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth()
-            .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        NotificationWidget(
-            Notification(
-                0,
-                Post(
-                    0,
-                    0,
-                    LocalDateTime.MIN,
-                    emptyList(),
-                    "Post title",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-                    emptyList(),
-                    1000,
-                    100
-                ),
-                Post(
-                    0,
-                    0,
-                    LocalDateTime.MIN,
-                    emptyList(),
-                    "Post title",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-                    emptyList(),
-                    1000,
-                    100
-                )
-            )
-        )
-    }
-}
-
-@Preview
-@Composable
-fun PreviewNewPostForm() {
-    NewPostForm()
-}
+//@Preview
+//@Composable
+//fun PreviewNotificationWidget() {
+//    Column(
+//        modifier = Modifier.background(Color.LightGray).padding(10.dp).fillMaxWidth()
+//            .fillMaxHeight(),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        NotificationWidget(
+//            Notification(
+//                0,
+//                Post(
+//                    0,
+//                    0,
+//                    LocalDateTime.MIN,
+//                    emptyList(),
+//                    "Post title",
+//                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+//                    emptyList(),
+//                    1000,
+//                    100
+//                ),
+//                Post(
+//                    0,
+//                    0,
+//                    LocalDateTime.MIN,
+//                    emptyList(),
+//                    "Post title",
+//                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+//                    emptyList(),
+//                    1000,
+//                    100
+//                )
+//            )
+//        )
+//    }
+//}
+//
+//@Preview
+//@Composable
+//fun PreviewNewPostForm() {
+//    NewPostForm()
+//}

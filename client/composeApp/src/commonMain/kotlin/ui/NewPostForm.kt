@@ -55,21 +55,21 @@ fun NewPostForm() {
                     modifier = Modifier.fillMaxWidth(),
                     value = title.value,
                     onValueChange = { title.value = it },
-                    label = { Text("Post title", fontWeight = FontWeight.SemiBold) },
+                    label = { Text("Заголовок поста", fontWeight = FontWeight.SemiBold) },
                     maxLines = 3
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     value = postText.value,
                     onValueChange = { postText.value = it },
-                    label = { Text("Post text") }
+                    label = { Text("Текст поста") }
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = checkedState.value,
                         onCheckedChange = { checkedState.value = it },
                     )
-                    Text("Attach CV from profile", fontWeight = FontWeight.Thin)
+                    Text("Прикрепить резюме из профиля", fontWeight = FontWeight.Thin)
                 }
             } else {
                 FlowRow(
@@ -105,7 +105,7 @@ fun NewPostForm() {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Spacer(Modifier.width(20.dp))
                         Spacer(Modifier.weight(1f))
-                        Text("Tags")
+                        Text("Теги")
                         Spacer(Modifier.weight(1f))
                         Image(
                             Icons.Rounded.ArrowDropDown, contentDescription = "Edit post tags",
@@ -123,6 +123,7 @@ fun NewPostForm() {
                         title.value = ""
                         postText.value = ""
                         postTags.replace(0, postTags.length, Tag.defaultTags)
+                        textMode.value = true
                     }
                 }) {
                     Image(

@@ -22,6 +22,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -32,14 +34,11 @@ import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,7 +62,9 @@ import java.time.format.DateTimeFormatter
 fun PostCard(
     post: Post,
     isInCommentsScreen: Boolean = false,
+    afterDeletePost: (() -> Unit)? = null
 ) {
+    val thisUser = post.userId == AuthManager.currentUser.id
     val ratingState = remember { mutableStateOf(post.likesCount) }
     val navigator =
         if (isInCommentsScreen) LocalNavigator.current else LocalNavigator.current?.parent
@@ -74,10 +75,35 @@ fun PostCard(
         Box(
             modifier = Modifier.fillMaxWidth().padding(10.dp)
         ) {
-            var expanded by remember { mutableStateOf(false) }
-            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                IconButton(onClick = { expanded = true }) {
+            val expanded = remember { mutableStateOf(false) }
+            Box(modifier = Modifier.align(Alignment.TopEnd)){
+                IconButton(onClick = { expanded.value = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = "Show dropdown menu")
+                }
+                DropdownMenu(
+                    expanded = expanded.value,
+                    onDismissRequest = {
+                        expanded.value = false
+                    }
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            savePost(post.id)
+                            expanded.value = false
+                        }
+                    ) {
+                        Text("Сохранить/удалить из сохраненных")
+                    }
+                    if (thisUser) {
+                        DropdownMenuItem(
+                            onClick = {
+                                expanded.value = false
+                                deletePost(post.id, afterDeletePost)
+                            }
+                        ) {
+                            Text("Удалить пост")
+                        }
+                    }
                 }
             }
             Column {
@@ -164,10 +190,10 @@ fun PostCard(
                             Image(Icons.Rounded.Email, contentDescription = "Comments")
                         }
                         Text(post.commentsCount.toString())
-                        Spacer(Modifier.weight(1f))
-                        IconButton(onClick = {}) {
-                            Image(Icons.Rounded.Share, contentDescription = "Share")
-                        }
+//                        Spacer(Modifier.weight(1f))
+//                        IconButton(onClick = {}) {
+//                            Image(Icons.Rounded.Share, contentDescription = "Share")
+//                        }
                     }
                 }
             }
@@ -175,9 +201,41 @@ fun PostCard(
     }
 }
 
+private fun deletePost(postId: Int, afterDeletingPost: (() -> Unit)?) {
+    RetrofitClient.retrofitCall.deletePost(postId).enqueue(object : Callback<Void> {
+        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            if (response.code() == 200) {
+                afterDeletingPost?.invoke()
+            } else {
+                println("wrong code on deleting post")
+            }
+        }
+
+        override fun onFailure(call: Call<Void>, t: Throwable) {
+            println("failure on deleting post")
+        }
+
+    })
+}
+
+private fun savePost(postId: Int) {
+    RetrofitClient.retrofitCall.savePost(postId, AuthManager.currentUser.id).enqueue(
+        object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.code() != 200) {
+                    println("wrong code on saving post")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                println("failure on saving post")
+            }
+        }
+    )
+}
+
 private fun likePost(postId: Int, rating: MutableState<Int>) {
     val userId = AuthManager.currentUser.id
-//    val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
     val retrofitCall = RetrofitClient.retrofitCall
     retrofitCall.likePost(postId, userId).enqueue(object : Callback<Int> {
         override fun onResponse(call: Call<Int>, response: Response<Int>) {
@@ -192,7 +250,6 @@ private fun likePost(postId: Int, rating: MutableState<Int>) {
 
 private fun dislikePost(postId: Int, rating: MutableState<Int>) {
     val userId = AuthManager.currentUser.id
-//    val retrofitCall = RetrofitClient.retrofit.create(ApiInterface::class.java)
     val retrofitCall = RetrofitClient.retrofitCall
     retrofitCall.dislikePost(postId, userId).enqueue(object : Callback<Int> {
         override fun onResponse(call: Call<Int>, response: Response<Int>) {

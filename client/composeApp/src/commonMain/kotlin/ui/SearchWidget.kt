@@ -33,7 +33,7 @@ fun SearchWidget() {
                 Icons.Rounded.Search, contentDescription = "Search",
                 modifier = Modifier.size(30.dp)
             )
-            Text("Search", modifier = Modifier.align(Alignment.Center),
+            Text("Поиск", modifier = Modifier.align(Alignment.Center),
                 fontSize = 18.sp)
         }
     }

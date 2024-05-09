@@ -64,7 +64,7 @@ class TagSelectionScreen(
                 ) {
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = "Choose your interests",
+                        text = "Выберите свои интересы",
                         style = MaterialTheme.typography.h5,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -79,7 +79,7 @@ class TagSelectionScreen(
                                     )
                                 }
                             ) {
-                                Text("Done")
+                                Text("Готово")
                             }
                         }
                     }
