@@ -91,19 +91,38 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-    @GetMapping("/users/getUserProfilePicture/{userId}")
+    @GetMapping("/users/picture/{userId}")
     public ResponseEntity<?> getUserProfilePicture(@PathVariable Integer userId) {
         User user = userService.getUser(userId);
+        String profilePictureUrl = user.getProfilePictureUrl();
         try {
-            if (user.getProfilePictureUrl() == null) {
+            if (profilePictureUrl == null) {
                 return ResponseEntity.ok(null);
             }
-            Path path = Paths.get(user.getProfilePictureUrl());
+            Path path = Paths.get(profilePictureUrl);
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.valueOf(Files.probeContentType(path)))
                     .body(userService.getUserProfilePicture(userId));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PostMapping("/users/picture/{userId}/upload")
+    public ResponseEntity<User> deleteUserProfilePicture(@PathVariable Integer userId, @ModelAttribute MultipartFile profilePicture) {
+        try {
+            return ResponseEntity.ok(userService.uploadUserProfilePicture(userId, profilePicture));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @GetMapping("/users/picture/{userId}/delete")
+    public ResponseEntity<User> deleteUserProfilePicture(@PathVariable Integer userId) {
+        try {
+            return ResponseEntity.ok(userService.deleteUserProfilePicture(userId));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
     }
 

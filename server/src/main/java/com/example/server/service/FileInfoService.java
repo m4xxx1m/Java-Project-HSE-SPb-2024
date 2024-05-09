@@ -31,7 +31,7 @@ public class FileInfoService {
     public FileInfo upload(MultipartFile resource, int postId) throws IOException {
         String key = generateKey(resource.getOriginalFilename());
         FileInfo createdFile = new FileInfo(resource.getOriginalFilename(), key, postId, resource.getContentType());
-        uploadFileData(resource.getBytes(), DIRECTORY_PATH + key);
+        uploadFileData(resource.getBytes(), DIRECTORY_PATH + postId + "\\" + key);
         fileInfoRepository.save(createdFile);
         return createdFile;
     }
@@ -54,10 +54,11 @@ public class FileInfoService {
         return Files.readAllBytes(path);
     }
 
-    void delete(FileInfo fileInfo) throws IOException {
+    void delete(int postId, FileInfo fileInfo) throws IOException {
         assert fileInfo != null;
-        Path path = Paths.get(DIRECTORY_PATH + fileInfo.getKey());
+        Path path = Paths.get(DIRECTORY_PATH + postId + "\\" + fileInfo.getKey());
         Files.delete(path);
+        fileInfoRepository.delete(fileInfo);
     }
 
 }

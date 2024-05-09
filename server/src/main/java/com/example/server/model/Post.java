@@ -1,6 +1,7 @@
 package com.example.server.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,18 +15,18 @@ public class Post extends ContentObj {
     private String title;
     private int commentsCount;
 
-    @OneToOne
-    private FileInfo fileInfo;
+    private Integer fileInfoId;
+
+    private List<Integer> picInfoIds;
 
     public Post() {
         super();
     }
-    public Post(int authorId, String title, String content, List<Integer> tagIds, FileInfo fileInfo) {
+    public Post(int authorId, String title, String content, List<Integer> tagIds) {
         super(authorId, content);
         this.title = title;
         this.tagIds = tagIds;
         this.commentsCount = 0;
-        this.fileInfo = fileInfo;
     }
 
     public List<Integer> getTagIds() {
@@ -60,12 +61,20 @@ public class Post extends ContentObj {
         commentsCount--;
     }
 
-    public FileInfo getFileInfo() {
-        return fileInfo;
+    public Integer getFileInfoId() {
+        return fileInfoId;
     }
 
-    public void setFileInfo(FileInfo fileInfo) {
-        this.fileInfo = fileInfo;
+    public void setFileInfoId(Integer fileInfoId) {
+        this.fileInfoId = fileInfoId;
+    }
+
+    public List<Integer> getPicInfoIds() {
+        return picInfoIds;
+    }
+
+    public void setPicInfoIds(List<Integer> picInfoIds) {
+        this.picInfoIds = picInfoIds;
     }
 
 }
