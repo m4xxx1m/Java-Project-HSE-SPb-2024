@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -105,6 +106,7 @@ public class PostController {
         if (savedPosts == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        savedPosts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
         return new ResponseEntity<>(savedPosts, HttpStatus.OK);
     }
 
@@ -114,7 +116,8 @@ public class PostController {
         if (userPosts == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(postService.getPostsByAuthorId(userId), HttpStatus.OK);
+        userPosts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
+        return new ResponseEntity<>(userPosts, HttpStatus.OK);
     }
 
     @GetMapping("/getTags")
