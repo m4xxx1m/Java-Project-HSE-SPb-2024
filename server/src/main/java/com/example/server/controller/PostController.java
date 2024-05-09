@@ -63,7 +63,7 @@ public class PostController {
     }
 
     @RequestMapping("/post/add")
-    ResponseEntity<Post> addPost(@ModelAttribute PostDto postDto) throws IOException {
+    ResponseEntity<Post> addPost(@ModelAttribute PostDto postDto) {
         Post post = postService.addPost(postDto);
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
@@ -151,7 +151,7 @@ public class PostController {
     }
 
     @RequestMapping("/post/{id}/edit")
-    ResponseEntity<Post> editPost(@PathVariable Integer id, @RequestBody PostDto postDto) throws IOException {
+    ResponseEntity<Post> editPost(@PathVariable Integer id, @RequestBody PostDto postDto) {
         Post post = postService.getPostById(id);
         if (post == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

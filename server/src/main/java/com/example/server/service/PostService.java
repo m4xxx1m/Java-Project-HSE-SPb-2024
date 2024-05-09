@@ -39,7 +39,7 @@ public class PostService {
     @Autowired
     FileInfoService fileInfoService;
 
-    public Post addPost(PostDto postDto) throws IOException {
+    public Post addPost(PostDto postDto) {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
                 postDto.getContent(), postDto.getTagIds());
         return postRepository.save(post);
@@ -143,7 +143,7 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public void editPost(Post post, PostDto postDto) throws IOException {
+    public void editPost(Post post, PostDto postDto) {
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setTagIds(postDto.getTagIds());
