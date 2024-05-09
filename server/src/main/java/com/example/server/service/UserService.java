@@ -79,14 +79,10 @@ public class UserService {
         user.setUsername(updateDto.getUsername());
         user.setEmail(updateDto.getEmail());
         user.setPassword(updateDto.getPassword());
-        user.setFirstName(updateDto.getFirstName());
-        user.setSecondName(updateDto.getSecondName());
-        user.setDateOfBirth(updateDto.getDateOfBirth());
-        user.setCountry(updateDto.getCountry());
-        user.setCity(updateDto.getCity());
-        user.setEducation(updateDto.getEducation());
+        user.setContacts(updateDto.getContacts());
         user.setBio(updateDto.getBio());
         user.setResumeUrl(updateDto.getResumeUrl());
+        user.setTags(updateDto.getTags());
 
         return userRepository.save(user);
     }
@@ -119,6 +115,30 @@ public class UserService {
         Files.delete(Paths.get(user.getProfilePictureUrl()));
         user.setProfilePictureUrl("");
         return userRepository.save(user);
+    }
+
+    public void updateUserContacts(Integer userId, String contacts) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setContacts(contacts);
+
+        userRepository.save(user);
+    }
+
+    public void updateUserBio(Integer userId, String bio) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setBio(bio);
+
+        userRepository.save(user);
+    }
+
+    public void updateUserTags(Integer userId, String tags) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setTags(tags);
+
+        userRepository.save(user);
     }
 
     public User getUser(Integer userId) {

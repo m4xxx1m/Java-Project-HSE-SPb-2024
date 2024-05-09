@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 @Table(name = "rated_object")
 public class RatedObject extends UserObjectConnection {
 
+    public RatedObject() {
+    }
+
     public enum Type {
         LIKE,
         DISLIKE

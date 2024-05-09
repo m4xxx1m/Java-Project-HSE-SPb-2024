@@ -10,10 +10,10 @@ import java.util.List;
 @Table(name = "posts")
 public class Post extends ContentObj {
 
-    private List<Integer> tagIds = new ArrayList<>();
-
+    private String tags;
+    @Column(length = 255)
     private String title;
-    private int commentsCount;
+    private int commentsCount = 0;
 
     private Integer fileInfoId;
 
@@ -22,19 +22,20 @@ public class Post extends ContentObj {
     public Post() {
         super();
     }
-    public Post(int authorId, String title, String content, List<Integer> tagIds) {
+
+    public Post(int authorId, String title, String content, String tags, int commentsCount) {
         super(authorId, content);
         this.title = title;
-        this.tagIds = tagIds;
-        this.commentsCount = 0;
+        this.tags = tags;
+        this.commentsCount = commentsCount;
     }
 
-    public List<Integer> getTagIds() {
-        return tagIds;
+    public String getTags() {
+        return tags;
     }
 
-    public void setTagIds(List<Integer> tagIds) {
-        this.tagIds = tagIds;
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     public String getTitle() {

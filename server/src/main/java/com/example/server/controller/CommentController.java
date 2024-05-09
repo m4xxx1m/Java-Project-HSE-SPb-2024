@@ -54,15 +54,15 @@ public class CommentController {
     }
 
     @RequestMapping(value = "/post/{postId}/comments/{commentId}/like")
-    ResponseEntity<Void> likeComment(@PathVariable Integer commentId, @RequestParam("userId") int userId) {
-        commentService.incrementCommentRating(commentId, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    ResponseEntity<Integer> likeComment(@PathVariable Integer commentId, @RequestParam("userId") int userId) {
+        int rating = commentService.incrementCommentRating(commentId, userId);
+        return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/post/{postId}/comments/{commentId}/dislike")
-    ResponseEntity<Void> dislikeComment(@PathVariable Integer commentId, @RequestParam("userId") int userId) {
-        commentService.decrementCommentRating(commentId, userId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    ResponseEntity<Integer> dislikeComment(@PathVariable Integer commentId, @RequestParam("userId") int userId) {
+        int rating = commentService.decrementCommentRating(commentId, userId);
+        return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/saved/comments")
