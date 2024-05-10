@@ -6,6 +6,8 @@ import com.example.server.dto.UserUpdateDto;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -108,5 +110,29 @@ public class UserService {
 
     public List<User> getUsersList(Set<Integer> userIds) {
         return userRepository.findAllById(userIds);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public User create(User user) {
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException("Username already used");
+        }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already used");
+        }
+
+        return save(user);
+    }
+
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public UserDetailsService userDetailsService() {
+        return this::getByUsername;
     }
 }
