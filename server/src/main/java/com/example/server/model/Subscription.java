@@ -10,9 +10,11 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer subscriptionId;
 
+    @ManyToOne
     @JoinColumn(name = "subscriber_id")
     private User subscriber;
 
+    @ManyToOne
     @JoinColumn(name = "subscribe_to_id")
     private User subscribeTo;
 
