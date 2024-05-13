@@ -1,7 +1,5 @@
 package network
 
-import model.SignInManager
-import model.SignUpManager
 import navigation.CreatePostManager
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -13,31 +11,22 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiInterface {
-    @Headers("Content-Type:application/json")
-    @POST("register")
-    fun registerUser(@Body info: SignUpManager.UserSignUpBody):
-            Call<User>
 
     @Headers("Content-Type:application/json")
-    @POST("login")
-    fun loginUser(@Body info: SignInManager.UserSignInBody):
-            Call<User>
-
-    @Headers("Content-Type:application/json")
-    @POST("post/add")
+    @POST("/post/add")
     fun createPost(@Body info: CreatePostManager.CreatePostBody):
             Call<ResponseBody>
 
     @Headers("Content-Type:application/json")
-    @GET("post/getAll")
+    @GET("/post/getAll")
     fun getAllPosts(): Call<List<Post>>
 
     @Headers("Content-Type:application/json")
-    @GET("users/getUser/{userId}")
+    @GET("/users/getUser/{userId}")
     fun getUser(@Path("userId") userId: Int): Call<User>
 
     @Headers("Content-Type:application/json")
-    @POST("users/getUsersList")
+    @POST("/users/getUsersList")
     fun getUsersList(@Body userIds: Set<Int>): Call<List<User>>
 
     @Headers("Content-Type:application/json")
@@ -52,9 +41,9 @@ interface ApiInterface {
     @POST("/post/{postId}/addComment")
     fun addComment(@Path("postId") postId: Int, @Body comment: CommentCreate): Call<Comment>
 
-    @Headers("Content-Type:application/json")
-    @GET("/getTags")
-    fun getTags(): Call<ArrayList<String>>
+//    @Headers("Content-Type:application/json")
+//    @GET("/getTags")
+//    fun getTags(): Call<ArrayList<String>>
 
     @Headers("Content-Type:application/json")
     @POST("/post/{postId}/like")

@@ -1,6 +1,6 @@
 package model
 
-import network.RetrofitClient
+import network.RetrofitClientPreAuth
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,7 +18,7 @@ data class Tag(val tagId: Int, val tagName: String) {
             get() = defaultTags_!!
         
         fun initTags() {
-            RetrofitClient.retrofitCall.getTags().enqueue(object :
+            RetrofitClientPreAuth.retrofitCall.getTags().enqueue(object :
                 Callback<ArrayList<String>> {
                 override fun onResponse(
                     call: Call<ArrayList<String>>,

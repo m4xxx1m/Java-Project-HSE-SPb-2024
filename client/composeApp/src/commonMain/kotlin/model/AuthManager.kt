@@ -3,6 +3,7 @@ package model
 import cafe.adriel.voyager.navigator.Navigator
 import navigation.ConnectionErrorScreen
 import navigation.MainNavigation
+import network.RetrofitClient
 import platform_depended.AuthStorage
 
 class AuthManager {
@@ -39,7 +40,8 @@ class AuthManager {
         navigator.replace(ConnectionErrorScreen())
     }
 
-    fun saveAuthData(login: String, password: String, user: User?) {
+    fun saveAuthData(login: String, password: String, user: User?, token: String) {
+        RetrofitClient.setToken(token)
         if (AuthStorage.getToken() == null) {
             AuthStorage.saveToken("$login|$password")
         }
