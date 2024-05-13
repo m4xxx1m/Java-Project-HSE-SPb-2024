@@ -6,6 +6,8 @@ import com.example.server.dto.UserUpdateDto;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -25,42 +27,42 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User registerUser(UserRegistrationDto registrationDto) {
-        User existingUser = userRepository.findByUsername(registrationDto.getUsername());
-        if (existingUser != null) {
-            throw new RuntimeException("Username already in use");
-        }
+//    public User registerUser(UserRegistrationDto registrationDto) {
+//        User existingUser = userRepository.findByUsername(registrationDto.getUsername());
+//        if (existingUser != null) {
+//            throw new RuntimeException("Username already in use");
+//        }
+//
+//        User user = new User();
+//        user.setUsername(registrationDto.getUsername());
+//        user.setEmail(registrationDto.getEmail());
+//        user.setPassword(hashPassword(registrationDto.getPassword()));
+//
+//        return userRepository.save(user);
+//    }
 
-        User user = new User();
-        user.setUsername(registrationDto.getUsername());
-        user.setEmail(registrationDto.getEmail());
-        user.setPassword(hashPassword(registrationDto.getPassword()));
+//    public User loginUser(UserLoginDto loginDto) {
+//        User user = userRepository.findByUsername(loginDto.getUsername());
+//        if (user != null && user.getPassword().equals(hashPassword(loginDto.getPassword()))) {
+//            return user;
+//        }
+//        throw new RuntimeException("Invalid username or password");
+//    }
 
-        return userRepository.save(user);
-    }
-
-    public User loginUser(UserLoginDto loginDto) {
-        User user = userRepository.findByUsername(loginDto.getUsername());
-        if (user != null && user.getPassword().equals(hashPassword(loginDto.getPassword()))) {
-            return user;
-        }
-        throw new RuntimeException("Invalid username or password");
-    }
-
-    private String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
-            BigInteger number = new BigInteger(1, hash);
-            StringBuilder hexString = new StringBuilder(number.toString(16));
-            while (hexString.length() < 32) {
-                hexString.insert(0, '0');
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    private String hashPassword(String password) {
+//        try {
+//            MessageDigest md = MessageDigest.getInstance("SHA-256");
+//            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
+//            BigInteger number = new BigInteger(1, hash);
+//            StringBuilder hexString = new StringBuilder(number.toString(16));
+//            while (hexString.length() < 32) {
+//                hexString.insert(0, '0');
+//            }
+//            return hexString.toString();
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     public User updateUser(Integer userId, UserUpdateDto updateDto) {
         User user = userRepository.findById(userId)
@@ -108,5 +110,29 @@ public class UserService {
 
     public List<User> getUsersList(Set<Integer> userIds) {
         return userRepository.findAllById(userIds);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public User create(User user) {
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException("Username already used");
+        }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already used");
+        }
+
+        return save(user);
+    }
+
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public UserDetailsService userDetailsService() {
+        return this::getByUsername;
     }
 }
