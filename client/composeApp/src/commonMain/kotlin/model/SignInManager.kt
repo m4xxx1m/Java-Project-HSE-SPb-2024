@@ -10,16 +10,17 @@ class SignInManager(
     private val username: String,
     private val password: String
 ) {
-    fun signIn(onError: (() -> Unit)? = null, onSuccess: () -> Unit) {
-//        val call = RetrofitClient.retrofit.create(ApiInterface::class.java)
+    fun signIn(
+        onFailure: (() -> Unit)? = null,
+        onError: (() -> Unit)? = null,
+        onSuccess: () -> Unit
+    ) {
         val retrofitCall = RetrofitClientPreAuth.retrofitCall
         val registerInfo = UserSignInBody(username, password)
         retrofitCall.loginUser(registerInfo).enqueue(object : Callback<AuthenticationResponse> {
             override fun onFailure(call: Call<AuthenticationResponse>, t: Throwable) {
                 println("failure")
-                onError?.let {
-                    it()
-                }
+                onFailure?.invoke()
             }
 
             override fun onResponse(
@@ -32,13 +33,11 @@ class SignInManager(
                         user = it?.user?.convertUser()
                     }
                     val token = response.body()!!.token
-                    AuthManager().saveAuthData(username, password, user, token)
+                    AuthManager().saveAuthData(user, token)
                     onSuccess()
                 } else {
                     println("response but wrong code")
-                    onError?.let {
-                        it()
-                    }
+                    onError?.invoke()
                 }
             }
         })

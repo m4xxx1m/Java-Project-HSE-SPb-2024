@@ -29,11 +29,13 @@ data class Tag(val tagId: Int, val tagName: String) {
                         defaultTags_ = "0".repeat(tags.size)
                     } else {
                         println("wrong code on getting all tags")
+                        initTags()
                     }
                 }
 
                 override fun onFailure(call: Call<ArrayList<String>>, t: Throwable) {
                     println("failure on getting all tags")
+                    initTags()
                 }
 
             })

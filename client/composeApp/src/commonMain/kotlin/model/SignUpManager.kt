@@ -33,7 +33,7 @@ class SignUpManager(private val email: String) {
                         user = it?.user?.convertUser()
                     }
                     val token = response.body()!!.token
-                    AuthManager().saveAuthData(userName, password, user, token)
+                    AuthManager().saveAuthData(user, token)
                     onSuccess()
                 } else {
                     println("wrong code on registration")
