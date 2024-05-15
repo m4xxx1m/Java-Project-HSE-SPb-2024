@@ -22,12 +22,12 @@ import ui.SignInScreen
 
 class ConnectionErrorScreen : Screen {
     private var navigator: Navigator? = null
-    private var onError: (() -> Unit)? = null
+    private var onFailure: (() -> Unit)? = null
 
     @Composable
     override fun Content() {
         val isConnectionError = remember { mutableStateOf(false) }
-        onError = {
+        onFailure = {
             isConnectionError.value = true
         }
         navigator = LocalNavigator.currentOrThrow
@@ -41,9 +41,13 @@ class ConnectionErrorScreen : Screen {
         Tag.initTags()
         navigator?.let {
             val authManager = AuthManager()
-            if (!authManager.tryLogin(it, onError)) {
-                it.replace(SignInScreen())
-            }
+            authManager.tryLogin(
+                it,
+                onFailure,
+                onError = {
+                    it.replace(SignInScreen())
+                }
+            )
         }
     }
 

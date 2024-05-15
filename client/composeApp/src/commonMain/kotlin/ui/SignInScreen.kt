@@ -109,10 +109,12 @@ fun SignInForm(navigator: Navigator) {
                     emailOrUsername.value.trim(),
                     password.value.trim()
                 )
-                signInManager.signIn {
-                    navigator.popAll()
-                    navigator.replace(MainNavigation())
-                }
+                signInManager.signIn(
+                    onSuccess = {
+                        navigator.popAll()
+                        navigator.replace(MainNavigation())
+                    }
+                )
             }, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
                 Text("Войти в аккаунт")
             }
