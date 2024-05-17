@@ -38,25 +38,6 @@ public class UserController {
     }
 
     // example of usage:
-    // curl -X POST -H "Content-Type: application/json" -d '{"username":"testuser", "email":"testuser@example.com", "password":"testpassword"}' http://localhost:8080/register
-    @PostMapping("/register")
-    public User registerUser(@RequestBody UserRegistrationDto registrationDto) {
-        return userService.registerUser(registrationDto);
-    }
-
-    // example of usage:
-    // curl -i -X POST -H "Content-Type: application/json" -d '{"username":"testuser", "password":"testpassword"}' http://localhost:8080/login
-    @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody UserLoginDto loginDto) {
-        try {
-            User user = userService.loginUser(loginDto);
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
-
-    // example of usage:
     // curl -X PUT -H "Content-Type: application/json" \
     // -d '{
     //    "username": "newUsername",

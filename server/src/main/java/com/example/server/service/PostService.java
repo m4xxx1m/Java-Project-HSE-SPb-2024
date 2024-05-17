@@ -80,11 +80,12 @@ public class PostService {
     }
 
     public List<Post> getPostsByPostIds(List<Integer> postIds) {
-        List<Post> posts = new ArrayList<>();
-        for (int postId : postIds) {
-            posts.add(postRepository.getReferenceById(postId));
-        }
-        return posts;
+        return postRepository.findAllById(postIds);
+//        List<Post> posts = new ArrayList<>();
+//        for (int postId : postIds) {
+//            posts.add(postRepository.getReferenceById(postId));
+//        }
+//        return posts;
     }
 
     public List<Post> getPostsBySelectedTags(String tags) {
