@@ -6,6 +6,10 @@ import jakarta.persistence.*;
 @Table(name = "saved_object")
 public class SavedObject extends UserObjectConnection {
 
+    public SavedObject() {
+        type = Type.POST;
+    }
+
     public enum Type {
         POST,
         COMMENT

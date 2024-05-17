@@ -1,13 +1,21 @@
 package com.example.server.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Date;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
-public class User {
-
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
@@ -24,18 +32,24 @@ public class User {
     @Column(length = 2000)
     private String profilePictureUrl;
 
+    @Builder.Default
     @Column(length = 200)
     private String contacts = "";
 
+    @Builder.Default
     @Column(length = 200)
     private String bio = "";
 
     @Column(length = 2000)
     private String resumeUrl;
 
+    @Builder.Default
+    @Column(length = 2000)
     private String tags = Tag.defaultTags;
 
-    // Геттеры и сеттеры для каждого поля
+    @Column()
+    private Role role;
+
     public Integer getUserId() {
         return userId;
     }
@@ -106,5 +120,38 @@ public class User {
 
     public void setTags(String tags) {
         this.tags = tags;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
