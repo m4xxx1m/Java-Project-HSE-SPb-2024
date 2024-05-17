@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -67,9 +69,11 @@ class ManageSubscriptionsScreen(private val subscriptionList: List<User>) : Scre
                             remember { mutableStateOf(SubscriberManager(user.id, coroutineScope)) }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Image(
-                                Icons.Rounded.Person, contentDescription = "User profile image",
+                                Icons.Rounded.Person, 
+                                contentDescription = "User profile image",
+                                colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
                                 modifier = Modifier.size(40.dp).clip(CircleShape)
-                                    .background(Color.Red)
+                                    .background(MaterialTheme.colors.primaryVariant)
                             )
                             Spacer(Modifier.size(15.dp))
                             Text(

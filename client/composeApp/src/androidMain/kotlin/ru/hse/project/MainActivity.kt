@@ -1,18 +1,33 @@
 package ru.hse.project
 
 import App
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.ui.Modifier
 import platform_depended.AuthStorage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AuthStorage.init(this)
+        val statusBarColor = Color.parseColor("#FFEBF4F8")
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                statusBarColor, statusBarColor
+            ),
+            navigationBarStyle = SystemBarStyle.light(
+                Color.WHITE,
+                Color.WHITE
+            )
+        )
         setContent {
-            MaterialTheme {
+            Box(Modifier.safeDrawingPadding()) {
                 App()
             }
         }

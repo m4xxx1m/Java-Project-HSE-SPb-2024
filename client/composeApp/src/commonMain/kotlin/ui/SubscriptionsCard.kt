@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,9 +89,11 @@ fun SubscriptionsCard(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Image(
-                                Icons.Rounded.Person, contentDescription = "User profile image",
+                                Icons.Rounded.Person, 
+                                contentDescription = "User profile image",
+                                colorFilter = ColorFilter.tint(Color(0xb0000000)),
                                 modifier = Modifier.size(40.dp).clip(CircleShape)
-                                    .background(Color.Red)
+                                    .background(MaterialTheme.colors.primaryVariant)
                             )
                             var name = it.name
                             if (it.name.length > 8) {
@@ -124,7 +128,7 @@ private fun card(uiOption: Boolean, content: @Composable () -> Unit) {
     if (uiOption) {
         Card(
             modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
-            elevation = 6.dp
+            elevation = 0.dp
         ) {
             Column(
                 modifier = Modifier.padding(

@@ -1,11 +1,14 @@
 package platform_depended
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -13,6 +16,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
@@ -29,7 +33,14 @@ import ui.SearchWidget
 actual fun MainScreenScaffold(content: @Composable (PaddingValues) -> Unit) {
     Scaffold(
         topBar = {
-            Row(Modifier.widthIn(min = 500.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 1.dp)
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(Color.White),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 BottomNavigation(
                     backgroundColor = Color.White,
                     contentColor = Color.Black,

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -37,18 +39,31 @@ fun TagUi(
                 clicked.value = !clicked.value
                 onClick()
             }
-            .background(if (clicked.value) Color.Gray else Color.LightGray)
+            .background(
+                if (clicked.value) MaterialTheme.colors.secondaryVariant
+                else MaterialTheme.colors.secondary
+            )
             .padding(7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(tag.tagName, fontSize = TextUnit(18f, TextUnitType.Sp))
+        Text(
+            tag.tagName, 
+            fontSize = TextUnit(18f, TextUnitType.Sp),
+            color = if (clicked.value) Color.White else Color.Black
+        )
         if (!clicked.value) {
             Image(
-                Icons.Rounded.Add, contentDescription = "Add tag", modifier = Modifier
-                    .size(20.dp)
+                Icons.Rounded.Add, 
+                contentDescription = "Add tag", 
+                modifier = Modifier.size(20.dp)
             )
         } else {
-            Image(Icons.Rounded.Done, contentDescription = "Remove tag")
+            Image(
+                Icons.Rounded.Done, 
+                contentDescription = "Remove tag",
+                modifier = Modifier.size(20.dp),
+                colorFilter = ColorFilter.tint(Color.White)
+            )
         }
     }
 }

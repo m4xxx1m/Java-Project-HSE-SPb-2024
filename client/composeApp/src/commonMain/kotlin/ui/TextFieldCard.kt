@@ -28,13 +28,14 @@ fun TextFieldCard(label: String?, initText: String = "", onButtonClick: (String)
     Column {
         if (label != null) {
             Text(
-                label, fontWeight = FontWeight.Bold,
+                label, fontWeight = FontWeight.Light,
                 fontSize = 12.sp
             )
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
-            border = BorderStroke(2.dp, Color.Black)
+            elevation = 0.dp,
+            border = BorderStroke(0.5.dp, Color(0x77777777))
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

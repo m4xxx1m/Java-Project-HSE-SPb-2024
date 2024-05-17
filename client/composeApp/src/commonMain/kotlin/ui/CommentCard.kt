@@ -16,13 +16,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
-import androidx.compose.material.icons.rounded.MailOutline
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Reply
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,16 +54,20 @@ fun CommentCard(
 ) {
     val rating = remember { mutableStateOf(comment.likesCount) }
     val navigator = LocalNavigator.current
-    Card(elevation = 6.dp, modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()) {
+    Card(
+        elevation = 0.dp, 
+        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()
+    ) {
         Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
             Spacer(Modifier.width(35.dp))
             Image(
                 Icons.Rounded.Person,
                 contentDescription = null,
+                colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
                 modifier = Modifier
                     .size(35.dp)
                     .clip(CircleShape)
-                    .background(Color.Red)
+                    .background(MaterialTheme.colors.primaryVariant)
                     .clickable {
                         comment.user?.let {
                             navigator?.push(UserProfileScreen(it))
@@ -125,7 +131,7 @@ fun CommentCard(
                         fontSize = 11.sp
                     )
                     Spacer(Modifier.weight(1f))
-                    Image(Icons.Rounded.MailOutline, contentDescription = "Answer",
+                    Image(Icons.Rounded.Reply, contentDescription = "Answer",
                         modifier = Modifier.size(31.dp).padding(3.dp).clip(CircleShape)
                             .clickable { }
                     )
