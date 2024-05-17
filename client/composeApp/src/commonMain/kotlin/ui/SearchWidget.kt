@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
@@ -17,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -25,9 +25,14 @@ import androidx.compose.ui.unit.sp
 fun SearchWidget() {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
-            modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth().padding(10.dp)
-                .clip(RoundedCornerShape(5.dp)).background(Color.LightGray)
-                .clickable { }.padding(5.dp)
+            modifier = Modifier
+                .widthIn(max = 500.dp)
+                .fillMaxWidth()
+                .padding(10.dp)
+                .clip(RoundedCornerShape(5.dp))
+                .background(MaterialTheme.colors.primaryVariant)
+                .clickable { } 
+                .padding(5.dp)
         ) {
             Image(
                 Icons.Rounded.Search, contentDescription = "Search",

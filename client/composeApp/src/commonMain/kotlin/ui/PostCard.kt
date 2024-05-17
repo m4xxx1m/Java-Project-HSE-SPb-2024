@@ -30,7 +30,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Person
@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,13 +71,13 @@ fun PostCard(
         if (isInCommentsScreen) LocalNavigator.current else LocalNavigator.current?.parent
     Card(
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
-        elevation = 6.dp
+        elevation = 0.dp
     ) {
         Box(
             modifier = Modifier.fillMaxWidth().padding(10.dp)
         ) {
             val expanded = remember { mutableStateOf(false) }
-            Box(modifier = Modifier.align(Alignment.TopEnd)){
+            Box(modifier = Modifier.align(Alignment.TopEnd)) {
                 IconButton(onClick = { expanded.value = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = "Show dropdown menu")
                 }
@@ -111,10 +112,11 @@ fun PostCard(
                     Image(
                         Icons.Rounded.Person,
                         contentDescription = "User Image",
+                        colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(Color.Red)
+                            .background(MaterialTheme.colors.primaryVariant)
                             .clickable {
                                 post.user?.let {
                                     navigator?.push(UserProfileScreen(it))
@@ -154,7 +156,8 @@ fun PostCard(
                     ) {
                         items(post.tags) { tag ->
                             Card(
-                                backgroundColor = Color.Gray
+                                elevation = 0.dp,
+                                backgroundColor = MaterialTheme.colors.secondaryVariant
                             ) {
                                 Text(
                                     tag,
@@ -170,7 +173,9 @@ fun PostCard(
                     Text(post.title, style = MaterialTheme.typography.h6)
                 }
                 Text(post.text)
+                
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    
                     IconButton(onClick = {
                         likePost(post.id, ratingState)
                     }) {
@@ -180,21 +185,22 @@ fun PostCard(
                     IconButton(onClick = {
                         dislikePost(post.id, ratingState)
                     }) {
-                        Image(Icons.Rounded.KeyboardArrowDown, contentDescription = "Downvote post")
+                        Image(
+                            Icons.Rounded.KeyboardArrowDown,
+                            contentDescription = "Downvote post"
+                        )
                     }
+                    
                     if (!isInCommentsScreen) {
                         Spacer(Modifier.width(5.dp))
                         IconButton(onClick = {
                             navigator?.push(CommentScreen(post.id))
                         }) {
-                            Image(Icons.Rounded.Email, contentDescription = "Comments")
+                            Image(Icons.Rounded.Forum, contentDescription = "Comments")
                         }
                         Text(post.commentsCount.toString())
-//                        Spacer(Modifier.weight(1f))
-//                        IconButton(onClick = {}) {
-//                            Image(Icons.Rounded.Share, contentDescription = "Share")
-//                        }
                     }
+                    
                 }
             }
         }

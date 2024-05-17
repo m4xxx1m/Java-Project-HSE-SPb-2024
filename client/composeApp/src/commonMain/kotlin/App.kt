@@ -1,12 +1,12 @@
 
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import navigation.ConnectionErrorScreen
+import ui.AppTheme
 
 @Composable
 fun App() {
-    MaterialTheme {
+    AppTheme.apply {
         Navigator(screen = ConnectionErrorScreen())
     }
 }

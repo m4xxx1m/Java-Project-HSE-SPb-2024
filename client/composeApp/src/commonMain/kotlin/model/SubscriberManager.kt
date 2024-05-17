@@ -11,7 +11,7 @@ import retrofit2.Response
 class SubscriberManager(private val userId: Int, private val coroutineScope: CoroutineScope) {
     private val thisUserId = AuthManager.currentUser.id
 
-    val isSubscribed = mutableStateOf(false)
+    val isSubscribed = mutableStateOf(true)
 
     init {
         checkSubscription()

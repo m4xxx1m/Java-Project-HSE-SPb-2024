@@ -42,6 +42,8 @@ kotlin {
             // Retrofit
             implementation(libs.retrofit)
             implementation(libs.retrofit.converter.gson)
+            
+            api(compose.materialIconsExtended)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

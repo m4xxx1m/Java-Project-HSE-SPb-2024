@@ -19,13 +19,14 @@ fun OutlinedCard(label: String?, content: @Composable () -> Unit) {
     Column {
         if (label != null) {
             Text(
-                label, fontWeight = FontWeight.Bold,
+                label, fontWeight = FontWeight.Light,
                 fontSize = 12.sp
             )
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
-            border = BorderStroke(2.dp, Color.Black)
+            elevation = 0.dp,
+            border = BorderStroke(0.5.dp, Color(0x77777777))
         ) {
             Box(modifier = Modifier.padding(10.dp).fillMaxWidth()) {
                 content()

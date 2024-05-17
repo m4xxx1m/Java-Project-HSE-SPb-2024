@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,14 +29,17 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
@@ -49,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -78,6 +83,7 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
 
     @Composable
     fun Content() {
+        val thisUser = user.id == AuthManager.currentUser.id
         refreshHelper = remember { mutableStateOf(RefreshUserProfileHelper(user)) }
         RefreshableContent(refreshHelper) {
             val shownPosts = remember { mutableStateOf(ShownPosts.USER_POSTS) }
@@ -93,62 +99,74 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                     }
                     item {
                         if (helper.userProfile.value != null) {
-                            Row(
-                                modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(10.dp)
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(
-                                            if (shownPosts.value == ShownPosts.USER_POSTS)
-                                                Color.Gray
-                                            else
-                                                Color.LightGray
-                                        ).clickable {
-                                            shownPosts.value = ShownPosts.USER_POSTS
-                                        }.padding(5.dp),
-                                    contentAlignment = Alignment.Center
+                            if (thisUser) {
+                                Row(
+                                    modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        "Посты " + user.name,
-                                        color = if (shownPosts.value == ShownPosts.USER_POSTS)
-                                            Color.White
-                                        else
-                                            Color.Black,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Light
-                                    )
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(10.dp)
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(
-                                            if (shownPosts.value == ShownPosts.SAVED_POSTS)
-                                                Color.Gray
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(10.dp)
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .background(
+                                                if (shownPosts.value == ShownPosts.USER_POSTS)
+                                                    MaterialTheme.colors.primary
+                                                else
+                                                    MaterialTheme.colors.secondary
+                                            ).clickable {
+                                                shownPosts.value = ShownPosts.USER_POSTS
+                                            }.padding(5.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            "Посты " + user.name,
+                                            color = if (shownPosts.value == ShownPosts.USER_POSTS)
+                                                Color.White
                                             else
-                                                Color.LightGray
-                                        ).clickable {
-                                            shownPosts.value = ShownPosts.SAVED_POSTS
-                                        }.padding(5.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        "Сохраненные посты",
-                                        color = if (shownPosts.value == ShownPosts.SAVED_POSTS)
-                                            Color.White
-                                        else
-                                            Color.Black,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Light
-                                    )
+                                                Color.Black,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Light
+                                        )
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(10.dp)
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .background(
+                                                if (shownPosts.value == ShownPosts.SAVED_POSTS)
+                                                    MaterialTheme.colors.primary
+                                                else
+                                                    MaterialTheme.colors.secondary
+                                            ).clickable {
+                                                shownPosts.value = ShownPosts.SAVED_POSTS
+                                            }.padding(5.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            "Сохраненные посты",
+                                            color = if (shownPosts.value == ShownPosts.SAVED_POSTS)
+                                                Color.White
+                                            else
+                                                Color.Black,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Light
+                                        )
+                                    }
                                 }
+                                Spacer(Modifier.size(10.dp))
+                            } else {
+                                Divider(
+                                    modifier = Modifier
+                                        .widthIn(max = 500.dp)
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                                    color = Color.LightGray, 
+                                    thickness = 0.5.dp
+                                )
+                                Spacer(Modifier.height(10.dp))
                             }
-                            Spacer(Modifier.size(10.dp))
                         }
                     }
                     items(
@@ -237,14 +255,18 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.clip(RoundedCornerShape(7.dp)).clickable {}) {
                             Image(
-                                Icons.Rounded.Person, contentDescription = "User profile image",
+                                Icons.Rounded.Person, 
+                                contentDescription = "User profile image",
+                                colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
                                 modifier = Modifier.size(65.dp).clip(CircleShape)
-                                    .background(Color.Red)
+                                    .background(MaterialTheme.colors.primaryVariant)
                             )
-                            Image(
-                                Icons.Rounded.Edit, contentDescription = null,
-                                modifier = Modifier.size(15.dp).align(Alignment.BottomEnd)
-                            )
+                            if (thisUser) {
+                                Image(
+                                    Icons.Rounded.Edit, contentDescription = null,
+                                    modifier = Modifier.size(15.dp).align(Alignment.BottomEnd)
+                                )
+                            }
                         }
                         Spacer(Modifier.size(20.dp))
                         Text(
@@ -257,7 +279,7 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                             IconButton(onClick = {
                                 isDialogOpened.value = true
                             }) {
-                                Image(Icons.Rounded.Close, contentDescription = "Log out")
+                                Image(Icons.Rounded.Logout, contentDescription = "Log out")
                             }
                         }
                     }
@@ -315,7 +337,7 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                             ) {
                                 items(tags.value ?: emptyList()) { tag ->
                                     Card(
-                                        backgroundColor = Color.Gray
+                                        backgroundColor = MaterialTheme.colors.secondaryVariant
                                     ) {
                                         Text(
                                             tag,
@@ -347,7 +369,7 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                                     Image(Icons.Rounded.Edit, contentDescription = null)
                                 }
                                 IconButton(onClick = { }) {
-                                    Image(Icons.Rounded.Add, contentDescription = null)
+                                    Image(Icons.Rounded.AttachFile, contentDescription = null)
                                 }
                             }
                             IconButton(onClick = { }) {
