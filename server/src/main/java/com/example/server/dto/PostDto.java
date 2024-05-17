@@ -1,6 +1,7 @@
 package com.example.server.dto;
 
-import java.util.ArrayList;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 public class PostDto extends ContentObjDto {
