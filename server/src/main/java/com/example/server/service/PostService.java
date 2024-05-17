@@ -6,8 +6,12 @@ import com.example.server.model.*;
 import com.example.server.repository.CommentRepository;
 import com.example.server.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,13 +33,16 @@ public class PostService {
     @Autowired
     private RatedObjectService ratedObjectService;
 
+    @Autowired
+    FileInfoService fileInfoService;
+
     public Post addPost(PostDto postDto) {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
                 postDto.getContent(), postDto.getTags(), postDto.getCommentsCount());
         return postRepository.save(post);
     }
 
-    public void deletePost(int id) {
+    public void deletePost(int id) throws IOException {
         List<Comment> comments = commentRepository.findByPostId(id);
         for (Comment comment : comments) {
             ratedObjectService.deleteRatingsOfObject(comment.getId());
@@ -44,6 +51,17 @@ public class PostService {
         }
         ratedObjectService.deleteRatingsOfObject(id);
         savedObjectService.deleteSavedObjectForAllUsers(id);
+        Post post = getPostById(id);
+        FileInfo fileInfo = fileInfoService.findById(post.getFileInfoId());
+        if (fileInfo != null) {
+            fileInfoService.delete(id, fileInfo);
+        }
+        List<Integer> picInfoIds = post.getPicInfoIds();
+        if (picInfoIds != null) {
+            for (Integer picInfoId : picInfoIds) {
+                fileInfoService.delete(id, fileInfoService.findById(picInfoId));
+            }
+        }
         postRepository.deleteById(id);
     }
 
@@ -131,9 +149,62 @@ public class PostService {
     }
 
     public void editPost(Post post, PostDto postDto) {
+        post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setTags(postDto.getTags());
         postRepository.save(post);
+    }
+
+    public Post deleteFile(int id) throws IOException {
+        Post post = getPostById(id);
+        fileInfoService.delete(id, fileInfoService.findById(post.getFileInfoId()));
+        post.setFileInfoId(null);
+        return postRepository.save(post);
+    }
+
+    public Post uploadFile(int id, MultipartFile file) throws IOException {
+        Post post = getPostById(id);
+        FileInfo fileInfo = fileInfoService.upload(file, id);
+        if (post.getFileInfoId() != null) {
+            fileInfoService.delete(id, fileInfoService.findById(post.getFileInfoId()));
+        }
+        post.setFileInfoId(fileInfo.getId());
+        return postRepository.save(post);
+    }
+
+    public Post deletePicture(int postId, int picNumber) throws IOException {
+        Post post = getPostById(postId);
+        List<Integer> picInfoIds = post.getPicInfoIds();
+        FileInfo picInfo = fileInfoService.findById(picInfoIds.get(picNumber));
+        fileInfoService.delete(postId, picInfo);
+        picInfoIds.remove(picNumber);
+        post.setPicInfoIds(picInfoIds);
+        return postRepository.save(post);
+    }
+
+    public void uploadPicture(int postId, MultipartFile pic) throws IOException {
+        Post post = getPostById(postId);
+        List<Integer> picInfoIds;
+        if (post.getPicInfoIds() == null) {
+            picInfoIds = new ArrayList<>();
+        } else {
+            picInfoIds = post.getPicInfoIds();
+        }
+        FileInfo fileInfo = fileInfoService.upload(pic, postId);
+        picInfoIds.add(fileInfo.getId());
+        post.setPicInfoIds(picInfoIds);
+        postRepository.save(post);
+    }
+
+    public Post uploadPictures(int postId, List<MultipartFile> pics) throws IOException {
+        for (MultipartFile pic : pics) {
+            uploadPicture(postId, pic);
+        }
+        return getPostById(postId);
+    }
+
+    public byte[] getFileData(String key) throws IOException {
+        return FileInfoService.download(key);
     }
 
     public void changeCommentsCount(int postId, int delta) {
