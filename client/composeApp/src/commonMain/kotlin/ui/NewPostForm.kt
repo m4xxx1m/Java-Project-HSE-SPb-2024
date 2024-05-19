@@ -1,6 +1,5 @@
 package ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -31,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import model.Tag
@@ -61,7 +60,8 @@ fun NewPostForm() {
                     label = { Text("Заголовок поста", fontWeight = FontWeight.SemiBold) },
                     maxLines = 3,
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        backgroundColor = Color.White)
+                        backgroundColor = Color.White
+                    )
                 )
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth().weight(1f),
@@ -69,7 +69,8 @@ fun NewPostForm() {
                     onValueChange = { postText.value = it },
                     label = { Text("Текст поста") },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        backgroundColor = Color.White)
+                        backgroundColor = Color.White
+                    )
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
@@ -96,16 +97,17 @@ fun NewPostForm() {
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = {}) {
-                    Image(
+                    Icon(
                         Icons.Rounded.AttachFile, contentDescription = "Attach images and files",
-                        modifier = Modifier.size(35.dp)
+                        modifier = Modifier.size(35.dp),
+                        tint = AppTheme.black
                     )
                 }
                 Spacer(Modifier.weight(1f))
                 Button(
                     onClick = {
                         textMode.value = !textMode.value
-                    }, 
+                    },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = MaterialTheme.colors.primary
                     ),
@@ -119,10 +121,10 @@ fun NewPostForm() {
                             color = Color.White
                         )
                         Spacer(Modifier.weight(1f))
-                        Image(
-                            Icons.Rounded.ArrowDropDown, 
+                        Icon(
+                            Icons.Rounded.ArrowDropDown,
                             contentDescription = "Edit post tags",
-                            colorFilter = ColorFilter.tint(Color.White),
+                            tint = Color.White,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -140,9 +142,10 @@ fun NewPostForm() {
                         textMode.value = true
                     }
                 }) {
-                    Image(
+                    Icon(
                         Icons.Rounded.Done, contentDescription = "Post is done",
-                        modifier = Modifier.size(35.dp)
+                        modifier = Modifier.size(35.dp),
+                        tint = AppTheme.black
                     )
                 }
             }

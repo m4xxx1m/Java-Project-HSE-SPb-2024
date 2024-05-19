@@ -1,6 +1,5 @@
 package ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -34,12 +34,13 @@ fun SearchWidget() {
                 .clickable { } 
                 .padding(5.dp)
         ) {
-            Image(
+            Icon(
                 Icons.Rounded.Search, contentDescription = "Search",
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(30.dp),
+                tint = AppTheme.black
             )
             Text("Поиск", modifier = Modifier.align(Alignment.Center),
-                fontSize = 18.sp)
+                fontSize = 18.sp, color = AppTheme.black)
         }
     }
 

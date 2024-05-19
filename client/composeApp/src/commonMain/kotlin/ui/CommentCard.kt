@@ -13,9 +13,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -50,109 +53,136 @@ import java.time.format.DateTimeFormatter
 fun CommentCard(
     comment: Comment,
     isAnswerToAnswer: Boolean = false,
-    afterDeleteComment: (() -> Unit)? = null
+    afterDeleteComment: (() -> Unit)? = null,
+    isFirstInList: Boolean = false,
+    isLastInList: Boolean = false
 ) {
+    val shape = RoundedCornerShape(
+        topStart = if (isFirstInList) 10.dp else 0.dp,
+        topEnd = if (isFirstInList) 10.dp else 0.dp,
+        bottomStart = if (isLastInList) 10.dp else 0.dp,
+        bottomEnd = if (isLastInList) 10.dp else 0.dp
+    )
     val rating = remember { mutableStateOf(comment.likesCount) }
     val navigator = LocalNavigator.current
     Card(
-        elevation = 0.dp, 
+        elevation = 0.dp,
+        shape = shape,
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()
     ) {
-        Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-            Spacer(Modifier.width(35.dp))
-            Image(
-                Icons.Rounded.Person,
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
-                modifier = Modifier
-                    .size(35.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colors.primaryVariant)
-                    .clickable {
-                        comment.user?.let {
-                            navigator?.push(UserProfileScreen(it))
+//    Box(Modifier.fillMaxWidth()) {
+        Column {
+            Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+                Spacer(Modifier.width(35.dp))
+                Image(
+                    Icons.Rounded.Person,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
+                    modifier = Modifier
+                        .size(35.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colors.primaryVariant)
+                        .clickable {
+                            comment.user?.let {
+                                navigator?.push(UserProfileScreen(it))
+                            }
                         }
-                    }
-            )
-            Spacer(Modifier.size(10.dp))
-            Column {
-                Row {
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            comment.user?.name ?: "",
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(comment.text, fontSize = 14.sp)
-                    }
-                    Column {
-                        if (comment.authorId == AuthManager.currentUser.id) {
-                            Box {
-                                val expanded = remember { mutableStateOf(false) }
-                                Image(
-                                    Icons.Rounded.MoreVert,
-                                    contentDescription = "Show dropdown menu",
-                                    modifier = Modifier.size(31.dp).clip(CircleShape).clickable {
-                                        expanded.value = true
-                                    }.padding(3.dp)
-                                )
-                                DropdownMenu(
-                                    expanded = expanded.value,
-                                    onDismissRequest = {
-                                        expanded.value = false
-                                    }
-                                ) {
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            deleteComment(comment, afterDeleteComment)
+                )
+                Spacer(Modifier.size(10.dp))
+                Column {
+                    Row {
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                comment.user?.name ?: "",
+                                fontWeight = FontWeight.SemiBold,
+                                color = AppTheme.black
+                            )
+                            Text(comment.text, fontSize = 14.sp, color = AppTheme.black)
+                        }
+                        Column {
+                            if (comment.authorId == AuthManager.currentUser.id) {
+                                Box {
+                                    val expanded = remember { mutableStateOf(false) }
+                                    Icon(
+                                        Icons.Rounded.MoreVert,
+                                        contentDescription = "Show dropdown menu",
+                                        modifier = Modifier.size(25.dp).clip(CircleShape)
+                                            .clickable {
+                                                expanded.value = true
+                                            }.padding(3.dp),
+                                        tint = AppTheme.black
+                                    )
+                                    DropdownMenu(
+                                        expanded = expanded.value,
+                                        onDismissRequest = {
                                             expanded.value = false
                                         }
                                     ) {
-                                        Text("Удалить комментарий")
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                deleteComment(comment, afterDeleteComment)
+                                                expanded.value = false
+                                            }
+                                        ) {
+                                            Text("Удалить комментарий")
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (isAnswerToAnswer) {
-                            Image(
-                                Icons.Rounded.KeyboardArrowUp,
-                                contentDescription = "To previous comment",
-                                modifier = Modifier.size(31.dp).clip(CircleShape).clickable { }
-                                    .padding(3.dp)
-                            )
+                            if (isAnswerToAnswer) {
+                                Icon(
+                                    Icons.Rounded.KeyboardArrowUp,
+                                    contentDescription = "To previous comment",
+                                    modifier = Modifier.size(31.dp).clip(CircleShape).clickable { }
+                                        .padding(3.dp),
+                                    tint = AppTheme.black
+                                )
+                            }
                         }
                     }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = comment.dateTime.format(
+                                DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy")
+                            ),
+                            color = Color.Gray,
+                            fontSize = 11.sp
+                        )
+                        Spacer(Modifier.weight(1f))
+                        Icon(
+                            Icons.Rounded.Reply, contentDescription = "Answer",
+                            modifier = Modifier.size(30.dp).clip(CircleShape)
+                                .clickable { }.padding(5.dp),
+                            tint = AppTheme.black
+                        )
+                        Icon(
+                            Icons.Rounded.KeyboardArrowUp,
+                            contentDescription = "Upvote comment",
+                            modifier = Modifier.size(30.dp).clip(CircleShape)
+                                .clickable {
+                                    likeComment(comment, rating)
+                                }.padding(5.dp),
+                            tint = AppTheme.black
+                        )
+                        Text(rating.value.toString(), color = AppTheme.black, fontSize = 12.sp)
+                        Icon(
+                            Icons.Rounded.KeyboardArrowDown,
+                            contentDescription = "Downvote comment",
+                            modifier = Modifier.size(30.dp).clip(CircleShape)
+                                .clickable {
+                                    dislikeComment(comment, rating)
+                                }.padding(5.dp),
+                            tint = AppTheme.black
+                        )
+                    }
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = comment.dateTime.format(
-                            DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy")
-                        ),
-                        color = Color.Gray,
-                        fontSize = 11.sp
-                    )
-                    Spacer(Modifier.weight(1f))
-                    Image(Icons.Rounded.Reply, contentDescription = "Answer",
-                        modifier = Modifier.size(31.dp).padding(3.dp).clip(CircleShape)
-                            .clickable { }
-                    )
-                    Image(
-                        Icons.Rounded.KeyboardArrowUp,
-                        contentDescription = "Upvote comment",
-                        modifier = Modifier.size(31.dp).padding(3.dp).clip(CircleShape)
-                            .clickable {
-                                likeComment(comment, rating)
-                            }
-                    )
-                    Text(rating.value.toString())
-                    Image(
-                        Icons.Rounded.KeyboardArrowDown,
-                        contentDescription = "Downvote comment",
-                        modifier = Modifier.size(31.dp).padding(3.dp).clip(CircleShape)
-                            .clickable {
-                                dislikeComment(comment, rating)
-                            }
-                    )
-                }
+            }
+            if (!isLastInList) {
+                Divider(Modifier
+                    .fillMaxWidth()
+                    .padding(start = 50.dp/*95.dp*/, end = 20.dp, bottom = 5.dp), 
+                    color = Color.LightGray,
+                    thickness = 0.5.dp)
             }
         }
     }
