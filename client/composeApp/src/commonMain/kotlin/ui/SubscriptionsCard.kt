@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -111,10 +112,11 @@ fun SubscriptionsCard(
                     IconButton(onClick = {
                         navigator?.push(ManageSubscriptionsScreen(subscriptions))
                     }) {
-                        Image(
+                        Icon(
                             Icons.Rounded.ArrowForward,
                             contentDescription = "Управлять подписками",
-                            modifier = Modifier.size(25.dp)
+                            modifier = Modifier.size(25.dp),
+                            tint = AppTheme.black
                         )
                     }
                 }

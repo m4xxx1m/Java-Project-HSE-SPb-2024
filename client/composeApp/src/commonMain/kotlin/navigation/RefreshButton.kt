@@ -1,7 +1,7 @@
 package navigation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Refresh
@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import ui.AppTheme
 
 object RefreshButton {
     var onRefresh: (() -> Unit)? = null
@@ -46,7 +47,11 @@ object RefreshButton {
                 },
                 enabled = enabled.value
             ) {
-                Image(Icons.Rounded.Refresh, contentDescription = "refresh")
+                Icon(
+                    Icons.Rounded.Refresh, 
+                    contentDescription = "refresh",
+                    tint = AppTheme.black
+                )
             }
         }
     }

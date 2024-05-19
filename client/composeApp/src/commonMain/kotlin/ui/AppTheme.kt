@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 
 object AppTheme {
     
+    val black = Color(0xbe000000)
     private val primaryColor = Color(0xff086ca2)
     private val primaryVariantColor = Color(0xffc6cfdb)
     private val backgroundColor = Color(0xffebf4f8)

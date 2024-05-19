@@ -1,6 +1,5 @@
 package navigation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
@@ -45,6 +46,7 @@ import platform_depended.getPlatform
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import ui.AppTheme
 import ui.CommentCard
 import ui.PostCard
 
@@ -84,7 +86,8 @@ class CommentScreen(private val postId: Int) : Screen {
                             },
                             label = {
                                 Text("Комментарий")
-                            }
+                            },
+                            shape = RoundedCornerShape(10.dp)
                         )
                         IconButton(
                             onClick = {
@@ -94,7 +97,8 @@ class CommentScreen(private val postId: Int) : Screen {
                             },
                             enabled = commentText?.value?.isNotEmpty() ?: false
                         ) {
-                            Image(Icons.Rounded.Send, contentDescription = "Send comment")
+                            Icon(Icons.Rounded.Send, contentDescription = "Send comment",
+                                tint = AppTheme.black)
                         }
                     }
                 }
@@ -127,20 +131,20 @@ class CommentScreen(private val postId: Int) : Screen {
                                 Spacer(Modifier.size(15.dp))
                             }
                         }
-                        items(refreshHelper.value.comments) { comment ->
+                        itemsIndexed(refreshHelper.value.comments) { index, comment ->
                             comment.user = refreshHelper.value.users[comment.authorId]
                             CommentCard(
                                 comment,
                                 afterDeleteComment = {
                                     refreshHelper.value.load()
-                                }
+                                },
+                                isFirstInList = index == 0,
+                                isLastInList = index == refreshHelper.value.comments.size - 1
                             )
-                            Spacer(Modifier.size(10.dp))
                         }
                     }
                 }
             }
-            
         }
     }
 

@@ -30,12 +30,12 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Info
@@ -262,9 +262,10 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                                     .background(MaterialTheme.colors.primaryVariant)
                             )
                             if (thisUser) {
-                                Image(
+                                Icon(
                                     Icons.Rounded.Edit, contentDescription = null,
-                                    modifier = Modifier.size(15.dp).align(Alignment.BottomEnd)
+                                    modifier = Modifier.size(15.dp).align(Alignment.BottomEnd),
+                                    tint = AppTheme.black
                                 )
                             }
                         }
@@ -273,7 +274,8 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                             user.name,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            color = AppTheme.black
                         )
                         if (thisUser) {
                             IconButton(onClick = {
@@ -304,12 +306,12 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                     } else {
                         OutlinedCard("Контакты") {
                             SelectionContainer {
-                                Text(profile.contacts)
+                                Text(profile.contacts, color = AppTheme.black)
                             }
                         }
                         OutlinedCard("О себе") {
                             SelectionContainer {
-                                Text(profile.about)
+                                Text(profile.about, color = AppTheme.black)
                             }
                         }
                     }
@@ -352,10 +354,11 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                                 IconButton(onClick = {
                                     navigator?.push(TagSelectionScreen(profile.tags))
                                 }) {
-                                    Image(
+                                    Icon(
                                         Icons.Rounded.Settings,
                                         contentDescription = "Edit tags",
-                                        modifier = Modifier.size(25.dp)
+                                        modifier = Modifier.size(25.dp),
+                                        tint = AppTheme.black
                                     )
                                 }
                             }
@@ -363,17 +366,21 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                     }
                     OutlinedCard("") {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Мое резюме", modifier = Modifier.weight(1f))
+                            Text("Мое резюме", modifier = Modifier.weight(1f),
+                                color = AppTheme.black)
                             if (thisUser) {
                                 IconButton(onClick = { }) {
-                                    Image(Icons.Rounded.Edit, contentDescription = null)
+                                    Icon(Icons.Rounded.Edit, contentDescription = null,
+                                        tint = AppTheme.black)
                                 }
                                 IconButton(onClick = { }) {
-                                    Image(Icons.Rounded.AttachFile, contentDescription = null)
+                                    Icon(Icons.Rounded.AttachFile, contentDescription = null,
+                                        tint = AppTheme.black)
                                 }
                             }
                             IconButton(onClick = { }) {
-                                Image(Icons.Rounded.Info, contentDescription = null)
+                                Icon(Icons.Rounded.Info, contentDescription = null,
+                                    tint = AppTheme.black)
                             }
                         }
                     }

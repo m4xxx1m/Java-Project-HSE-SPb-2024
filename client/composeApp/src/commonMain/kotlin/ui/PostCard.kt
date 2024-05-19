@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -71,7 +72,8 @@ fun PostCard(
         if (isInCommentsScreen) LocalNavigator.current else LocalNavigator.current?.parent
     Card(
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
-        elevation = 0.dp
+        elevation = 0.dp,
+        shape = RoundedCornerShape(10.dp)
     ) {
         Box(
             modifier = Modifier.fillMaxWidth().padding(10.dp)
@@ -79,7 +81,12 @@ fun PostCard(
             val expanded = remember { mutableStateOf(false) }
             Box(modifier = Modifier.align(Alignment.TopEnd)) {
                 IconButton(onClick = { expanded.value = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Show dropdown menu")
+                    Icon(
+                        Icons.Default.MoreVert, 
+                        contentDescription = "Show dropdown menu",
+                        Modifier.size(23.dp),
+                        tint = AppTheme.black
+                    )
                 }
                 DropdownMenu(
                     expanded = expanded.value,
@@ -127,7 +134,8 @@ fun PostCard(
                     Column {
                         Text(
                             text = post.user?.name ?: "",
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            color = AppTheme.black
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -170,37 +178,62 @@ fun PostCard(
                     }
                 }
                 if (post.title.isNotEmpty()) {
-                    Text(post.title, style = MaterialTheme.typography.h6)
+                    Text(
+                        post.title,
+                        style = MaterialTheme.typography.h6,
+                        color = AppTheme.black
+                    )
                 }
-                Text(post.text)
-                
+                Text(post.text, color = AppTheme.black)
+
+//                Box(Modifier
+//                    .fillMaxWidth()
+//                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 5.dp)
+//                ) {
+//                    Divider(Modifier.fillMaxWidth(), color = Color.LightGray, thickness = 0.4.dp)
+//                }
+                Spacer(Modifier.size(5.dp))
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    
-                    IconButton(onClick = {
+
+                    Box(Modifier.clip(CircleShape).clickable {
                         likePost(post.id, ratingState)
-                    }) {
-                        Image(Icons.Rounded.KeyboardArrowUp, contentDescription = "Upvote post")
-                    }
-                    Text(ratingState.value.toString())
-                    IconButton(onClick = {
-                        dislikePost(post.id, ratingState)
-                    }) {
-                        Image(
-                            Icons.Rounded.KeyboardArrowDown,
-                            contentDescription = "Downvote post"
+                    }.padding(5.dp)) {
+                        Icon(
+                            Icons.Rounded.KeyboardArrowUp,
+                            contentDescription = "Upvote post",
+                            modifier = Modifier.size(25.dp),
+                            tint = AppTheme.black
                         )
                     }
-                    
+                    Text(ratingState.value.toString(), color = AppTheme.black, fontSize = 12.sp)
+                    Box(Modifier.clip(CircleShape).clickable {
+                        dislikePost(post.id, ratingState)
+                    }.padding(5.dp)) {
+                        Icon(
+                            Icons.Rounded.KeyboardArrowDown,
+                            contentDescription = "Downvote post",
+                            modifier = Modifier.size(25.dp),
+                            tint = AppTheme.black
+                        )
+                    }
+
                     if (!isInCommentsScreen) {
                         Spacer(Modifier.width(5.dp))
-                        IconButton(onClick = {
+                        Box(Modifier.clip(CircleShape).clickable {
                             navigator?.push(CommentScreen(post.id))
-                        }) {
-                            Image(Icons.Rounded.Forum, contentDescription = "Comments")
+                        }.padding(9.dp)) {
+                            Icon(
+                                Icons.Rounded.Forum,
+                                contentDescription = "Comments",
+                                modifier = Modifier.size(21.dp),
+                                tint = AppTheme.black
+                            )
                         }
-                        Text(post.commentsCount.toString())
+                        Text(post.commentsCount.toString(), color = AppTheme.black, 
+                            fontSize = 12.sp)
                     }
-                    
+
                 }
             }
         }

@@ -27,6 +27,7 @@ import navigation.NotificationsTab
 import navigation.ProfileTab
 import navigation.RefreshButton
 import navigation.SubscriptionsTab
+import ui.AppTheme
 import ui.SearchWidget
 
 @Composable
@@ -37,15 +38,15 @@ actual fun MainScreenScaffold(content: @Composable (PaddingValues) -> Unit) {
                 Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 1.dp)
-                    .clip(RoundedCornerShape(5.dp))
+                    .clip(RoundedCornerShape(10.dp))
                     .background(Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BottomNavigation(
                     backgroundColor = Color.White,
-                    contentColor = Color.Black,
+                    contentColor = AppTheme.black,
                     elevation = 0.dp,
-                    modifier = Modifier.weight(3f)
+                    modifier = Modifier.weight(3f).clip(RoundedCornerShape(10.dp))
                 ) {
                     TabItem(HomeTab)
                     TabItem(NotificationsTab)

@@ -16,6 +16,7 @@ import navigation.HomeTab
 import navigation.NotificationsTab
 import navigation.ProfileTab
 import navigation.SubscriptionsTab
+import ui.AppTheme
 import ui.SearchWidget
 
 @Composable
@@ -27,7 +28,7 @@ actual fun MainScreenScaffold(content: @Composable (PaddingValues) -> Unit) {
         bottomBar = {
             BottomNavigation(
                 backgroundColor = Color.White,
-                contentColor = Color.Black,
+                contentColor = AppTheme.black,
                 elevation = 15.dp
             ) {
                 TabItem(HomeTab)
