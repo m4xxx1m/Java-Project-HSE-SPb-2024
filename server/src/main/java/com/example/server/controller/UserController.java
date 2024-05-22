@@ -113,7 +113,10 @@ public class UserController {
     }
 
     @PostMapping("/users/picture/{userId}/upload")
-    public ResponseEntity<User> deleteUserProfilePicture(@PathVariable Integer userId, @ModelAttribute MultipartFile profilePicture) {
+    public ResponseEntity<User> uploadUserProfilePicture(
+            @PathVariable Integer userId,
+            @ModelAttribute("profilePicture") MultipartFile profilePicture
+    ) {
         try {
             return ResponseEntity.ok(userService.uploadUserProfilePicture(userId, profilePicture));
         } catch (IOException e) {
