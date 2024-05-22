@@ -28,7 +28,7 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    private static final String DIRECTORY_PATH = "server\\src\\main\\resources\\profile_pic\\";
+    private static final String DIRECTORY_PATH = "src\\main\\resources\\profile_pic\\";
 
     private final UserRepository userRepository;
 
@@ -114,8 +114,8 @@ public class UserService {
 
     public User deleteUserProfilePicture(Integer userId) throws IOException {
         User user = getUser(userId);
-        Files.delete(Paths.get(user.getProfilePictureUrl()));
-        user.setProfilePictureUrl("");
+        Files.deleteIfExists(Paths.get(user.getProfilePictureUrl()));
+        user.setProfilePictureUrl(null);
         return userRepository.save(user);
     }
 
