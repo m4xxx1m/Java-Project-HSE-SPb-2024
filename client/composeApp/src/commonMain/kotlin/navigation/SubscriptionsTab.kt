@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import files.AvatarsDownloader.ProfilePictures
+import files.AvatarsDownloader.downloadProfilePicture
 import model.AuthManager
 import model.Post
 import model.User
@@ -78,7 +80,10 @@ object SubscriptionsTab : Tab {
                 }
                 items(refreshHelper.value.posts) { post ->
                     post.user = refreshHelper.value.users[post.userId]
-                    PostCard(post)
+                    PostCard(
+                        post,
+                        profilePicture = ProfilePictures[post.userId]
+                    )
                     Spacer(Modifier.size(10.dp))
                 }
             }
@@ -92,11 +97,35 @@ private class RefreshSubscriptionsHelper : Refreshable() {
     val updateSubscriptionsList = mutableStateOf(true)
     val userId = AuthManager.currentUser.id
 
-    override fun load() {
-        isRefreshing = true
-        updateSubscriptionsList.value = true
-        val retrofitCall = RetrofitClient.retrofitCall
-        retrofitCall.getPostsFromSubscriptions(userId)
+    private fun getUsersList(userIds: Set<Int>) {
+        RetrofitClient.retrofitCall.getUsersList(userIds)
+            .enqueue(object : Callback<List<network.User>> {
+                override fun onResponse(
+                    call: Call<List<network.User>>,
+                    response: Response<List<network.User>>
+                ) {
+                    response.body()?.let {
+                        it.forEach { user ->
+                            users[user.userId] = user.convertUser()
+                            if (!ProfilePictures.containsKey(user.userId)) {
+                                downloadProfilePicture(user.userId)
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<List<network.User>>,
+                    t: Throwable
+                ) {
+                    println("get users list failure")
+                }
+
+            })
+    }
+
+    private fun getPosts() {
+        RetrofitClient.retrofitCall.getPostsFromSubscriptions(userId)
             .enqueue(object : Callback<List<network.Post>> {
                 override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
                     println("refresh subscriptions tab failure")
@@ -117,32 +146,18 @@ private class RefreshSubscriptionsHelper : Refreshable() {
                                 post.convertPost()
                             })
                         }
-                        retrofitCall.getUsersList(userIds)
-                            .enqueue(object : Callback<List<network.User>> {
-                                override fun onResponse(
-                                    call: Call<List<network.User>>,
-                                    response: Response<List<network.User>>
-                                ) {
-                                    response.body()?.let {
-                                        it.forEach { user ->
-                                            users[user.userId] = user.convertUser()
-                                        }
-                                    }
-                                }
-
-                                override fun onFailure(
-                                    call: Call<List<network.User>>,
-                                    t: Throwable
-                                ) {
-                                    println("get users list failure")
-                                }
-
-                            })
+                        getUsersList(userIds)
                     } else {
                         println("refresh subscriptions tab wrong code")
                     }
                     isRefreshing = false
                 }
             })
+    }
+
+    override fun load() {
+        isRefreshing = true
+        updateSubscriptionsList.value = true
+        getPosts()
     }
 }

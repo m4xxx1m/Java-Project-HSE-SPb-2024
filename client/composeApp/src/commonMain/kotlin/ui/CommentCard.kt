@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,7 +56,8 @@ fun CommentCard(
     isAnswerToAnswer: Boolean = false,
     afterDeleteComment: (() -> Unit)? = null,
     isFirstInList: Boolean = false,
-    isLastInList: Boolean = false
+    isLastInList: Boolean = false,
+    profilePicture: ImageBitmap? = null
 ) {
     val shape = RoundedCornerShape(
         topStart = if (isFirstInList) 10.dp else 0.dp,
@@ -70,24 +72,38 @@ fun CommentCard(
         shape = shape,
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()
     ) {
-//    Box(Modifier.fillMaxWidth()) {
         Column {
             Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
                 Spacer(Modifier.width(35.dp))
-                Image(
-                    Icons.Rounded.Person,
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
-                    modifier = Modifier
-                        .size(35.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colors.primaryVariant)
-                        .clickable {
-                            comment.user?.let {
-                                navigator?.push(UserProfileScreen(it))
+                if (profilePicture == null) {
+                    Image(
+                        Icons.Rounded.Person,
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
+                        modifier = Modifier
+                            .size(35.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colors.primaryVariant)
+                            .clickable {
+                                comment.user?.let {
+                                    navigator?.push(UserProfileScreen(it))
+                                }
                             }
-                        }
-                )
+                    )
+                } else {
+                    Image(
+                        profilePicture,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(35.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                comment.user?.let {
+                                    navigator?.push(UserProfileScreen(it))
+                                }
+                            }
+                    )
+                }
                 Spacer(Modifier.size(10.dp))
                 Column {
                     Row {

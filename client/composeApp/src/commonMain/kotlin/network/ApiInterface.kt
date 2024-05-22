@@ -1,17 +1,20 @@
 package network
 
 import navigation.CreatePostManager
+import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiInterface {
-
+    
     @Headers("Content-Type:application/json")
     @POST("/post/add")
     fun createPost(@Body info: CreatePostManager.CreatePostBody):
@@ -135,4 +138,15 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @GET("/user/posts")
     fun getUserPosts(@Query("userId") userId: Int): Call<List<Post>>
+
+    @Multipart
+    @POST("/users/picture/{userId}/upload")
+    fun uploadProfilePicture(
+        @Path("userId") userId: Int,
+        @Part profilePicture: MultipartBody.Part
+    ): Call<Unit>
+
+    @GET("/users/picture/{userId}")
+    fun getUserProfilePicture(@Path("userId") userId: Int): Call<ResponseBody>
+
 }

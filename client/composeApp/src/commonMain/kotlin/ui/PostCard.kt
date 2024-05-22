@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,7 +65,8 @@ import java.time.format.DateTimeFormatter
 fun PostCard(
     post: Post,
     isInCommentsScreen: Boolean = false,
-    afterDeletePost: (() -> Unit)? = null
+    afterDeletePost: (() -> Unit)? = null,
+    profilePicture: ImageBitmap? = null
 ) {
     val thisUser = post.userId == AuthManager.currentUser.id
     val ratingState = remember { mutableStateOf(post.likesCount) }
@@ -116,20 +118,35 @@ fun PostCard(
             }
             Column {
                 Row {
-                    Image(
-                        Icons.Rounded.Person,
-                        contentDescription = "User Image",
-                        colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colors.primaryVariant)
-                            .clickable {
-                                post.user?.let {
-                                    navigator?.push(UserProfileScreen(it))
+                    if (profilePicture == null) {
+                        Image(
+                            Icons.Rounded.Person,
+                            contentDescription = "User Image",
+                            colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colors.primaryVariant)
+                                .clickable {
+                                    post.user?.let {
+                                        navigator?.push(UserProfileScreen(it))
+                                    }
                                 }
-                            }
-                    )
+                        )
+                    } else {
+                        Image(
+                            bitmap = profilePicture,
+                            contentDescription = "User Image",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .clickable {
+                                    post.user?.let {
+                                        navigator?.push(UserProfileScreen(it))
+                                    }
+                                }
+                        )
+                    }
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(

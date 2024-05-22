@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import files.AvatarsDownloader.ProfilePictures
+import files.AvatarsDownloader.downloadProfilePicture
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.Comment
@@ -97,8 +99,10 @@ class CommentScreen(private val postId: Int) : Screen {
                             },
                             enabled = commentText?.value?.isNotEmpty() ?: false
                         ) {
-                            Icon(Icons.Rounded.Send, contentDescription = "Send comment",
-                                tint = AppTheme.black)
+                            Icon(
+                                Icons.Rounded.Send, contentDescription = "Send comment",
+                                tint = AppTheme.black
+                            )
                         }
                     }
                 }
@@ -127,7 +131,9 @@ class CommentScreen(private val postId: Int) : Screen {
                                     true,
                                     afterDeletePost = {
                                         navigator?.pop()
-                                    })
+                                    },
+                                    profilePicture = ProfilePictures[post.userId]
+                                )
                                 Spacer(Modifier.size(15.dp))
                             }
                         }
@@ -139,7 +145,8 @@ class CommentScreen(private val postId: Int) : Screen {
                                     refreshHelper.value.load()
                                 },
                                 isFirstInList = index == 0,
-                                isLastInList = index == refreshHelper.value.comments.size - 1
+                                isLastInList = index == refreshHelper.value.comments.size - 1,
+                                profilePicture = ProfilePictures[comment.authorId]
                             )
                         }
                     }
@@ -153,13 +160,11 @@ class CommentScreen(private val postId: Int) : Screen {
         val comments = mutableStateListOf<Comment>()
         val users = mutableStateMapOf<Int, User>()
 
-        val retrofitCall = RetrofitClient.retrofitCall
-
         fun sendComment() {
             if (commentText == null) {
                 return
             }
-            retrofitCall.addComment(
+            RetrofitClient.retrofitCall.addComment(
                 postId,
                 CommentCreate(AuthManager.currentUser.id, commentText?.value ?: "")
             ).enqueue(object : Callback<network.Comment> {
@@ -181,73 +186,88 @@ class CommentScreen(private val postId: Int) : Screen {
             })
         }
 
-        override fun load() {
-            isRefreshing = true
-            retrofitCall.getComments(postId).enqueue(object : Callback<List<network.Comment>> {
-                override fun onFailure(call: Call<List<network.Comment>>, t: Throwable) {
+        private fun getUsersList(userIds: Set<Int>) {
+            RetrofitClient.retrofitCall.getUsersList(userIds)
+                .enqueue(object : Callback<List<network.User>> {
+                    override fun onFailure(
+                        call: Call<List<network.User>>,
+                        t: Throwable
+                    ) {
+                        println("get users list failure")
+                    }
+
+                    override fun onResponse(
+                        call: Call<List<network.User>>,
+                        response: Response<List<network.User>>
+                    ) {
+                        response.body()?.let {
+                            it.forEach { user ->
+                                users[user.userId] = user.convertUser()
+                                if (!ProfilePictures.containsKey(user.userId)) {
+                                    downloadProfilePicture(user.userId)
+                                }
+                            }
+                        }
+                    }
+                })
+        }
+
+        private fun getPost(postId: Int, userIds: MutableSet<Int>) {
+            RetrofitClient.retrofitCall.getPost(postId).enqueue(object : Callback<network.Post> {
+                override fun onFailure(call: Call<network.Post>, t: Throwable) {
                     println("refresh comments screen failure")
-                    isRefreshing = false
                 }
 
                 override fun onResponse(
-                    call: Call<List<network.Comment>>,
-                    response: Response<List<network.Comment>>
+                    call: Call<network.Post>,
+                    response: Response<network.Post>
                 ) {
-                    if (response.code() == 200) {
-                        println("refresh comments screen success")
-                        comments.clear()
-                        val userIds = mutableSetOf<Int>()
-                        response.body()?.let {
-                            comments.addAll(it.map { comment ->
-                                userIds.add(comment.authorId)
-                                comment.convertComment()
-                            })
-                        }
-
-                        retrofitCall.getPost(postId).enqueue(object : Callback<network.Post> {
-                            override fun onFailure(call: Call<network.Post>, t: Throwable) {
-                                println("refresh comments screen failure")
-                            }
-
-                            override fun onResponse(
-                                call: Call<network.Post>,
-                                response: Response<network.Post>
-                            ) {
-                                response.body()?.let {
-                                    post.value = it.convertPost()
-                                }
-                                post.value?.let {
-                                    userIds.add(it.userId)
-                                }
-
-                                retrofitCall.getUsersList(userIds)
-                                    .enqueue(object : Callback<List<network.User>> {
-                                        override fun onFailure(
-                                            call: Call<List<network.User>>,
-                                            t: Throwable
-                                        ) {
-                                            println("get users list failure")
-                                        }
-
-                                        override fun onResponse(
-                                            call: Call<List<network.User>>,
-                                            response: Response<List<network.User>>
-                                        ) {
-                                            response.body()?.let {
-                                                it.forEach { user ->
-                                                    users[user.userId] = user.convertUser()
-                                                }
-                                            }
-                                        }
-                                    })
-                            }
-                        })
-                    } else {
-                        println("refresh comments screen wrong code")
+                    response.body()?.let {
+                        post.value = it.convertPost()
                     }
-                    isRefreshing = false
+                    post.value?.let {
+                        userIds.add(it.userId)
+                    }
+
+                    getUsersList(userIds)
                 }
             })
+        }
+
+        private fun getComments() {
+            RetrofitClient.retrofitCall.getComments(postId)
+                .enqueue(object : Callback<List<network.Comment>> {
+                    override fun onFailure(call: Call<List<network.Comment>>, t: Throwable) {
+                        println("refresh comments screen failure")
+                        isRefreshing = false
+                    }
+
+                    override fun onResponse(
+                        call: Call<List<network.Comment>>,
+                        response: Response<List<network.Comment>>
+                    ) {
+                        if (response.code() == 200) {
+                            println("refresh comments screen success")
+                            comments.clear()
+                            val userIds = mutableSetOf<Int>()
+                            response.body()?.let {
+                                comments.addAll(it.map { comment ->
+                                    userIds.add(comment.authorId)
+                                    comment.convertComment()
+                                })
+                            }
+                            getPost(postId, userIds)
+                        } else {
+                            println("refresh comments screen wrong code")
+                        }
+                        isRefreshing = false
+                    }
+                })
+        }
+
+        override fun load() {
+            isRefreshing = true
+            getComments()
         }
     }
 }
