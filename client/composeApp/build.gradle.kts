@@ -43,6 +43,8 @@ kotlin {
             implementation(libs.retrofit)
             implementation(libs.retrofit.converter.gson)
             
+            implementation(libs.okhttp)
+            
             api(compose.materialIconsExtended)
         }
         desktopMain.dependencies {
@@ -95,6 +97,16 @@ compose.desktop {
             modules("java.instrument", "java.prefs", "java.sql", "jdk.unsupported")
             packageName = "ru.hse.project"
             packageVersion = "1.0.0"
+            
+//            macOS {
+//                iconFile.set(project.file("icon/internfon_logo.icns"))
+//            }
+//            windows {
+//                iconFile.set(project.file("icon/internfon_logo.ico"))
+//            }
+//            linux {
+//                iconFile.set(project.file("icon/internfon_logo.png"))
+//            }
         }
     }
 }

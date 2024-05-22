@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import files.AvatarsDownloader.ProfilePictures
+import files.AvatarsDownloader.downloadProfilePicture
 import kotlinx.coroutines.launch
 import model.Post
 import model.User
@@ -76,7 +78,8 @@ object HomeTab : Tab {
                             coroutineScope.launch {
                                 refreshHelper.value.load()
                             }
-                        }
+                        },
+                        profilePicture = ProfilePictures[post.userId]
                     )
                     Spacer(Modifier.size(10.dp))
                 }
@@ -88,11 +91,33 @@ object HomeTab : Tab {
 private class RefreshHomeHelper : Refreshable() {
     val posts = mutableStateListOf<Post>()
     val users = mutableStateMapOf<Int, User>()
+    
+    private fun getUsersList(userIds: Set<Int>) {
+        RetrofitClient.retrofitCall.getUsersList(userIds)
+            .enqueue(object : Callback<List<network.User>> {
+                override fun onResponse(
+                    call: Call<List<network.User>>,
+                    response: Response<List<network.User>>
+                ) {
+                    response.body()?.let {
+                        it.forEach { user ->
+                            users[user.userId] = user.convertUser()
+                            if (!ProfilePictures.containsKey(user.userId)) {
+                                downloadProfilePicture(user.userId)
+                            }
+                        }
+                    }
+                }
 
-    override fun load() {
-        isRefreshing = true
-        val retrofitCall = RetrofitClient.retrofitCall
-        retrofitCall.getAllPosts().enqueue(object : Callback<List<network.Post>> {
+                override fun onFailure(call: Call<List<network.User>>, t: Throwable) {
+                    println("get users list failure")
+                }
+
+            })
+    }
+
+    private fun getAllPosts() {
+        RetrofitClient.retrofitCall.getAllPosts().enqueue(object : Callback<List<network.Post>> {
             override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
                 println("refresh home tab failure")
                 isRefreshing = false
@@ -112,29 +137,17 @@ private class RefreshHomeHelper : Refreshable() {
                             post.convertPost()
                         })
                     }
-                    retrofitCall.getUsersList(userIds)
-                        .enqueue(object : Callback<List<network.User>> {
-                            override fun onResponse(
-                                call: Call<List<network.User>>,
-                                response: Response<List<network.User>>
-                            ) {
-                                response.body()?.let {
-                                    it.forEach { user ->
-                                        users[user.userId] = user.convertUser()
-                                    }
-                                }
-                            }
-
-                            override fun onFailure(call: Call<List<network.User>>, t: Throwable) {
-                                println("get users list failure")
-                            }
-
-                        })
+                    getUsersList(userIds)
                 } else {
                     println("refresh home tab wrong code")
                 }
                 isRefreshing = false
             }
         })
+    }
+
+    override fun load() {
+        isRefreshing = true
+        getAllPosts()
     }
 }

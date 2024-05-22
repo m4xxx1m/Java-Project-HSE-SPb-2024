@@ -35,10 +35,13 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import files.AvatarsDownloader.ProfilePictures
 import model.SubscriberManager
 import model.User
 
-class ManageSubscriptionsScreen(private val subscriptionList: List<User>) : Screen {
+class ManageSubscriptionsScreen(
+    private val subscriptionList: List<User>
+) : Screen {
 
     @Composable
     override fun Content() {
@@ -68,13 +71,21 @@ class ManageSubscriptionsScreen(private val subscriptionList: List<User>) : Scre
                         val subscriptionManager =
                             remember { mutableStateOf(SubscriberManager(user.id, coroutineScope)) }
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                Icons.Rounded.Person, 
-                                contentDescription = "User profile image",
-                                colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
-                                modifier = Modifier.size(40.dp).clip(CircleShape)
-                                    .background(MaterialTheme.colors.primaryVariant)
-                            )
+                            ProfilePictures[user.id]?.let {
+                                Image(
+                                    bitmap = it,
+                                    contentDescription = "User profile image",
+                                    modifier = Modifier.size(40.dp).clip(CircleShape)
+                                )
+                            } ?: run {
+                                Image(
+                                    Icons.Rounded.Person,
+                                    contentDescription = "User profile image",
+                                    colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
+                                    modifier = Modifier.size(40.dp).clip(CircleShape)
+                                        .background(MaterialTheme.colors.primaryVariant)
+                                )
+                            }
                             Spacer(Modifier.size(15.dp))
                             Text(
                                 text = user.name,

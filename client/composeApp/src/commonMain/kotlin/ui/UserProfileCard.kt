@@ -58,6 +58,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
+import files.AvatarsDownloader.ProfilePictures
+import files.AvatarsDownloader.downloadProfilePicture
+import files.ProfilePictureUploader
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.Post
@@ -162,7 +165,7 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                                         .widthIn(max = 500.dp)
                                         .fillMaxWidth()
                                         .padding(horizontal = 10.dp, vertical = 5.dp),
-                                    color = Color.LightGray, 
+                                    color = Color.LightGray,
                                     thickness = 0.5.dp
                                 )
                                 Spacer(Modifier.height(10.dp))
@@ -182,7 +185,8 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                                 coroutineScope.launch {
                                     helper.load()
                                 }
-                            }
+                            },
+                            profilePicture = ProfilePictures[post.userId]
                         )
                         Spacer(Modifier.size(10.dp))
                     }
@@ -194,7 +198,6 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
     @Composable
     private fun profileCard() {
         val thisUser = user.id == AuthManager.currentUser.id
-//        val userProfile = remember { mutableStateOf<UserProfile?>(null) }
         val coroutineScope = rememberCoroutineScope()
         val subscriptionManager =
             if (thisUser) null else remember {
@@ -206,11 +209,7 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                 )
             }
         val updateSubscriptionsList = remember { mutableStateOf(true) }
-//        if (userProfile.value == null) {
-//            coroutineScope.launch {
-//                user.setProfile(userProfile)
-//            }
-//        }
+
         val isDialogOpened = remember { mutableStateOf(false) }
         if (thisUser && isDialogOpened.value) {
             AlertDialog(
@@ -246,21 +245,33 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
         refreshHelper.value?.userProfile?.value?.let { profile ->
             Box(
                 modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
-//            elevation = 6.dp
             ) {
                 Column(
                     Modifier.padding(vertical = 10.dp),
                     verticalArrangement = Arrangement.spacedBy(7.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.clip(RoundedCornerShape(7.dp)).clickable {}) {
-                            Image(
-                                Icons.Rounded.Person, 
-                                contentDescription = "User profile image",
-                                colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
-                                modifier = Modifier.size(65.dp).clip(CircleShape)
-                                    .background(MaterialTheme.colors.primaryVariant)
-                            )
+//                        Box(Modifier.clip(RoundedCornerShape(7.dp)).clickable {
+//                            
+//                            navigator?.push(ImageUploadScreen())
+//                            
+//                        }) {
+                        ProfilePictureUploader(thisUser) {
+                            ProfilePictures[user.id]?.let {
+                                Image(
+                                    bitmap = it,
+                                    contentDescription = "User profile image",
+                                    modifier = Modifier.size(65.dp).clip(CircleShape)
+                                )
+                            } ?: run {
+                                Image(
+                                    Icons.Rounded.Person,
+                                    contentDescription = "User profile image",
+                                    colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
+                                    modifier = Modifier.size(65.dp).clip(CircleShape)
+                                        .background(MaterialTheme.colors.primaryVariant)
+                                )
+                            }
                             if (thisUser) {
                                 Icon(
                                     Icons.Rounded.Edit, contentDescription = null,
@@ -366,21 +377,29 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                     }
                     OutlinedCard("") {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Мое резюме", modifier = Modifier.weight(1f),
-                                color = AppTheme.black)
+                            Text(
+                                "Мое резюме", modifier = Modifier.weight(1f),
+                                color = AppTheme.black
+                            )
                             if (thisUser) {
                                 IconButton(onClick = { }) {
-                                    Icon(Icons.Rounded.Edit, contentDescription = null,
-                                        tint = AppTheme.black)
+                                    Icon(
+                                        Icons.Rounded.Edit, contentDescription = null,
+                                        tint = AppTheme.black
+                                    )
                                 }
                                 IconButton(onClick = { }) {
-                                    Icon(Icons.Rounded.AttachFile, contentDescription = null,
-                                        tint = AppTheme.black)
+                                    Icon(
+                                        Icons.Rounded.AttachFile, contentDescription = null,
+                                        tint = AppTheme.black
+                                    )
                                 }
                             }
                             IconButton(onClick = { }) {
-                                Icon(Icons.Rounded.Info, contentDescription = null,
-                                    tint = AppTheme.black)
+                                Icon(
+                                    Icons.Rounded.Info, contentDescription = null,
+                                    tint = AppTheme.black
+                                )
                             }
                         }
                     }
@@ -432,95 +451,98 @@ private class RefreshUserProfileHelper(private val user: User) : Refreshable() {
     val users = mutableStateMapOf<Int, User>()
     val userProfile = mutableStateOf<UserProfile?>(null)
 
+    private fun getUsersList(userIds: Set<Int>) {
+        RetrofitClient.retrofitCall.getUsersList(userIds)
+            .enqueue(object : Callback<List<network.User>> {
+                override fun onResponse(
+                    call: Call<List<network.User>>,
+                    response: Response<List<network.User>>
+                ) {
+                    response.body()?.let {
+                        it.forEach { user ->
+                            users[user.userId] = user.convertUser()
+                            if (!ProfilePictures.containsKey(user.userId)) {
+                                downloadProfilePicture(user.userId)
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<List<network.User>>,
+                    t: Throwable
+                ) {
+                    println("get users list failure")
+                }
+
+            })
+    }
+
+    private fun getUserPosts() {
+        RetrofitClient.retrofitCall.getUserPosts(user.id)
+            .enqueue(object : Callback<List<network.Post>> {
+                override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
+                    println("refresh user profile failure")
+                    isRefreshing = false
+                }
+
+                override fun onResponse(
+                    call: Call<List<network.Post>>,
+                    response: Response<List<network.Post>>
+                ) {
+                    if (response.code() == 200) {
+                        userPosts.clear()
+                        val userIds = mutableSetOf<Int>()
+                        response.body()?.let {
+                            userPosts.addAll(it.map { post ->
+                                userIds.add(post.authorId)
+                                post.convertPost()
+                            })
+                        }
+                        getUsersList(userIds)
+                    } else {
+                        println("refresh user profile wrong code")
+                    }
+                    isRefreshing = false
+                }
+            })
+    }
+
+    private fun getSavedPosts() {
+        RetrofitClient.retrofitCall.getSavedPosts(user.id)
+            .enqueue(object : Callback<List<network.Post>> {
+                override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
+                    println("refresh saved posts failure")
+                    isRefreshing = false
+                }
+
+                override fun onResponse(
+                    call: Call<List<network.Post>>,
+                    response: Response<List<network.Post>>
+                ) {
+                    if (response.code() == 200) {
+                        savedPosts.clear()
+                        val userIds = mutableSetOf<Int>()
+                        response.body()?.let {
+                            savedPosts.addAll(it.map { post ->
+                                userIds.add(post.authorId)
+                                post.convertPost()
+                            })
+                        }
+                        getUsersList(userIds)
+                    } else {
+                        println("refresh saved posts wrong code")
+                    }
+                    isRefreshing = false
+                }
+            })
+    }
+
     override fun load() {
         isRefreshing = true
+        downloadProfilePicture(user.id)
         user.setProfile(userProfile)
-        val retrofitCall = RetrofitClient.retrofitCall
-        retrofitCall.getUserPosts(user.id).enqueue(object : Callback<List<network.Post>> {
-            override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
-                println("refresh user profile failure")
-                isRefreshing = false
-            }
-
-            override fun onResponse(
-                call: Call<List<network.Post>>,
-                response: Response<List<network.Post>>
-            ) {
-                if (response.code() == 200) {
-                    userPosts.clear()
-                    val userIds = mutableSetOf<Int>()
-                    response.body()?.let {
-                        userPosts.addAll(it.map { post ->
-                            userIds.add(post.authorId)
-                            post.convertPost()
-                        })
-                    }
-                    retrofitCall.getUsersList(userIds)
-                        .enqueue(object : Callback<List<network.User>> {
-                            override fun onResponse(
-                                call: Call<List<network.User>>,
-                                response: Response<List<network.User>>
-                            ) {
-                                response.body()?.let {
-                                    it.forEach { user ->
-                                        users[user.userId] = user.convertUser()
-                                    }
-                                }
-                            }
-
-                            override fun onFailure(call: Call<List<network.User>>, t: Throwable) {
-                                println("get users list failure")
-                            }
-
-                        })
-                } else {
-                    println("refresh user profile wrong code")
-                }
-                isRefreshing = false
-            }
-        })
-        retrofitCall.getSavedPosts(user.id).enqueue(object : Callback<List<network.Post>> {
-            override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
-                println("refresh saved posts failure")
-                isRefreshing = false
-            }
-
-            override fun onResponse(
-                call: Call<List<network.Post>>,
-                response: Response<List<network.Post>>
-            ) {
-                if (response.code() == 200) {
-                    savedPosts.clear()
-                    val userIds = mutableSetOf<Int>()
-                    response.body()?.let {
-                        savedPosts.addAll(it.map { post ->
-                            userIds.add(post.authorId)
-                            post.convertPost()
-                        })
-                    }
-                    retrofitCall.getUsersList(userIds)
-                        .enqueue(object : Callback<List<network.User>> {
-                            override fun onResponse(
-                                call: Call<List<network.User>>,
-                                response: Response<List<network.User>>
-                            ) {
-                                response.body()?.let {
-                                    it.forEach { user ->
-                                        users[user.userId] = user.convertUser()
-                                    }
-                                }
-                            }
-
-                            override fun onFailure(call: Call<List<network.User>>, t: Throwable) {
-                                println("get users list failure")
-                            }
-
-                        })
-                } else {
-                    println("refresh saved posts wrong code")
-                }
-                isRefreshing = false
-            }
-        })
+        getUserPosts()
+        getSavedPosts()
     }
 }

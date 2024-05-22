@@ -40,6 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
+import files.AvatarsDownloader.ProfilePictures
+import files.AvatarsDownloader.downloadProfilePicture
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.User
@@ -89,13 +91,21 @@ fun SubscriptionsCard(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Image(
-                                Icons.Rounded.Person, 
-                                contentDescription = "User profile image",
-                                colorFilter = ColorFilter.tint(Color(0xb0000000)),
-                                modifier = Modifier.size(40.dp).clip(CircleShape)
-                                    .background(MaterialTheme.colors.primaryVariant)
-                            )
+                            ProfilePictures[it.id]?.let { picture ->
+                                Image(
+                                    picture,
+                                    contentDescription = "User profile image",
+                                    modifier = Modifier.size(40.dp).clip(CircleShape)
+                                )
+                            } ?: run {
+                                Image(
+                                    Icons.Rounded.Person,
+                                    contentDescription = "User profile image",
+                                    colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
+                                    modifier = Modifier.size(40.dp).clip(CircleShape)
+                                        .background(MaterialTheme.colors.primaryVariant)
+                                )
+                            }
                             var name = it.name
                             if (it.name.length > 8) {
                                 name = name.substring(0, 8) + "..."
@@ -110,7 +120,11 @@ fun SubscriptionsCard(
                 }
                 if (thisUser) {
                     IconButton(onClick = {
-                        navigator?.push(ManageSubscriptionsScreen(subscriptions))
+                        navigator?.push(
+                            ManageSubscriptionsScreen(
+                                subscriptions
+                            )
+                        )
                     }) {
                         Icon(
                             Icons.Rounded.ArrowForward,
@@ -153,7 +167,9 @@ private fun card(uiOption: Boolean, content: @Composable () -> Unit) {
     }
 }
 
-private fun getSubscriptions(userId: Int, subscriptions: MutableList<User>) {
+private fun getSubscriptions(
+    userId: Int, subscriptions: MutableList<User>
+) {
     RetrofitClient.retrofitCall.getSubscriptions(userId)
         .enqueue(object : Callback<List<network.User>> {
             override fun onResponse(
@@ -164,6 +180,9 @@ private fun getSubscriptions(userId: Int, subscriptions: MutableList<User>) {
                     response.body()?.let {
                         subscriptions.clear()
                         subscriptions.addAll(it.map(network.User::convertUser))
+                        for (user in it) {
+                            downloadProfilePicture(user.userId)
+                        }
                     }
                 } else {
                     println("wrong code on getting list of subscriptions")
