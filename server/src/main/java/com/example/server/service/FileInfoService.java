@@ -19,8 +19,6 @@ import org.springframework.util.DigestUtils;
 @Service
 public class FileInfoService {
 
-    private static final String DIRECTORY_PATH = "server\\src\\main\\resources\\files\\";
-
     @Autowired
     private FileInfoRepository fileInfoRepository;
 
@@ -28,10 +26,10 @@ public class FileInfoService {
         return fileInfoRepository.findById(id).orElse(null);
     }
 
-    public FileInfo upload(MultipartFile resource, int postId) throws IOException {
+    public FileInfo upload(MultipartFile resource, int sourceId, String directoryPath) throws IOException {
         String key = generateKey(resource.getOriginalFilename());
-        FileInfo createdFile = new FileInfo(resource.getOriginalFilename(), key, postId, resource.getContentType());
-        uploadFileData(resource.getBytes(), DIRECTORY_PATH + postId + "\\" + key);
+        FileInfo createdFile = new FileInfo(resource.getOriginalFilename(), key, sourceId, resource.getContentType());
+        uploadFileData(resource.getBytes(), directoryPath + key);
         fileInfoRepository.save(createdFile);
         return createdFile;
     }
@@ -49,14 +47,14 @@ public class FileInfoService {
         }
     }
 
-    static byte[] download(String key) throws IOException {
-        Path path = Paths.get(DIRECTORY_PATH + key);
+    static byte[] download(String key, String directoryPath) throws IOException {
+        Path path = Paths.get(directoryPath + key);
         return Files.readAllBytes(path);
     }
 
-    void delete(int postId, FileInfo fileInfo) throws IOException {
+    void delete(int postId, FileInfo fileInfo, String directoryPath) throws IOException {
         assert fileInfo != null;
-        Path path = Paths.get(DIRECTORY_PATH + postId + "\\" + fileInfo.getKey());
+        Path path = Paths.get(directoryPath + fileInfo.getKey());
         Files.delete(path);
         fileInfoRepository.delete(fileInfo);
     }

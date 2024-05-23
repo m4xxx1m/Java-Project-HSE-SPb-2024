@@ -41,7 +41,7 @@ public class User implements UserDetails {
     private String bio = "";
 
     @Column(length = 2000)
-    private String resumeUrl;
+    private Integer resumeInfoId;
 
     @Builder.Default
     @Column(length = 2000)
@@ -106,12 +106,12 @@ public class User implements UserDetails {
         this.bio = bio;
     }
 
-    public String getResumeUrl() {
-        return resumeUrl;
+    public Integer getResumeInfoId() {
+        return resumeInfoId;
     }
 
-    public void setResumeUrl(String resumeUrl) {
-        this.resumeUrl = resumeUrl;
+    public void setResumeInfoId(Integer resumeInfoId) {
+        this.resumeInfoId = resumeInfoId;
     }
 
     public String getTags() {
