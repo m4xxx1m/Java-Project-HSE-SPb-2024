@@ -142,4 +142,8 @@ public class PostService {
             post.setCommentsCount(post.getCommentsCount() + delta);
         }
     }
+
+    public List<Post> getPostsByContentUsingTrigram(String content) {
+        return postRepository.findByContentUsingTrigram(content);
+    }
 }

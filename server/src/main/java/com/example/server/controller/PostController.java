@@ -124,4 +124,14 @@ public class PostController {
     public List<String> getTags() {
         return Tag.getAllTags();
     }
+
+    @GetMapping("/post/search/trigram")
+    public ResponseEntity<List<Post>> searchPostsUsingTrigram(@RequestParam("content") String content) {
+        List<Post> posts = postService.getPostsByContentUsingTrigram(content);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        }
+    }
 }
