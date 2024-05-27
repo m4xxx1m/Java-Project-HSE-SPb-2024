@@ -19,12 +19,12 @@ import org.springframework.util.DigestUtils;
 @Service
 public class FileInfoService {
 
-    private static final String DIRECTORY_PATH = "server\\src\\main\\resources\\files\\";
+    private static final String DIRECTORY_PATH = "src\\main\\resources\\files\\";
 
     @Autowired
     private FileInfoRepository fileInfoRepository;
 
-    public FileInfo findById(int id) {
+    public FileInfo findById(Integer id) {
         return fileInfoRepository.findById(id).orElse(null);
     }
 
