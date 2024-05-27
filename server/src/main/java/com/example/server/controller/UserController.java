@@ -1,11 +1,13 @@
 package com.example.server.controller;
 
+import com.example.server.dto.ResumeDto;
 import com.example.server.dto.UserUpdateDto;
 import com.example.server.model.FileInfo;
 import com.example.server.model.Post;
 import com.example.server.model.Subscription;
 import com.example.server.model.User;
 import com.example.server.service.FileInfoService;
+import com.example.server.service.ResumeService;
 import com.example.server.service.SubscriptionService;
 import com.example.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -28,16 +31,19 @@ public class UserController {
 
     private final UserService userService;
     private final SubscriptionService subscriptionService;
-
     private final FileInfoService fileInfoService;
+
+    private final ResumeService resumeService;
 
     @Autowired
     public UserController(UserService userService,
                           SubscriptionService subscriptionService,
-                          FileInfoService fileInfoService) {
+                          FileInfoService fileInfoService,
+                          ResumeService resumeService) {
         this.userService = userService;
         this.subscriptionService = subscriptionService;
         this.fileInfoService = fileInfoService;
+        this.resumeService = resumeService;
     }
 
     // example of usage:
@@ -177,7 +183,7 @@ public class UserController {
         try {
             byte[] fileData = userService.getResumeData(id + "//" + resumeInfo.getKey());
             return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.valueOf(resumeInfo.getFileType()))
+                    .contentType(MediaType.valueOf("application/pdf"))
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=\"" + resumeInfo.getFileName() + "\"")
                     .body(fileData);
@@ -203,6 +209,17 @@ public class UserController {
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @PostMapping(value = "/user/{id}/resume/create")
+    ResponseEntity<?> createResume(@PathVariable Integer id, @ModelAttribute("resumeDto") String resumeDto) {
+        try {
+            resumeService.createResume(resumeDto, id);
+        } catch (Exception e) {
+            System.out.println(Arrays.toString(e.getStackTrace()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return getResume(id);
     }
 
 }
