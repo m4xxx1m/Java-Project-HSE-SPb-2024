@@ -133,14 +133,14 @@ class TagSelectionScreen(
             RetrofitClient.retrofitCall.updateUserTags(
                 AuthManager.currentUser.id,
                 chosenTags!!
-            ).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            ).enqueue(object : Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.code() != 200) {
                         println("wrong code on updating user tags")
                     }
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
                     println("failure updating user tags")
                 }
 

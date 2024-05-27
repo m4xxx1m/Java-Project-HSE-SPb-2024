@@ -26,6 +26,7 @@ import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,8 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import files.PdfPicker
 import model.Tag
 import navigation.CreatePostManager
+import java.io.File
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -52,6 +55,7 @@ fun NewPostForm() {
             val postText = remember { mutableStateOf("") }
             val checkedState = remember { mutableStateOf(false) }
             val postTags = remember { StringBuffer(Tag.defaultTags) }
+            val postFile: MutableState<File?> = remember { mutableStateOf(null) }
             if (textMode.value) {
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -96,7 +100,9 @@ fun NewPostForm() {
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = {}) {
+                PdfPicker(onPdfSelected = {
+                    postFile.value = it
+                }) {
                     Icon(
                         Icons.Rounded.AttachFile, contentDescription = "Attach images and files",
                         modifier = Modifier.size(35.dp),
@@ -134,7 +140,8 @@ fun NewPostForm() {
                     CreatePostManager().createPost(
                         title.value,
                         postText.value,
-                        postTags.toString()
+                        postTags.toString(),
+                        postFile.value
                     ) {
                         title.value = ""
                         postText.value = ""

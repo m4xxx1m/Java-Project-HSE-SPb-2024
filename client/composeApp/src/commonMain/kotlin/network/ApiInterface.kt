@@ -9,16 +9,17 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiInterface {
-    
+
     @Headers("Content-Type:application/json")
     @POST("/post/add")
     fun createPost(@Body info: CreatePostManager.CreatePostBody):
-            Call<ResponseBody>
+            Call<Post>
 
     @Headers("Content-Type:application/json")
     @GET("/post/getAll")
@@ -43,10 +44,6 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @POST("/post/{postId}/addComment")
     fun addComment(@Path("postId") postId: Int, @Body comment: CommentCreate): Call<Comment>
-
-//    @Headers("Content-Type:application/json")
-//    @GET("/getTags")
-//    fun getTags(): Call<ArrayList<String>>
 
     @Headers("Content-Type:application/json")
     @POST("/post/{postId}/like")
@@ -74,11 +71,11 @@ interface ApiInterface {
 
     @Headers("Content-Type:application/json")
     @POST("/users/{userId}/updateContacts")
-    fun updateContacts(@Path("userId") userId: Int, @Query("contacts") contacts: String): Call<Void>
+    fun updateContacts(@Path("userId") userId: Int, @Query("contacts") contacts: String): Call<Unit>
 
     @Headers("Content-Type:application/json")
     @POST("/users/{userId}/updateBio")
-    fun updateBio(@Path("userId") userId: Int, @Query("bio") bio: String): Call<Void>
+    fun updateBio(@Path("userId") userId: Int, @Query("bio") bio: String): Call<Unit>
 
     @Headers("Content-Type:application/json")
     @POST("/users/{subscriberId}/subscribe/{subscribeToId}")
@@ -92,7 +89,7 @@ interface ApiInterface {
     fun unsubscribe(
         @Path("subscriberId") subscriberId: Int,
         @Path("subscribeToId") subscribeToId: Int
-    ): Call<Void>
+    ): Call<Unit>
 
     @Headers("Content-Type:application/json")
     @GET("/users/{subscriberId}/checkSubscription/{subscribeToId}")
@@ -111,26 +108,22 @@ interface ApiInterface {
     @GET("/users/{userId}/getPostsFromSubscriptions")
     fun getPostsFromSubscriptions(@Path("userId") userId: Int): Call<List<Post>>
 
-//    @Headers("Content-Type:application/json")
-//    @GET("/users/{userId}/getUserTags")
-//    fun getUserTags(@Path("userId") userId: Int): Call<String>
-
     @Headers("Content-Type:application/json")
     @POST("/users/{userId}/updateTags")
-    fun updateUserTags(@Path("userId") userId: Int, @Query("tags") tags: String): Call<Void>
+    fun updateUserTags(@Path("userId") userId: Int, @Query("tags") tags: String): Call<Unit>
 
     @Headers("Content-Type:application/json")
     @POST("/post/{postId}/save")
-    fun savePost(@Path("postId") postId: Int, @Query("userId") userId: Int): Call<Void>
+    fun savePost(@Path("postId") postId: Int, @Query("userId") userId: Int): Call<Unit>
 
     @Headers("Content-Type:application/json")
     @POST("/post/{postId}/delete")
-    fun deletePost(@Path("postId") postId: Int): Call<Void>
+    fun deletePost(@Path("postId") postId: Int): Call<Unit>
 
     @Headers("Content-Type:application/json")
     @POST("post/{postId}/comments/{commendId}/delete")
-    fun deleteComment(@Path("postId") postId: Int, @Path("commendId") commentId: Int): Call<Void>
-    
+    fun deleteComment(@Path("postId") postId: Int, @Path("commendId") commentId: Int): Call<Unit>
+
     @Headers("Content-Type:application/json")
     @GET("/saved/posts")
     fun getSavedPosts(@Query("userId") userId: Int): Call<List<Post>>
@@ -147,6 +140,17 @@ interface ApiInterface {
     ): Call<Unit>
 
     @GET("/users/picture/{userId}")
+    @Headers("Content-Type:image/png")
     fun getUserProfilePicture(@Path("userId") userId: Int): Call<ResponseBody>
 
+    @GET("/post/{postId}/file")
+    @Headers("Content-Type:application/pdf")
+    fun getPostFile(@Path("postId") postId: Int): Call<ResponseBody>
+
+    @Multipart
+    @PUT("/post/{postId}/file/add")
+    fun uploadPostFile(
+        @Path("postId") postId: Int,
+        @Part postFile: MultipartBody.Part
+    ): Call<Unit>
 }

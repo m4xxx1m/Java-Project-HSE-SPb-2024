@@ -128,7 +128,6 @@ private class RefreshHomeHelper : Refreshable() {
                 response: Response<List<network.Post>>
             ) {
                 if (response.code() == 200) {
-                    println("refresh home tab success")
                     posts.clear()
                     val userIds = mutableSetOf<Int>()
                     response.body()?.let {
