@@ -52,7 +52,10 @@ public class PostService {
         ratedObjectService.deleteRatingsOfObject(id);
         savedObjectService.deleteSavedObjectForAllUsers(id);
         Post post = getPostById(id);
-        FileInfo fileInfo = fileInfoService.findById(post.getFileInfoId());
+        FileInfo fileInfo = null;
+        if (post.getFileInfoId() != null) {
+            fileInfo = fileInfoService.findById(post.getFileInfoId());
+        }
         if (fileInfo != null) {
             fileInfoService.delete(id, fileInfo);
         }
@@ -169,6 +172,7 @@ public class PostService {
             fileInfoService.delete(id, fileInfoService.findById(post.getFileInfoId()));
         }
         post.setFileInfoId(fileInfo.getId());
+        post.setFileName(fileInfo.getFileName());
         return postRepository.save(post);
     }
 
