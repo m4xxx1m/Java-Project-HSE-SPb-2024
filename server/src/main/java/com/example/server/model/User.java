@@ -32,16 +32,21 @@ public class User implements UserDetails {
     @Column(length = 2000)
     private String profilePictureUrl;
 
+    @Builder.Default
     @Column(length = 200)
     private String contacts = "";
 
+    @Builder.Default
     @Column(length = 200)
     private String bio = "";
 
     @Column(length = 2000)
     private String resumeUrl;
 
+    @Builder.Default
+    @Column(length = 2000)
     private String tags = Tag.defaultTags;
+
     @Column()
     private Role role;
 
