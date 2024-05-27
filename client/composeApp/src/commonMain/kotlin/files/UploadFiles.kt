@@ -1,13 +1,11 @@
 package files
 
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import files.AvatarsDownloader.ProfilePictures
 import model.AuthManager
 import network.RetrofitClient
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.jetbrains.skia.Image
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,7 +24,7 @@ fun uploadProfilePicture(file: File) {
             if (response.code() == 200) {
                 println("Image uploaded successfully")
                 file.readBytes().let {
-                    val bitmap = Image.makeFromEncoded(it).toComposeImageBitmap()
+                    val bitmap = bytesToImageBitmap(it)
                     ProfilePictures[AuthManager.currentUser.id] = bitmap
                 }
             } else {

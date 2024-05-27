@@ -1,10 +1,8 @@
 package files
 
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import network.RetrofitClient
 import okhttp3.ResponseBody
-import org.jetbrains.skia.Image
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,8 +23,7 @@ object AvatarsDownloader {
                     if (response.code() == 200) {
                         response.body()?.bytes()?.let {
                             if (it.isNotEmpty()) {
-                                val bitmap =
-                                    Image.makeFromEncoded(it).toComposeImageBitmap()
+                                val bitmap = bytesToImageBitmap(it)
                                 ProfilePictures[userId] = bitmap
                             }
                         }
@@ -41,3 +38,5 @@ object AvatarsDownloader {
         )
     }
 }
+
+expect fun bytesToImageBitmap(byteArray: ByteArray): ImageBitmap

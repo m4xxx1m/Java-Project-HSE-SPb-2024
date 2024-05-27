@@ -31,6 +31,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
@@ -50,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
+import files.DownloadAndOpenPdfButton
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.Post
@@ -84,7 +86,7 @@ fun PostCard(
             Box(modifier = Modifier.align(Alignment.TopEnd)) {
                 IconButton(onClick = { expanded.value = true }) {
                     Icon(
-                        Icons.Default.MoreVert, 
+                        Icons.Default.MoreVert,
                         contentDescription = "Show dropdown menu",
                         Modifier.size(23.dp),
                         tint = AppTheme.black
@@ -201,7 +203,34 @@ fun PostCard(
                         color = AppTheme.black
                     )
                 }
-                Text(post.text, color = AppTheme.black)
+                if (post.text.isNotEmpty()) {
+                    Text(post.text, color = AppTheme.black)
+                }
+
+                if (post.fileName != null) {
+                    Spacer(Modifier.size(5.dp))
+                    DownloadAndOpenPdfButton(post.id) {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(7.dp))
+                                .background(MaterialTheme.colors.background)
+                                .padding(horizontal = 6.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Rounded.AttachFile,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(7.dp))
+                                    .background(MaterialTheme.colors.primaryVariant)
+                                    .padding(3.dp),
+//                                tint = Color.White
+                            )
+                            Spacer(Modifier.size(7.dp))
+                            Text(post.fileName, color = AppTheme.black)
+                        }
+                    }
+                }
 
 //                Box(Modifier
 //                    .fillMaxWidth()
@@ -247,8 +276,10 @@ fun PostCard(
                                 tint = AppTheme.black
                             )
                         }
-                        Text(post.commentsCount.toString(), color = AppTheme.black, 
-                            fontSize = 12.sp)
+                        Text(
+                            post.commentsCount.toString(), color = AppTheme.black,
+                            fontSize = 12.sp
+                        )
                     }
 
                 }
@@ -258,8 +289,8 @@ fun PostCard(
 }
 
 private fun deletePost(postId: Int, afterDeletingPost: (() -> Unit)?) {
-    RetrofitClient.retrofitCall.deletePost(postId).enqueue(object : Callback<Void> {
-        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+    RetrofitClient.retrofitCall.deletePost(postId).enqueue(object : Callback<Unit> {
+        override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
             if (response.code() == 200) {
                 afterDeletingPost?.invoke()
             } else {
@@ -267,7 +298,7 @@ private fun deletePost(postId: Int, afterDeletingPost: (() -> Unit)?) {
             }
         }
 
-        override fun onFailure(call: Call<Void>, t: Throwable) {
+        override fun onFailure(call: Call<Unit>, t: Throwable) {
             println("failure on deleting post")
         }
 
@@ -276,14 +307,14 @@ private fun deletePost(postId: Int, afterDeletingPost: (() -> Unit)?) {
 
 private fun savePost(postId: Int) {
     RetrofitClient.retrofitCall.savePost(postId, AuthManager.currentUser.id).enqueue(
-        object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.code() != 200) {
                     println("wrong code on saving post")
                 }
             }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
                 println("failure on saving post")
             }
         }

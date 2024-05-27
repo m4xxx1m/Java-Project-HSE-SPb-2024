@@ -206,8 +206,8 @@ fun CommentCard(
 
 private fun deleteComment(comment: Comment, afterDeleteComment: (() -> Unit)?) {
     RetrofitClient.retrofitCall.deleteComment(comment.postId, comment.id).enqueue(
-        object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.code() == 200) {
                     afterDeleteComment?.invoke()
                 } else {
@@ -215,7 +215,7 @@ private fun deleteComment(comment: Comment, afterDeleteComment: (() -> Unit)?) {
                 }
             }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
                 println("failure on deleting comment")
             }
         }

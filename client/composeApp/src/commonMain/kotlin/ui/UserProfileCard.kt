@@ -410,17 +410,17 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
 
     private fun updateContacts(contacts: String) {
         RetrofitClient.retrofitCall.updateContacts(user.id, contacts)
-            .enqueue(object : Callback<Void> {
+            .enqueue(object : Callback<Unit> {
                 override fun onResponse(
-                    call: Call<Void>,
-                    response: Response<Void>
+                    call: Call<Unit>,
+                    response: Response<Unit>
                 ) {
                     if (response.code() != 200) {
                         println("Wrong code while updating contacts")
                     }
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
                     println("Failure while updating contacts")
                 }
             })
@@ -428,17 +428,17 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
 
     private fun updateBio(bio: String) {
         RetrofitClient.retrofitCall.updateBio(user.id, bio)
-            .enqueue(object : Callback<Void> {
+            .enqueue(object : Callback<Unit> {
                 override fun onResponse(
-                    call: Call<Void>,
-                    response: Response<Void>
+                    call: Call<Unit>,
+                    response: Response<Unit>
                 ) {
                     if (response.code() != 200) {
                         println("Wrong code while updating bio")
                     }
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
                     println("Wrong code while updating bio")
                 }
             })

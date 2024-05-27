@@ -13,7 +13,8 @@ data class Post(
     val content: String,
     val rating: Int,
     val tags: String,
-    val commentsCount: Int
+    val commentsCount: Int,
+    val fileName: String?
 ) {
     fun convertPost(): Post {
         val tagsList = ArrayList<String>()
@@ -31,7 +32,8 @@ data class Post(
             content,
             emptyList(),
             rating,
-            commentsCount
+            commentsCount,
+            fileName
         )
     }
 }

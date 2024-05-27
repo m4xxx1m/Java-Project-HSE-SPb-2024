@@ -56,8 +56,8 @@ class SubscriberManager(private val userId: Int, private val coroutineScope: Cor
 
     private fun unsubscribe() {
         RetrofitClient.retrofitCall.unsubscribe(thisUserId, userId)
-            .enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            .enqueue(object : Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     if (response.code() == 200) {
                         checkSubscription()
                     } else {
@@ -65,7 +65,7 @@ class SubscriberManager(private val userId: Int, private val coroutineScope: Cor
                     }
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
                     println("failure while subscribing")
                 }
             })

@@ -247,7 +247,6 @@ class CommentScreen(private val postId: Int) : Screen {
                         response: Response<List<network.Comment>>
                     ) {
                         if (response.code() == 200) {
-                            println("refresh comments screen success")
                             comments.clear()
                             val userIds = mutableSetOf<Int>()
                             response.body()?.let {

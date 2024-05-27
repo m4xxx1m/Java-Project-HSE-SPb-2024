@@ -11,7 +11,8 @@ data class Post(
     val text: String,
     val imagesUrl: List<String>,
     val likesCount: Int,
-    val commentsCount: Int
+    val commentsCount: Int,
+    val fileName: String?
 ) {
     var user: User? = null
 }
