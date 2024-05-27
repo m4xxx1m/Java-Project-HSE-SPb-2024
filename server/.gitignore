@@ -1,4 +1,4 @@
-src/main/resources/profile_pic
+src/main/resources/*
 .gradle
 .idea
 build
