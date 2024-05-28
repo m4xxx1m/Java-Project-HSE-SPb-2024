@@ -25,9 +25,7 @@ public class ResumeService {
     private final UserService userService;
 
     public void createResume(String resumeDto, int userId) throws IOException, InterruptedException {
-        System.out.println(resumeDto);
         ResumeDto resumeDtoStruct = new Gson().fromJson(resumeDto, ResumeDto.class);
-        System.out.println(resumeDtoStruct);
         String tex = generateText(resumeDtoStruct);
         File tempFile = File.createTempFile("temp", ".tex");
         Writer writer = new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8);
@@ -51,6 +49,10 @@ public class ResumeService {
         MultipartFile multipartFile = new MockMultipartFile(pdfFile.getName(), new FileInputStream(pdfFile));
 
         userService.uploadResume(userId, multipartFile);
+
+        FileInfo fileInfo = fileInfoService.findById(userService.getUser(userId).getResumeInfoId());
+        fileInfo.setFileType("application/pdf");
+        fileInfoService.saveFileInfo(fileInfo);
 
         tempFile.delete();
         pdfFile.delete();

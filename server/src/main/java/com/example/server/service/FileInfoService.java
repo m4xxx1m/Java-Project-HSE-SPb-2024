@@ -26,6 +26,10 @@ public class FileInfoService {
         return fileInfoRepository.findById(id).orElse(null);
     }
 
+    public void saveFileInfo(FileInfo fileInfo) {
+        fileInfoRepository.save(fileInfo);
+    }
+
     public FileInfo upload(MultipartFile resource, int sourceId, String directoryPath) throws IOException {
         String key = generateKey(resource.getOriginalFilename());
         FileInfo createdFile = new FileInfo(resource.getOriginalFilename(), key, sourceId, resource.getContentType());
