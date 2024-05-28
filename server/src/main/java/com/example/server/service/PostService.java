@@ -8,9 +8,11 @@ import com.example.server.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.core.io.Resource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,11 +38,31 @@ public class PostService {
     private RatedObjectService ratedObjectService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     FileInfoService fileInfoService;
 
-    public Post addPost(PostDto postDto) {
+    public Post addPost(PostDto postDto) throws IOException {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
                 postDto.getContent(), postDto.getTags(), postDto.getCommentsCount());
+        postRepository.save(post);
+        if (postDto.isResumeNeeded()) {
+            User author = userService.getUser(postDto.getAuthorId());
+            FileInfo resumeInfo = fileInfoService.findById(author.getResumeInfoId());
+            MultipartFile multipartFile = null;
+            try {
+                multipartFile = new MockMultipartFile(resumeInfo.getFileName(), userService.getResumeData(postDto.getAuthorId() + "\\" + resumeInfo.getKey()));
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new IOException();
+            }
+            uploadFile(post.getId(), multipartFile);
+            FileInfo fileInfo = fileInfoService.findById(post.getFileInfoId());
+            fileInfo.setFileName(resumeInfo.getFileName());
+            fileInfo.setFileType(resumeInfo.getFileType());
+            fileInfoService.saveFileInfo(fileInfo);
+        }
         return postRepository.save(post);
     }
 

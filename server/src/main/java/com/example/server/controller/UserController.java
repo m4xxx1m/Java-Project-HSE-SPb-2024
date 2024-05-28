@@ -183,7 +183,7 @@ public class UserController {
         try {
             byte[] fileData = userService.getResumeData(id + "//" + resumeInfo.getKey());
             return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.valueOf("application/pdf"))
+                    .contentType(MediaType.valueOf(resumeInfo.getFileType()))
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=\"" + resumeInfo.getFileName() + "\"")
                     .body(fileData);

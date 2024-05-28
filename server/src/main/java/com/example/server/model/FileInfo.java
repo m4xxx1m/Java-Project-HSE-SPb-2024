@@ -53,4 +53,7 @@ public class FileInfo {
     public String getFileType() {
         return fileType;
     }
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
 }

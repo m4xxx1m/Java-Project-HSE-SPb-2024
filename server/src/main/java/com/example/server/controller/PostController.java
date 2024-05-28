@@ -66,7 +66,12 @@ public class PostController {
 
     @RequestMapping("/post/add")
     ResponseEntity<Post> addPost(@ModelAttribute PostDto postDto) {
-        Post post = postService.addPost(postDto);
+        Post post;
+        try {
+            post = postService.addPost(postDto);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 

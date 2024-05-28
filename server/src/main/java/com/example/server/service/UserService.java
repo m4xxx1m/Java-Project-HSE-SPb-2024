@@ -189,6 +189,7 @@ public class UserService {
         if (user.getResumeInfoId() != null) {
             fileInfoService.delete(id, fileInfoService.findById(user.getResumeInfoId()), RESUME_DIRECTORY_PATH + id + "\\");
         }
+        resumeInfo.setFileName("cv_" + user.getUsername());
         user.setResumeInfoId(resumeInfo.getId());
         return userRepository.save(user);
     }
