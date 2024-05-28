@@ -16,6 +16,7 @@ public class Post extends ContentObj {
     private int commentsCount = 0;
 
     private Integer fileInfoId;
+    private String fileName;
 
     private List<Integer> picInfoIds;
 
@@ -28,6 +29,14 @@ public class Post extends ContentObj {
         this.title = title;
         this.tags = tags;
         this.commentsCount = commentsCount;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getTags() {

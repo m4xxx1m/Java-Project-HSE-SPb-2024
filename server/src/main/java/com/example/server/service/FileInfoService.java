@@ -22,7 +22,7 @@ public class FileInfoService {
     @Autowired
     private FileInfoRepository fileInfoRepository;
 
-    public FileInfo findById(int id) {
+    public FileInfo findById(Integer id) {
         return fileInfoRepository.findById(id).orElse(null);
     }
 

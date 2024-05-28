@@ -64,8 +64,8 @@ public class PostController {
         }
     }
 
-    @RequestMapping("/post/add")
-    ResponseEntity<Post> addPost(@ModelAttribute PostDto postDto) {
+    @PostMapping("/post/add")
+    ResponseEntity<Post> addPost(@RequestBody PostDto postDto) {
         Post post;
         try {
             post = postService.addPost(postDto);
@@ -168,7 +168,7 @@ public class PostController {
         }
     }
 
-    @RequestMapping("/post/{id}/delete")
+    @PostMapping("/post/{id}/delete")
     ResponseEntity<Void> deletePost(@PathVariable Integer id) {
         try {
             postService.deletePost(id);
