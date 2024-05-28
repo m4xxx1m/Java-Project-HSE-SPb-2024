@@ -11,10 +11,7 @@ import com.example.server.service.ResumeService;
 import com.example.server.service.SubscriptionService;
 import com.example.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -109,7 +106,7 @@ public class UserController {
         User user = userService.getUser(userId);
         String profilePictureUrl = user.getProfilePictureUrl();
         try {
-            if (profilePictureUrl == null) {
+            if (profilePictureUrl == null || profilePictureUrl.isEmpty()) {
                 return ResponseEntity.ok(null);
             }
             Path path = Paths.get(profilePictureUrl);
