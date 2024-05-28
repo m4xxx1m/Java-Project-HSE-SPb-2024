@@ -10,7 +10,6 @@ public class UserUpdateDto {
     private String password;
     private String contacts;
     private String bio;
-    private String resumeUrl;
     private String tags;
 
     public String getUsername() {
@@ -51,14 +50,6 @@ public class UserUpdateDto {
 
     public void setBio(String bio) {
         this.bio = bio;
-    }
-
-    public String getResumeUrl() {
-        return resumeUrl;
-    }
-
-    public void setResumeUrl(String resumeUrl) {
-        this.resumeUrl = resumeUrl;
     }
 
     public void setTags(String tags) {

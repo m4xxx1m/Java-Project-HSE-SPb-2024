@@ -4,23 +4,23 @@ package com.example.server.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "post_files")
+@Table(name = "file_info")
 public class FileInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String fileName;
     private String key;
-    private int postId;
+    private int sourceId;
     private String fileType;
 
     public FileInfo() {
     }
 
-    public FileInfo(String fileName, String key, int postId, String fileType) {
+    public FileInfo(String fileName, String key, int sourceId, String fileType) {
         this.fileName = fileName;
         this.key = key;
-        this.postId = postId;
+        this.sourceId = sourceId;
         this.fileType = fileType;
     }
 
@@ -43,14 +43,17 @@ public class FileInfo {
         this.key = key;
     }
 
-    public int getPostId() {
-        return postId;
+    public int getSourceId() {
+        return sourceId;
     }
 
-    public void setPostId(int postId) {
-        this.postId = postId;
+    public void setSourceId(int sourceId) {
+        this.sourceId = sourceId;
     }
     public String getFileType() {
         return fileType;
+    }
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 }
