@@ -8,9 +8,11 @@ import com.example.server.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.core.io.Resource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostService {
+
+    private static final String DIRECTORY_PATH = "src\\main\\resources\\files\\";
 
     @Autowired
     private PostRepository postRepository;
@@ -34,11 +38,31 @@ public class PostService {
     private RatedObjectService ratedObjectService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     FileInfoService fileInfoService;
 
-    public Post addPost(PostDto postDto) {
+    public Post addPost(PostDto postDto) throws IOException {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
                 postDto.getContent(), postDto.getTags(), postDto.getCommentsCount());
+        postRepository.save(post);
+        if (postDto.isResumeNeeded()) {
+            User author = userService.getUser(postDto.getAuthorId());
+            FileInfo resumeInfo = fileInfoService.findById(author.getResumeInfoId());
+            MultipartFile multipartFile = null;
+            try {
+                multipartFile = new MockMultipartFile(resumeInfo.getFileName(), userService.getResumeData(postDto.getAuthorId() + "\\" + resumeInfo.getKey()));
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new IOException();
+            }
+            uploadFile(post.getId(), multipartFile);
+            FileInfo fileInfo = fileInfoService.findById(post.getFileInfoId());
+            fileInfo.setFileName(resumeInfo.getFileName());
+            fileInfo.setFileType(resumeInfo.getFileType());
+            fileInfoService.saveFileInfo(fileInfo);
+        }
         return postRepository.save(post);
     }
 
@@ -57,12 +81,12 @@ public class PostService {
             fileInfo = fileInfoService.findById(post.getFileInfoId());
         }
         if (fileInfo != null) {
-            fileInfoService.delete(id, fileInfo);
+            fileInfoService.delete(id, fileInfo, DIRECTORY_PATH + id + "\\");
         }
         List<Integer> picInfoIds = post.getPicInfoIds();
         if (picInfoIds != null) {
             for (Integer picInfoId : picInfoIds) {
-                fileInfoService.delete(id, fileInfoService.findById(picInfoId));
+                fileInfoService.delete(id, fileInfoService.findById(picInfoId), DIRECTORY_PATH + id + "\\");
             }
         }
         postRepository.deleteById(id);
@@ -160,16 +184,18 @@ public class PostService {
 
     public Post deleteFile(int id) throws IOException {
         Post post = getPostById(id);
-        fileInfoService.delete(id, fileInfoService.findById(post.getFileInfoId()));
+        fileInfoService.delete(id, fileInfoService.findById(post.getFileInfoId()),
+                DIRECTORY_PATH + id + "\\");
         post.setFileInfoId(null);
         return postRepository.save(post);
     }
 
     public Post uploadFile(int id, MultipartFile file) throws IOException {
         Post post = getPostById(id);
-        FileInfo fileInfo = fileInfoService.upload(file, id);
+        FileInfo fileInfo = fileInfoService.upload(file, id, DIRECTORY_PATH + id + "\\");
         if (post.getFileInfoId() != null) {
-            fileInfoService.delete(id, fileInfoService.findById(post.getFileInfoId()));
+            fileInfoService.delete(id,
+                    fileInfoService.findById(post.getFileInfoId()), DIRECTORY_PATH + id + "\\");
         }
         post.setFileInfoId(fileInfo.getId());
         post.setFileName(fileInfo.getFileName());
@@ -180,7 +206,7 @@ public class PostService {
         Post post = getPostById(postId);
         List<Integer> picInfoIds = post.getPicInfoIds();
         FileInfo picInfo = fileInfoService.findById(picInfoIds.get(picNumber));
-        fileInfoService.delete(postId, picInfo);
+        fileInfoService.delete(postId, picInfo, DIRECTORY_PATH + postId + "\\");
         picInfoIds.remove(picNumber);
         post.setPicInfoIds(picInfoIds);
         return postRepository.save(post);
@@ -194,7 +220,7 @@ public class PostService {
         } else {
             picInfoIds = post.getPicInfoIds();
         }
-        FileInfo fileInfo = fileInfoService.upload(pic, postId);
+        FileInfo fileInfo = fileInfoService.upload(pic, postId, DIRECTORY_PATH + postId + "\\");
         picInfoIds.add(fileInfo.getId());
         post.setPicInfoIds(picInfoIds);
         postRepository.save(post);
@@ -208,7 +234,7 @@ public class PostService {
     }
 
     public byte[] getFileData(String key) throws IOException {
-        return FileInfoService.download(key);
+        return FileInfoService.download(key, DIRECTORY_PATH);
     }
 
     public void changeCommentsCount(int postId, int delta) {
