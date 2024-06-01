@@ -51,7 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
-import files.DownloadAndOpenPdfButton
+import files.DownloadAndOpenPostFileButton
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.Post
@@ -209,7 +209,7 @@ fun PostCard(
 
                 if (post.fileName != null) {
                     Spacer(Modifier.size(5.dp))
-                    DownloadAndOpenPdfButton(post.id) {
+                    DownloadAndOpenPostFileButton(post.id) {
                         Row(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(7.dp))

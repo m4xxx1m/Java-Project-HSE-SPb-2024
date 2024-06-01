@@ -153,4 +153,15 @@ interface ApiInterface {
         @Path("postId") postId: Int,
         @Part postFile: MultipartBody.Part
     ): Call<Unit>
+
+    @Multipart
+    @PUT("/user/{userId}/resume/add")
+    fun uploadUserResume(
+        @Path("userId") userId: Int,
+        @Part resume: MultipartBody.Part
+    ): Call<User>
+
+    @GET("/user/{userId}/resume")
+    @Headers("Content-Type:application/pdf")
+    fun getUserResume(@Path("userId") userId: Int): Call<ResponseBody>
 }

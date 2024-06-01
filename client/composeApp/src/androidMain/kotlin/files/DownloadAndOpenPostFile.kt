@@ -5,30 +5,40 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import network.RetrofitClient
 import okhttp3.ResponseBody
+import retrofit2.Call
 import java.io.File
 
 @Composable
-actual fun DownloadAndOpenPdfButton(postId: Int, content: @Composable () -> Unit) {
+private fun DownloadAndOpenPdfButton(
+    call: Call<ResponseBody>,
+    boxModifier: Modifier,
+    content: @Composable () -> Unit
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    
+
     Box(
-        modifier = Modifier.clickable {
+        modifier = boxModifier.clickable {
             scope.launch(Dispatchers.IO) {
                 try {
                     val response: ResponseBody =
-                        RetrofitClient.retrofitCall.getPostFile(postId)
-                            .execute().body()!!
+                        call.execute().body()!!
                     val file = File(context.cacheDir, "downloaded_file.pdf")
                     savePostFile(response, file)
                     withContext(Dispatchers.Main) {
@@ -38,13 +48,32 @@ actual fun DownloadAndOpenPdfButton(postId: Int, content: @Composable () -> Unit
                     e.printStackTrace()
                 }
             }
-        }
+        },
+        contentAlignment = Alignment.Center
     ) {
         content()
     }
 }
 
-fun openPdfFile(context: Context, file: File) {
+@Composable
+actual fun DownloadAndOpenPostFileButton(postId: Int, content: @Composable () -> Unit) {
+    DownloadAndOpenPdfButton(
+        RetrofitClient.retrofitCall.getPostFile(postId),
+        Modifier.clip(RoundedCornerShape(7.dp)),
+        content
+    )
+}
+
+@Composable
+actual fun DownloadAndOpenUserCvButton(userId: Int, content: @Composable () -> Unit) {
+    DownloadAndOpenPdfButton(
+        RetrofitClient.retrofitCall.getUserResume(userId),
+        Modifier.size(45.dp).clip(CircleShape),
+        content
+    )
+}
+
+private fun openPdfFile(context: Context, file: File) {
     val uri: Uri = FileProvider.getUriForFile(
         context,
         "${context.packageName}.provider", file

@@ -7,7 +7,7 @@ data class UserProfile(
     val contacts: String,
     val about: String,
     val tags: String,
-    val cvUrl: String?
+    val cvFileName: String?
 ) {
     fun getTagsList(list: MutableState<ArrayList<String>?>) {
         val newList = ArrayList<String>()
