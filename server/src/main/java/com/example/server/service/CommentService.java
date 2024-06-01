@@ -41,11 +41,11 @@ public class CommentService {
     public void deleteComment(int id) {
         ratedObjectService.deleteRatingsOfObject(id);
         savedObjectService.deleteSavedObjectForAllUsers(id);
-        commentRepository.deleteById(id);
         Comment comment = getCommentById(id);
         if (comment != null) {
             postService.changeCommentsCount(comment.getPostId(), -1);
         }
+        commentRepository.deleteById(id);
     }
 
     public Comment getCommentById(int id) {
