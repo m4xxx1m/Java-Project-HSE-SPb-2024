@@ -1,5 +1,6 @@
 src/main/resources/profile_pic
 src/main/resources/files
+src/main/resources/resume
 .gradle
 .idea
 build

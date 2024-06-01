@@ -61,6 +61,7 @@ public class PostService {
             FileInfo fileInfo = fileInfoService.findById(post.getFileInfoId());
             fileInfo.setFileName(resumeInfo.getFileName());
             fileInfo.setFileType(resumeInfo.getFileType());
+            post.setFileName(resumeInfo.getFileName());
             fileInfoService.saveFileInfo(fileInfo);
         }
         return postRepository.save(post);

@@ -43,6 +43,9 @@ public class User implements UserDetails {
     @Column(length = 2000)
     private Integer resumeInfoId;
 
+    @Column(length = 200)
+    private String resumeFileName;
+
     @Builder.Default
     @Column(length = 2000)
     private String tags = Tag.defaultTags;
@@ -153,5 +156,13 @@ public class User implements UserDetails {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getResumeFileName() {
+        return resumeFileName;
+    }
+
+    public void setResumeFileName(String resumeFileName) {
+        this.resumeFileName = resumeFileName;
     }
 }

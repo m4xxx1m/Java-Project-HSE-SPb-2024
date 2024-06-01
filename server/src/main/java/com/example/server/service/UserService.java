@@ -191,6 +191,7 @@ public class UserService {
         }
         resumeInfo.setFileName("cv_" + user.getUsername());
         user.setResumeInfoId(resumeInfo.getId());
+        user.setResumeFileName(resumeInfo.getFileName());
         return userRepository.save(user);
     }
 
