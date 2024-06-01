@@ -8,7 +8,7 @@ data class User(
     val profilePictureUrl: String?,
     val contacts: String,
     val bio: String,
-    val resumeUrl: String?,
+    val resumeFileName: String?,
     val tags: String
 ) {
     fun convertUser() : model.User {

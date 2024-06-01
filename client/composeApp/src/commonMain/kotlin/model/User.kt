@@ -24,7 +24,7 @@ data class User(
                             contacts = it.contacts,
                             about = it.bio,
                             tags = it.tags,
-                            cvUrl = it.resumeUrl
+                            cvFileName = it.resumeFileName
                         )
                     }
                 } else {

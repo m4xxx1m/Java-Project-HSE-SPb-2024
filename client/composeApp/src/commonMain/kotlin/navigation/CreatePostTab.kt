@@ -34,9 +34,9 @@ object CreatePostTab: Tab {
 }
 
 class CreatePostManager {
-    fun createPost(title: String, text: String, tags: String, file: File?, clearFields: () -> Unit) {
+    fun createPost(title: String, text: String, tags: String, file: File?, userCv: Boolean, clearFields: () -> Unit) {
         val retrofitCall = RetrofitClient.retrofitCall
-        val createPostInfo = CreatePostBody(AuthManager.currentUser.id, title, text, tags)
+        val createPostInfo = CreatePostBody(AuthManager.currentUser.id, title, text, tags, userCv)
         retrofitCall.createPost(createPostInfo).enqueue(object : Callback<network.Post> {
             override fun onFailure(call: Call<network.Post>, t: Throwable) {
                 println("failure on creating post")
@@ -78,6 +78,7 @@ class CreatePostManager {
         val authorId: Int,
         val title: String,
         val content: String,
-        val tags: String
+        val tags: String,
+        val addResume: Boolean
     )
 }

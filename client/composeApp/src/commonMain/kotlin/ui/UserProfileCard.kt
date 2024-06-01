@@ -38,10 +38,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
@@ -60,6 +60,8 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
 import files.AvatarsDownloader.ProfilePictures
 import files.AvatarsDownloader.downloadProfilePicture
+import files.DownloadAndOpenUserCvButton
+import files.PdfPicker
 import files.ProfilePictureUploader
 import kotlinx.coroutines.launch
 import model.AuthManager
@@ -71,9 +73,13 @@ import navigation.Refreshable
 import navigation.RefreshableContent
 import navigation.TagSelectionScreen
 import network.RetrofitClient
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 class UserProfileCard(private val user: User, private val navigator: Navigator?) {
     private var refreshHelper: MutableState<RefreshUserProfileHelper?> =
@@ -378,34 +384,67 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                     OutlinedCard("") {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                "Мое резюме", modifier = Modifier.weight(1f),
+                                text = "Резюме: " +
+                                        (refreshHelper.value?.userProfile?.value?.cvFileName
+                                            ?: "отсутствует"),
+                                modifier = Modifier
+                                    .weight(1f),
                                 color = AppTheme.black
                             )
+                            if (refreshHelper.value?.userProfile?.value?.cvFileName != null) {
+                                DownloadAndOpenUserCvButton(user.id) {
+                                    Icon(
+                                        Icons.Rounded.Visibility, contentDescription = null,
+                                        tint = AppTheme.black
+                                    )
+                                }
+                            }
                             if (thisUser) {
-                                IconButton(onClick = { }) {
+                                IconButton(onClick = {
+
+                                }) {
                                     Icon(
                                         Icons.Rounded.Edit, contentDescription = null,
                                         tint = AppTheme.black
                                     )
                                 }
-                                IconButton(onClick = { }) {
+                                PdfPicker(onPdfSelected = {
+                                    if (it != null) {
+                                        uploadResume(it)
+                                    }
+                                }) {
                                     Icon(
                                         Icons.Rounded.AttachFile, contentDescription = null,
                                         tint = AppTheme.black
                                     )
                                 }
                             }
-                            IconButton(onClick = { }) {
-                                Icon(
-                                    Icons.Rounded.Info, contentDescription = null,
-                                    tint = AppTheme.black
-                                )
-                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun uploadResume(file: File) {
+        val requestFile = file.asRequestBody("application/pdf".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("resume", file.name, requestFile)
+
+        RetrofitClient.retrofitCall.uploadUserResume(user.id, body)
+            .enqueue(object : Callback<network.User> {
+                override fun onResponse(call: Call<network.User>, response: Response<network.User>) {
+                    if (response.code() != 200) {
+                        println("wrong code on uploading post file")
+                    } else {
+                        refreshHelper.value?.load()
+                    }
+                }
+
+                override fun onFailure(call: Call<network.User>, t: Throwable) {
+                    println("failure uploading post file")
+                }
+
+            })
     }
 
     private fun updateContacts(contacts: String) {

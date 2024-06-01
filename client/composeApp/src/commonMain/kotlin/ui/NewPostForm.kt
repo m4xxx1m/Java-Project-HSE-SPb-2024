@@ -1,6 +1,8 @@
 package ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
@@ -31,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -79,7 +83,10 @@ fun NewPostForm() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = checkedState.value,
-                        onCheckedChange = { checkedState.value = it },
+                        onCheckedChange = {
+                            checkedState.value = it
+                            postFile.value = null
+                        },
                     )
                     Text("Прикрепить резюме из профиля", fontWeight = FontWeight.Thin)
                 }
@@ -102,12 +109,25 @@ fun NewPostForm() {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 PdfPicker(onPdfSelected = {
                     postFile.value = it
+                    checkedState.value = false
                 }) {
-                    Icon(
-                        Icons.Rounded.AttachFile, contentDescription = "Attach images and files",
-                        modifier = Modifier.size(35.dp),
-                        tint = AppTheme.black
-                    )
+                    Box {
+                        Icon(
+                            Icons.Rounded.AttachFile,
+                            contentDescription = "Attach images and files",
+                            modifier = Modifier.size(35.dp),
+                            tint = AppTheme.black
+                        )
+                        if (postFile.value != null) {
+                            Box(
+                                Modifier
+                                    .align(Alignment.TopEnd)
+                                    .size(7.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .background(MaterialTheme.colors.secondaryVariant)
+                            )
+                        }
+                    }
                 }
                 Spacer(Modifier.weight(1f))
                 Button(
@@ -136,19 +156,28 @@ fun NewPostForm() {
                     }
                 }
                 Spacer(Modifier.weight(1f))
-                IconButton(onClick = {
-                    CreatePostManager().createPost(
-                        title.value,
-                        postText.value,
-                        postTags.toString(),
-                        postFile.value
-                    ) {
-                        title.value = ""
-                        postText.value = ""
-                        postTags.replace(0, postTags.length, Tag.defaultTags)
-                        textMode.value = true
-                    }
-                }) {
+                IconButton(
+                    onClick = {
+                        CreatePostManager().createPost(
+                            title.value,
+                            postText.value,
+                            postTags.toString(),
+                            postFile.value,
+                            checkedState.value
+                        ) {
+                            title.value = ""
+                            postText.value = ""
+                            postTags.replace(0, postTags.length, Tag.defaultTags)
+                            textMode.value = true
+                            postFile.value = null
+                            checkedState.value = false
+                        }
+                    },
+                    enabled = title.value.isNotEmpty() ||
+                            postText.value.isNotEmpty() ||
+                            checkedState.value ||
+                            postFile.value != null
+                ) {
                     Icon(
                         Icons.Rounded.Done, contentDescription = "Post is done",
                         modifier = Modifier.size(35.dp),
