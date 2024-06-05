@@ -1,9 +1,5 @@
 package com.example.server.dto;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
 public class PostDto extends ContentObjDto {
 
     private final String tags;
