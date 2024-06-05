@@ -30,10 +30,11 @@ public class CommentService {
 
     public Comment addComment(ContentObjDto commentRequest, int postId) {
         Comment comment = new Comment(
-                commentRequest.getAuthorId(),
-                commentRequest.getContent(),
-                postId
-        );
+                    commentRequest.getAuthorId(),
+                    commentRequest.getContent(),
+                    postId,
+                    commentRequest.getReplyToCommentId()
+            );
         postService.changeCommentsCount(postId, 1);
         return commentRepository.save(comment);
     }
