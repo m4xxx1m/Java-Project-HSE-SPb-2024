@@ -15,6 +15,5 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     Optional<Post> findById(int id);
 
-    @Query(value = "SELECT * FROM content_obj WHERE content @@ :content", nativeQuery = true)
-    List<Post> findByContentUsingTrigram(@Param("content") String content);
-}
+    @Query(value = "SELECT * FROM content_obj WHERE word_similarity(content, :content) > 0.4", nativeQuery = true)
+    List<Post> findByContentUsingTrigram(@Param("content") String content);}
