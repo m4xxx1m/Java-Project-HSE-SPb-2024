@@ -1,8 +1,10 @@
 package com.example.server.service;
 
 
+import com.example.server.controller.NotificationController;
 import com.example.server.dto.ContentObjDto;
 import com.example.server.model.Comment;
+import com.example.server.model.Notification;
 import com.example.server.model.Post;
 import com.example.server.model.RatedObject;
 import com.example.server.repository.CommentRepository;
@@ -26,7 +28,13 @@ public class CommentService {
     private PostService postService;
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private RatedObjectService ratedObjectService;
+
+    @Autowired
+    private NotificationController notificationController;
 
     public Comment addComment(ContentObjDto commentRequest, int postId) {
         Comment comment = new Comment(
@@ -36,6 +44,15 @@ public class CommentService {
                     commentRequest.getReplyToCommentId()
             );
         postService.changeCommentsCount(postId, 1);
+        if (comment.getReplyToCommentId() != -1 &&
+                comment.getAuthorId() != getCommentById(comment.getReplyToCommentId()).getAuthorId()) {
+            int originalCommentId = comment.getReplyToCommentId();
+            int originalCommentAuthorId = getCommentById(originalCommentId).getAuthorId();
+            Notification notification = new Notification(postId, originalCommentId,
+                    originalCommentAuthorId, comment.getId(), comment.getAuthorId());
+            notificationService.saveNotification(notification);
+            notificationController.notifyUserAboutReply(originalCommentAuthorId, notification);
+        }
         return commentRepository.save(comment);
     }
 
