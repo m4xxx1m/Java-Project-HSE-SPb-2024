@@ -4,6 +4,7 @@ import com.example.server.dto.UserLoginDto;
 import com.example.server.dto.UserRegistrationDto;
 import com.example.server.dto.UserUpdateDto;
 import com.example.server.model.Post;
+import com.example.server.model.Role;
 import com.example.server.model.Subscription;
 import com.example.server.model.User;
 import com.example.server.service.SubscriptionService;
@@ -112,5 +113,35 @@ public class UserController {
     public String getUserTags(@PathVariable Integer userId) {
         User user = userService.getUser(userId);
         return user == null ? null : user.getTags();
+    }
+
+    @PostMapping("/users/{userId}/updateUsername")
+    public void updateUsername(@PathVariable Integer userId, @RequestParam("username") String username) {
+        userService.updateUsername(userId, username);
+    }
+
+    @PostMapping("/users/{userId}/updateEmail")
+    public void updateEmail(@PathVariable Integer userId, @RequestParam("email") String email) {
+        userService.updateEmail(userId, email);
+    }
+
+    @PostMapping("/users/{userId}/updatePassword")
+    public void updatePassword(@PathVariable Integer userId, @RequestParam("password") String password) {
+        userService.updatePassword(userId, password);
+    }
+
+    @PostMapping("/users/{userId}/updateProfilePictureUrl")
+    public void updateProfilePictureUrl(@PathVariable Integer userId, @RequestParam("profilePictureUrl") String profilePictureUrl) {
+        userService.updateProfilePictureUrl(userId, profilePictureUrl);
+    }
+
+    @PostMapping("/users/{userId}/updateResumeUrl")
+    public void updateResumeUrl(@PathVariable Integer userId, @RequestParam("resumeUrl") String resumeUrl) {
+        userService.updateResumeUrl(userId, resumeUrl);
+    }
+
+    @PostMapping("/users/{userId}/updateRole")
+    public void updateRole(@PathVariable Integer userId, @RequestParam("role") Role role) {
+        userService.updateRole(userId, role);
     }
 }
