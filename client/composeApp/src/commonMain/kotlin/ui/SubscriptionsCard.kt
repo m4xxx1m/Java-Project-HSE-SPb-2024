@@ -2,6 +2,7 @@ package ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 import model.AuthManager
 import model.User
 import navigation.ManageSubscriptionsScreen
+import navigation.UserProfileScreen
 import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -96,6 +98,9 @@ fun SubscriptionsCard(
                                     picture,
                                     contentDescription = "User profile image",
                                     modifier = Modifier.size(40.dp).clip(CircleShape)
+                                        .clickable { 
+                                            navigator?.push(UserProfileScreen(it))
+                                        }
                                 )
                             } ?: run {
                                 Image(
@@ -104,6 +109,9 @@ fun SubscriptionsCard(
                                     colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
                                     modifier = Modifier.size(40.dp).clip(CircleShape)
                                         .background(MaterialTheme.colors.primaryVariant)
+                                        .clickable {
+                                            navigator?.push(UserProfileScreen(it))
+                                        }
                                 )
                             }
                             var name = it.name

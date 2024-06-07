@@ -187,6 +187,7 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                         post.user = helper.users[post.userId]
                         PostCard(
                             post,
+                            navigator,
                             afterDeletePost = {
                                 coroutineScope.launch {
                                     helper.load()

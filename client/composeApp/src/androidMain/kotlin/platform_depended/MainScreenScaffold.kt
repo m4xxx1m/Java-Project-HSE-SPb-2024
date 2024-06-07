@@ -9,6 +9,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import navigation.CreatePostTab
@@ -23,7 +24,7 @@ import ui.SearchWidget
 actual fun MainScreenScaffold(content: @Composable (PaddingValues) -> Unit) {
     Scaffold(
         topBar = {
-            SearchWidget()
+            SearchWidget(LocalNavigator.current?.parent)
         },
         bottomBar = {
             BottomNavigation(

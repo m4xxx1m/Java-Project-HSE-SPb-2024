@@ -128,7 +128,7 @@ class CommentScreen(private val postId: Int) : Screen {
                                 post.user = refreshHelper.value.users[post.userId]
                                 PostCard(
                                     post,
-                                    true,
+                                    isInCommentsScreen = true,
                                     afterDeletePost = {
                                         navigator?.pop()
                                     },

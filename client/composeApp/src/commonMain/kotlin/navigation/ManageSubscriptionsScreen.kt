@@ -2,6 +2,7 @@ package navigation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,7 +35,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import files.AvatarsDownloader.ProfilePictures
 import model.SubscriberManager
 import model.User
@@ -46,9 +46,10 @@ class ManageSubscriptionsScreen(
     @Composable
     override fun Content() {
         val coroutineScope = rememberCoroutineScope()
+        val navigator = LocalNavigator.current
         Scaffold(
             topBar = {
-                BackButton(LocalNavigator.currentOrThrow)
+                BackButton(navigator!!)
             }
         ) {
             Box(
@@ -76,6 +77,9 @@ class ManageSubscriptionsScreen(
                                     bitmap = it,
                                     contentDescription = "User profile image",
                                     modifier = Modifier.size(40.dp).clip(CircleShape)
+                                        .clickable { 
+                                            navigator?.push(UserProfileScreen(user))
+                                        }
                                 )
                             } ?: run {
                                 Image(
@@ -84,6 +88,9 @@ class ManageSubscriptionsScreen(
                                     colorFilter = ColorFilter.tint(Color(0xfff0f2f5)),
                                     modifier = Modifier.size(40.dp).clip(CircleShape)
                                         .background(MaterialTheme.colors.primaryVariant)
+                                        .clickable { 
+                                            navigator?.push(UserProfileScreen(user))
+                                        }
                                 )
                             }
                             Spacer(Modifier.size(15.dp))

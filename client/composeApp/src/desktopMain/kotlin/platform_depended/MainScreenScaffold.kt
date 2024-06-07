@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import navigation.CreatePostTab
@@ -57,7 +58,7 @@ actual fun MainScreenScaffold(content: @Composable (PaddingValues) -> Unit) {
                 Spacer(Modifier.weight(1f))
                 RefreshButton.Content()
                 Box(Modifier.weight(2f)) {
-                    SearchWidget()
+                    SearchWidget(LocalNavigator.current?.parent)
                 }
             }
         },

@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import files.DownloadAndOpenPostFileButton
 import kotlinx.coroutines.launch
 import model.AuthManager
@@ -66,14 +67,13 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun PostCard(
     post: Post,
+    navigator: Navigator? = LocalNavigator.current,
     isInCommentsScreen: Boolean = false,
     afterDeletePost: (() -> Unit)? = null,
     profilePicture: ImageBitmap? = null
 ) {
     val thisUser = post.userId == AuthManager.currentUser.id
     val ratingState = remember { mutableStateOf(post.likesCount) }
-    val navigator =
-        if (isInCommentsScreen) LocalNavigator.current else LocalNavigator.current?.parent
     Card(
         modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth(),
         elevation = 0.dp,
