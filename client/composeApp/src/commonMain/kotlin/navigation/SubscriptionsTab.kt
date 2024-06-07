@@ -82,6 +82,7 @@ object SubscriptionsTab : Tab {
                     post.user = refreshHelper.value.users[post.userId]
                     PostCard(
                         post,
+                        navigator = LocalNavigator.current?.parent,
                         profilePicture = ProfilePictures[post.userId]
                     )
                     Spacer(Modifier.size(10.dp))
