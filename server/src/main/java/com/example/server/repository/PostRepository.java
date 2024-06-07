@@ -15,6 +15,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     Optional<Post> findById(int id);
 
-    @Query(value = "SELECT * FROM content_obj WHERE content @@ :content", nativeQuery = true)
+    @Query(value = "SELECT * FROM content_obj " +
+            "WHERE (content @@ :content OR title @@ :content) " +
+            "AND dtype = 'Post'",
+            nativeQuery = true)
     List<Post> findByContentUsingTrigram(@Param("content") String content);
 }
