@@ -13,7 +13,7 @@ public class Post extends ContentObj {
     private String tags;
     @Column(length = 255)
     private String title;
-    private int commentsCount = 0;
+    private Integer commentsCount = 0;
 
     private Integer fileInfoId;
     private String fileName;
@@ -24,7 +24,7 @@ public class Post extends ContentObj {
         super();
     }
 
-    public Post(int authorId, String title, String content, String tags, int commentsCount) {
+    public Post(int authorId, String title, String content, String tags, Integer commentsCount) {
         super(authorId, content);
         this.title = title;
         this.tags = tags;
@@ -55,11 +55,11 @@ public class Post extends ContentObj {
         this.title = title;
     }
 
-    public int getCommentsCount() {
+    public Integer getCommentsCount() {
         return commentsCount;
     }
 
-    public void setCommentsCount(int commentsCount) {
+    public void setCommentsCount(Integer commentsCount) {
         this.commentsCount = commentsCount;
     }
 

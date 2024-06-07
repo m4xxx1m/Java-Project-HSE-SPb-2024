@@ -221,7 +221,7 @@ public class PostController {
     public List<String> getTags() {
         return Tag.getAllTags();
     }
-
+    
     @GetMapping("/post/search/trigram")
     public ResponseEntity<List<Post>> searchPostsUsingTrigram(@RequestParam("content") String content) {
         List<Post> posts = postService.getPostsByContentUsingTrigram(content);
