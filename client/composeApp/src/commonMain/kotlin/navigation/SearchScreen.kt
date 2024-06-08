@@ -1,5 +1,6 @@
 package navigation
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,10 +9,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -28,6 +37,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import files.AvatarsDownloader
 import kotlinx.coroutines.launch
 import model.Post
+import model.Tag
 import model.User
 import network.RetrofitClient
 import platform_depended.Platform
@@ -37,6 +47,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import ui.PostCard
 import ui.SearchWidget
+import ui.TagsSelectionWidget
 
 class SearchScreen(private var searchQuery: String) : Screen {
 
@@ -56,6 +67,7 @@ class SearchScreen(private var searchQuery: String) : Screen {
             }
         ) {
             RefreshableContent(refreshHelper) {
+                val tagsSelection = remember { mutableStateOf(false) }
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,10 +76,54 @@ class SearchScreen(private var searchQuery: String) : Screen {
                         bottom = 10.dp
                     )
                 ) {
-                    item { 
+                    item {
                         SearchWidget(navigator = null, default = searchQuery) {
                             searchQuery = it
                             refreshHelper.value.load()
+                        }
+                        Column(
+                            modifier = Modifier
+                                .widthIn(max = 500.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = {
+                                    tagsSelection.value = !tagsSelection.value
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = MaterialTheme.colors.primary
+                                )
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "Теги",
+                                        color = Color.White
+                                    )
+                                    Spacer(Modifier.width(10.dp))
+                                    Icon(
+                                        Icons.Rounded.ArrowDropDown,
+                                        contentDescription = "Edit post tags",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                            if (tagsSelection.value) {
+                                Spacer(Modifier.height(10.dp))
+                                TagsSelectionWidget(
+                                    { index ->
+                                        refreshHelper.value.selectedTags[index] == '1'
+                                    }
+                                ) { index ->
+                                    refreshHelper.value.selectedTags.setCharAt(
+                                        index,
+                                        if (refreshHelper.value.selectedTags[index] == '1')
+                                            '0'
+                                        else 
+                                            '1'
+                                    )
+                                }
+                            }
                         }
                         Spacer(Modifier.height(15.dp))
                         if (refreshHelper.value.posts.isEmpty()) {
@@ -98,6 +154,7 @@ class SearchScreen(private var searchQuery: String) : Screen {
     private inner class RefreshSearchHelper : Refreshable() {
         val posts = mutableStateListOf<Post>()
         val users = mutableStateMapOf<Int, User>()
+        val selectedTags = StringBuffer(Tag.defaultTags.replace('0', '1'))
 
         private fun getUsersList(userIds: Set<Int>) {
             RetrofitClient.retrofitCall.getUsersList(userIds)
@@ -119,12 +176,11 @@ class SearchScreen(private var searchQuery: String) : Screen {
                     override fun onFailure(call: Call<List<network.User>>, t: Throwable) {
                         println("get users list failure")
                     }
-
                 })
         }
 
         private fun searchPosts() {
-            RetrofitClient.retrofitCall.searchPosts(searchQuery)
+            RetrofitClient.retrofitCall.searchPosts(searchQuery, selectedTags.toString())
                 .enqueue(object : Callback<List<network.Post>> {
                     override fun onResponse(
                         call: Call<List<network.Post>>,
@@ -154,7 +210,6 @@ class SearchScreen(private var searchQuery: String) : Screen {
                     }
 
                 })
-
         }
 
         override fun load() {

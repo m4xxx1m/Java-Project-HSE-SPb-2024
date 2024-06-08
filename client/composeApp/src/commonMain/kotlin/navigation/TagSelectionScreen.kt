@@ -1,10 +1,8 @@
 package navigation
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -33,7 +31,7 @@ import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import ui.TagUi
+import ui.TagsSelectionWidget
 
 class TagSelectionScreen(
     private val userTags: String? = null
@@ -85,26 +83,39 @@ class TagSelectionScreen(
                     }
                 }
                 Spacer(Modifier.size(15.dp))
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Tag.tags.forEachIndexed { index, tag ->
-                        TagUi(
-                            Tag(index, tag),
-                            chosenTags.value?.getOrNull(index) == '1'
-                        ) {
-                            changed.value = true
-                            chosenTags.value?.let {
-                                if (it.length <= index) {
-                                    it.append("0".repeat(index - it.length + 1))
-                                }
-                                it.setCharAt(index, if (it[index] == '1') '0' else '1')
-                            }
+                TagsSelectionWidget(
+                    { index ->
+                        chosenTags.value?.getOrNull(index) == '1'
+                    }
+                ) { index ->
+                    changed.value = true
+                    chosenTags.value?.let {
+                        if (it.length <= index) {
+                            it.append("0".repeat(index - it.length + 1))
                         }
+                        it.setCharAt(index, if (it[index] == '1') '0' else '1')
                     }
                 }
+//                FlowRow(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalArrangement = Arrangement.spacedBy(10.dp),
+//                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+//                ) {
+//                    Tag.tags.forEachIndexed { index, tag ->
+//                        TagUi(
+//                            Tag(index, tag),
+//                            chosenTags.value?.getOrNull(index) == '1'
+//                        ) {
+//                            changed.value = true
+//                            chosenTags.value?.let {
+//                                if (it.length <= index) {
+//                                    it.append("0".repeat(index - it.length + 1))
+//                                }
+//                                it.setCharAt(index, if (it[index] == '1') '0' else '1')
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
     }
