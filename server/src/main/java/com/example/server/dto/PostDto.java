@@ -7,7 +7,7 @@ public class PostDto extends ContentObjDto {
     private final int commentsCount;
 
     public PostDto(int authorId, String title, String content, String tags, int commentsCount) {
-        super(authorId, content);
+        super(authorId, content, -1);
         this.tags = tags;
         this.title = title;
         this.commentsCount = commentsCount;
