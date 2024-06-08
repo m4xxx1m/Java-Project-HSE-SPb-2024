@@ -231,4 +231,17 @@ public class PostController {
             return new ResponseEntity<>(posts, HttpStatus.OK);
         }
     }
+
+    @GetMapping("/posts/search/filtered")
+    public ResponseEntity<List<Post>> searchPostsWithFilter(
+            @RequestParam("content") String content,
+            @RequestParam("tags") String tags
+    ) {
+        List<Post> posts = postService.getPostsByContentAndTags(content, tags);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        }
+    }
 }
