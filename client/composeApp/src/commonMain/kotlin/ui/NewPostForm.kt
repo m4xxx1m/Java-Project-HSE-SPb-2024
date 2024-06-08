@@ -1,11 +1,9 @@
 package ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -91,20 +89,29 @@ fun NewPostForm() {
                     Text("Прикрепить резюме из профиля", fontWeight = FontWeight.Thin)
                 }
             } else {
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Tag.tags.forEachIndexed { index, tag ->
-                        TagUi(
-                            Tag(index, tag),
+                Box(Modifier.weight(1f)) {
+                    TagsSelectionWidget(
+                        { index ->
                             postTags[index] == '1'
-                        ) {
-                            postTags.setCharAt(index, if (postTags[index] == '1') '0' else '1')
                         }
+                    ) { index ->
+                        postTags.setCharAt(index, if (postTags[index] == '1') '0' else '1')
                     }
                 }
+//                FlowRow(
+//                    modifier = Modifier.fillMaxWidth().weight(1f),
+//                    verticalArrangement = Arrangement.spacedBy(10.dp),
+//                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+//                ) {
+//                    Tag.tags.forEachIndexed { index, tag ->
+//                        TagUi(
+//                            Tag(index, tag),
+//                            postTags[index] == '1'
+//                        ) {
+//                            postTags.setCharAt(index, if (postTags[index] == '1') '0' else '1')
+//                        }
+//                    }
+//                }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 PdfPicker(onPdfSelected = {

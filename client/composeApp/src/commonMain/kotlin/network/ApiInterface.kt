@@ -164,7 +164,10 @@ interface ApiInterface {
     @GET("/user/{userId}/resume")
     @Headers("Content-Type:application/pdf")
     fun getUserResume(@Path("userId") userId: Int): Call<ResponseBody>
-    
-    @GET("/post/search/trigram")
-    fun searchPosts(@Query("content") content: String): Call<List<Post>>
+
+    @GET("/posts/search/filtered")
+    fun searchPosts(
+        @Query("content") content: String, 
+        @Query("tags") tags: String
+    ): Call<List<Post>>
 }
