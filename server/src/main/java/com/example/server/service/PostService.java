@@ -117,13 +117,21 @@ public class PostService {
     }
 
     public List<Post> getPostsBySelectedTags(String tags) {
-        List<Integer> tagIds = Tag.tagsToTagIds(tags);
         List<Post> posts = getPosts();
-        return posts.stream()
-                .filter(post -> Tag.tagsToTagIds(post.getTags())
-                        .stream()
-                        .anyMatch(tagIds::contains))
-                .collect(Collectors.toList());
+        return filterPostsByTags(posts, tags);
+    }
+
+    public static List<Post> filterPostsByTags(List<Post> posts, String tags) {
+        if (tags.indexOf('0') != -1) {
+            List<Integer> tagIds = Tag.tagsToTagIds(tags);
+            return posts.stream()
+                    .filter(post -> Tag.tagsToTagIds(post.getTags())
+                            .stream()
+                            .anyMatch(tagIds::contains))
+                    .collect(Collectors.toList());
+        } else {
+            return posts;
+        }
     }
 
     public List<String> getPostTags(int id) {
@@ -247,5 +255,9 @@ public class PostService {
 
     public List<Post> getPostsByContentUsingTrigram(String content) {
         return postRepository.findByContentUsingTrigram(content);
+    }
+
+    public List<Post> getPostsByContentAndTags(String content, String tags) {
+        return filterPostsByTags(getPostsByContentUsingTrigram(content), tags);
     }
 }
