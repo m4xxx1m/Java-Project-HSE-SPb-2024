@@ -45,8 +45,9 @@ public class PostController {
     }
 
     @GetMapping("/post/getAll")
-    ResponseEntity<List<Post>> getAll() {
-        List<Post> list = postService.getPosts();
+    public ResponseEntity<List<Post>> getAll(@RequestParam(defaultValue = "-1") int prevId,
+                                                    @RequestParam(defaultValue = "10") int size) {
+        List<Post> list = postService.getPostsAfterId(prevId, size);
         if (list == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
@@ -55,8 +56,10 @@ public class PostController {
     }
 
     @RequestMapping("/post/getAll")
-    ResponseEntity<List<Post>> getPostsByTags(@RequestParam("tags") String tags) {
-        List<Post> list = postService.getPostsBySelectedTags(tags);
+    ResponseEntity<List<Post>> getPostsByTags(@RequestParam("tags") String tags,
+                                              @RequestParam(defaultValue = "-1") int prevId,
+                                              @RequestParam(defaultValue = "10") int size) {
+        List<Post> list = postService.getPostsBySelectedTagsAfterId(tags, prevId, size);
         if (list == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } else {

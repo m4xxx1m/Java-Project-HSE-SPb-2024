@@ -25,4 +25,6 @@ public class Notification {
         this.replyCommentId = replyCommentId;
         this.replyCommentAuthorId = replyCommentAuthorId;
     }
+
+    public Notification() {}
 }

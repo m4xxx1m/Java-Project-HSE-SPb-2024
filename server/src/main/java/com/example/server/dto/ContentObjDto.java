@@ -5,16 +5,10 @@ public class ContentObjDto {
     private final String content;
     private final int replyToCommentId;
 
-    public ContentObjDto(int authorId, String content) {
+    public ContentObjDto(int authorId, String content, Integer replyToCommentId) {
         this.authorId = authorId;
         this.content = content;
-        this.replyToCommentId = -1;
-    }
-
-    public ContentObjDto(int authorId, String content, int replyToCommentId) {
-        this.authorId = authorId;
-        this.content = content;
-        this.replyToCommentId = replyToCommentId;
+        this.replyToCommentId = replyToCommentId == null ? -1 : replyToCommentId;
     }
 
     public int getAuthorId() {

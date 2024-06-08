@@ -31,7 +31,7 @@ public class NotificationController {
         messagingTemplate.convertAndSendToUser(userId.toString(), "/topic/replies", notification);
     }
 
-    @GetMapping(value = "/{user_id}")
+    @GetMapping(value = "/{userId}")
     ResponseEntity<List<Notification>> getUserNotifications(@PathVariable Integer userId) {
         return ResponseEntity.ok(notificationService.getNotificationsForUser(userId));
     }
