@@ -24,11 +24,15 @@ abstract class Refreshable {
 @Composable
 fun RefreshableContent(
     refreshHelper: MutableState<out Refreshable?>,
+    initialized: MutableState<Boolean>? = null,
     content: @Composable () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    coroutineScope.launch {
-        refreshHelper.value?.load()
+    if (initialized?.value != true) {
+        coroutineScope.launch {
+            refreshHelper.value?.load()
+        }
+        initialized?.value = true
     }
     val onRefresh: () -> Unit = {
         coroutineScope.launch {
@@ -57,28 +61,4 @@ fun RefreshableContent(
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
-//    if (getPlatform() == Platform.DESKTOP) {
-//        val enabled = remember { mutableStateOf(true) }
-//        LaunchedEffect(enabled.value) {
-//            if (enabled.value) {
-//                return@LaunchedEffect
-//            } else {
-//                delay(1000L)
-//                enabled.value = true
-//            }
-//        }
-//        Box(modifier = Modifier.padding(5.dp).fillMaxWidth(),
-//            contentAlignment = Alignment.TopEnd) {
-//            IconButton(
-//                modifier = Modifier.size(40.dp),
-//                onClick = {
-//                    onRefresh()
-//                    enabled.value = false
-//                },
-//                enabled = enabled.value
-//            ) {
-//                Image(Icons.Rounded.Refresh, contentDescription = "refresh")
-//            }
-//        }
-//    }
 }

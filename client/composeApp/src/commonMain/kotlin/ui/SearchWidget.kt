@@ -49,13 +49,11 @@ fun SearchWidget(
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(
             onSearch = {
-                if (searchQuery.value.isNotEmpty()) {
-                    if (onSearch == null) {
-                        navigator?.push(SearchScreen(searchQuery.value))
-                        searchQuery.value = ""
-                    } else {
-                        onSearch(searchQuery.value)
-                    }
+                if (onSearch == null) {
+                    navigator?.push(SearchScreen(searchQuery.value))
+                    searchQuery.value = ""
+                } else {
+                    onSearch(searchQuery.value)
                 }
             }
         ),

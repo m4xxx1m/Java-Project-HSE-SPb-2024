@@ -12,11 +12,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -27,6 +31,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import files.AvatarsDownloader.ProfilePictures
 import files.AvatarsDownloader.downloadProfilePicture
 import kotlinx.coroutines.launch
+import model.AuthManager
 import model.Post
 import model.User
 import network.RetrofitClient
@@ -46,22 +51,43 @@ object HomeTab : Tab {
         }
 
     private var scrollState: Pair<Int, Int> = Pair(0, 0)
+    private var posts = mutableStateListOf<Post>()
+    private var users = mutableStateMapOf<Int, User>()
+    private val initialized = mutableStateOf(false)
 
     @Composable
     override fun Content() {
         val lazyListState =
             rememberLazyListState(scrollState.first, scrollState.second)
+        val reachedBottom = remember {
+            derivedStateOf {
+                val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+                lastVisibleItem?.index != 0 && lastVisibleItem?.index ==
+                        lazyListState.layoutInfo.totalItemsCount - 1
+            }
+        }
+
+        val refreshHelper = remember { mutableStateOf(RefreshHomeHelper(posts, users)) }
+        val coroutineScope = rememberCoroutineScope()
+
         DisposableEffect(scrollState) {
             onDispose {
                 scrollState = Pair(
                     lazyListState.firstVisibleItemIndex,
                     lazyListState.firstVisibleItemScrollOffset
                 )
+                posts = refreshHelper.value.posts
+                users = refreshHelper.value.users
             }
         }
-        val refreshHelper = remember { mutableStateOf(RefreshHomeHelper()) }
-        val coroutineScope = rememberCoroutineScope()
-        RefreshableContent(refreshHelper) {
+
+        LaunchedEffect(reachedBottom.value) {
+            if (reachedBottom.value) {
+                refreshHelper.value.loadMore()
+            }
+        }
+
+        RefreshableContent(refreshHelper, initialized) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -90,10 +116,11 @@ object HomeTab : Tab {
     }
 }
 
-private class RefreshHomeHelper : Refreshable() {
-    val posts = mutableStateListOf<Post>()
-    val users = mutableStateMapOf<Int, User>()
-    
+private class RefreshHomeHelper(
+    val posts: SnapshotStateList<Post> = mutableStateListOf(),
+    val users: SnapshotStateMap<Int, User> = mutableStateMapOf()
+) : Refreshable() {
+
     private fun getUsersList(userIds: Set<Int>) {
         RetrofitClient.retrofitCall.getUsersList(userIds)
             .enqueue(object : Callback<List<network.User>> {
@@ -119,31 +146,67 @@ private class RefreshHomeHelper : Refreshable() {
     }
 
     private fun getAllPosts() {
-        RetrofitClient.retrofitCall.getAllPosts().enqueue(object : Callback<List<network.Post>> {
-            override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
-                println("refresh home tab failure")
-                isRefreshing = false
-            }
+        RetrofitClient.retrofitCall.getPostsForUser(AuthManager.currentUser.id)
+            .enqueue(object : Callback<List<network.Post>> {
+                override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
+                    println("refresh home tab failure")
+                    isRefreshing = false
+                }
 
+                override fun onResponse(
+                    call: Call<List<network.Post>>,
+                    response: Response<List<network.Post>>
+                ) {
+                    if (response.code() == 200) {
+                        posts.clear()
+                        val userIds = mutableSetOf<Int>()
+                        response.body()?.let {
+                            posts.addAll(it.map { post ->
+                                userIds.add(post.authorId)
+                                post.convertPost()
+                            })
+                        }
+                        getUsersList(userIds)
+                    } else {
+                        println("refresh home tab wrong code")
+                    }
+                    isRefreshing = false
+                }
+            })
+    }
+
+    fun loadMore() {
+        if (posts.isEmpty()) {
+            return
+        }
+        RetrofitClient.retrofitCall.getMorePostsForUser(
+            AuthManager.currentUser.id,
+            posts.lastOrNull()?.id ?: -1
+        ).enqueue(object : Callback<List<network.Post>> {
             override fun onResponse(
                 call: Call<List<network.Post>>,
                 response: Response<List<network.Post>>
             ) {
                 if (response.code() == 200) {
-                    posts.clear()
                     val userIds = mutableSetOf<Int>()
                     response.body()?.let {
                         posts.addAll(it.map { post ->
                             userIds.add(post.authorId)
                             post.convertPost()
                         })
+                        getUsersList(userIds)
                     }
-                    getUsersList(userIds)
                 } else {
-                    println("refresh home tab wrong code")
+                    println("wrong code on getting more posts")
                 }
                 isRefreshing = false
             }
+
+            override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
+                println("error on getting more posts")
+                isRefreshing = false
+            }
+
         })
     }
 
