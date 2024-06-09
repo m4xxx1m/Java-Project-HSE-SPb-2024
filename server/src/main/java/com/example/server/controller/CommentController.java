@@ -48,7 +48,7 @@ public class CommentController {
         if (comment == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            commentService.editComment(comment, new ContentObjDto(comment.getAuthorId(), content));
+            commentService.editComment(comment, new ContentObjDto(comment.getAuthorId(), content, comment.getReplyToCommentId()));
             return new ResponseEntity<>(comment, HttpStatus.OK);
         }
     }
