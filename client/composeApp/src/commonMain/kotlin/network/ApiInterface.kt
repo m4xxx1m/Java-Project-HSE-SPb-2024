@@ -165,9 +165,25 @@ interface ApiInterface {
     @Headers("Content-Type:application/pdf")
     fun getUserResume(@Path("userId") userId: Int): Call<ResponseBody>
 
+    @Headers("Content-Type:application/json")
     @GET("/posts/search/filtered")
     fun searchPosts(
-        @Query("content") content: String, 
+        @Query("content") content: String,
         @Query("tags") tags: String
+    ): Call<List<Post>>
+
+    @Headers("Content-Type:application/json")
+    @GET("/post/getAll")
+    fun getMorePosts(@Query("prevId") prevId: Int): Call<List<Post>>
+
+    @Headers("Content-Type:application/json")
+    @GET("/post/getForUser")
+    fun getPostsForUser(@Query("userId") userId: Int): Call<List<Post>>
+    
+    @Headers("Content-Type:application/json")
+    @GET("/post/getForUser")
+    fun getMorePostsForUser(
+        @Query("userId") userId: Int,
+        @Query("prevId") prevId: Int
     ): Call<List<Post>>
 }
