@@ -8,7 +8,7 @@ public class PostDto extends ContentObjDto {
     private final boolean addResume;
 
     public PostDto(int authorId, String title, String content, String tags, int commentsCount, boolean addResume) {
-        super(authorId, content);
+        super(authorId, content, -1);
         this.tags = tags;
         this.title = title;
         this.commentsCount = commentsCount;

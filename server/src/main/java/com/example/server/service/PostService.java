@@ -8,6 +8,10 @@ import com.example.server.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -101,10 +105,20 @@ public class PostService {
         return postRepository.findByAuthorId(authorId);
     }
 
-    public List<Post> getPosts() {
-        var posts = postRepository.findAll();
-        posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
-        return posts;
+    public List<Post> getPosts(int size) {
+        Pageable paging = PageRequest.of(0, size, Sort.by("id").descending());
+        Page<Post> pagedResult = postRepository.findAll(paging);
+        return pagedResult.getContent();
+        // var posts = postRepository.findAll();
+        // posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
+        // return posts;
+    }
+
+    public List<Post> getPostsAfterId(int id, int size) {
+        if (id == -1) {
+            return postRepository.findAll(PageRequest.of(0, size, Sort.by("id").descending())).getContent();
+        }
+        return postRepository.findByIdLessThan(id, PageRequest.of(0, size, Sort.by("id").descending()));
     }
 
     public List<Post> getPostsByPostIds(List<Integer> postIds) {
@@ -114,6 +128,16 @@ public class PostService {
 //            posts.add(postRepository.getReferenceById(postId));
 //        }
 //        return posts;
+    }
+
+    public List<Post> getPostsBySelectedTagsAfterId(String tags, int id, int size) {
+        List<Post> posts;
+        if (id == -1) {
+            posts = postRepository.findAll(PageRequest.of(0, size, Sort.by("id").descending())).getContent();
+        } else {
+            posts = postRepository.findByIdLessThan(id, PageRequest.of(0, size, Sort.by("id").descending()));
+        }
+        return filterPostsByTags(posts, tags);
     }
 
     public List<Post> getPostsBySelectedTags(String tags) {
