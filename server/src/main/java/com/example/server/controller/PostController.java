@@ -67,9 +67,14 @@ public class PostController {
         }
     }
 
-    @RequestMapping("/post/add")
-    ResponseEntity<Post> addPost(@ModelAttribute PostDto postDto) {
-        Post post = postService.addPost(postDto);
+    @PostMapping("/post/add")
+    ResponseEntity<Post> addPost(@RequestBody PostDto postDto) {
+        Post post;
+        try {
+            post = postService.addPost(postDto);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
@@ -166,7 +171,7 @@ public class PostController {
         }
     }
 
-    @RequestMapping("/post/{id}/delete")
+    @PostMapping("/post/{id}/delete")
     ResponseEntity<Void> deletePost(@PathVariable Integer id) {
         try {
             postService.deletePost(id);
@@ -218,5 +223,28 @@ public class PostController {
     @GetMapping("/getTags")
     public List<String> getTags() {
         return Tag.getAllTags();
+    }
+    
+    @GetMapping("/post/search/trigram")
+    public ResponseEntity<List<Post>> searchPostsUsingTrigram(@RequestParam("content") String content) {
+        List<Post> posts = postService.getPostsByContentUsingTrigram(content);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping("/posts/search/filtered")
+    public ResponseEntity<List<Post>> searchPostsWithFilter(
+            @RequestParam("content") String content,
+            @RequestParam("tags") String tags
+    ) {
+        List<Post> posts = postService.getPostsByContentAndTags(content, tags);
+        if (posts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        }
     }
 }

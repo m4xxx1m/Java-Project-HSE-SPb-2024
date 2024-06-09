@@ -1,26 +1,18 @@
 package com.example.server.service;
 
-import com.example.server.dto.UserLoginDto;
-import com.example.server.dto.UserRegistrationDto;
 import com.example.server.dto.UserUpdateDto;
 import com.example.server.model.FileInfo;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.commons.io.*;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -28,13 +20,18 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    private static final String DIRECTORY_PATH = "src\\main\\resources\\profile_pic\\";
+    private static final String PIC_DIRECTORY_PATH = "src\\main\\resources\\profile_pic\\";
+
+    private static final String RESUME_DIRECTORY_PATH = "src\\main\\resources\\resume\\";
 
     private final UserRepository userRepository;
 
+    private final FileInfoService fileInfoService;
+
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, FileInfoService fileInfoService) {
         this.userRepository = userRepository;
+        this.fileInfoService = fileInfoService;
     }
 
 //    public User registerUser(UserRegistrationDto registrationDto) {
@@ -83,7 +80,6 @@ public class UserService {
         user.setPassword(updateDto.getPassword());
         user.setContacts(updateDto.getContacts());
         user.setBio(updateDto.getBio());
-        user.setResumeUrl(updateDto.getResumeUrl());
         user.setTags(updateDto.getTags());
 
         return userRepository.save(user);
@@ -95,7 +91,7 @@ public class UserService {
 
         String extension = FilenameUtils.getExtension(profilePicture.getOriginalFilename());
         String key = FileInfoService.generateKey(profilePicture.getOriginalFilename());
-        String newProfilePictureUrl = DIRECTORY_PATH + userId + "\\" + key + "." + extension;
+        String newProfilePictureUrl = PIC_DIRECTORY_PATH + userId + "\\" + key + "." + extension;
         try {
             FileInfoService.uploadFileData(profilePicture.getBytes(), newProfilePictureUrl);
         } catch (Exception e) {
@@ -186,4 +182,29 @@ public class UserService {
     public UserDetailsService userDetailsService() {
         return this::getByUsername;
     }
+
+    public User uploadResume(int id, MultipartFile resume) throws IOException {
+        User user = getUser(id);
+        FileInfo resumeInfo = fileInfoService.upload(resume, id, RESUME_DIRECTORY_PATH + id + "\\");
+        if (user.getResumeInfoId() != null) {
+            fileInfoService.delete(id, fileInfoService.findById(user.getResumeInfoId()), RESUME_DIRECTORY_PATH + id + "\\");
+        }
+        resumeInfo.setFileName("cv_" + user.getUsername());
+        user.setResumeInfoId(resumeInfo.getId());
+        user.setResumeFileName(resumeInfo.getFileName());
+        return userRepository.save(user);
+    }
+
+    public User deleteResume(int id) throws IOException {
+        User user = getUser(id);
+        fileInfoService.delete(id, fileInfoService.findById(user.getResumeInfoId()),
+                RESUME_DIRECTORY_PATH + id + "\\");
+        user.setResumeInfoId(null);
+        return userRepository.save(user);
+    }
+
+    public byte[] getResumeData(String key) throws IOException {
+        return FileInfoService.download(key, RESUME_DIRECTORY_PATH);
+    }
+
 }
