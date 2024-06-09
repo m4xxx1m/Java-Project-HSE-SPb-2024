@@ -9,6 +9,7 @@ import com.example.server.model.Post;
 import com.example.server.model.RatedObject;
 import com.example.server.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,11 +39,12 @@ public class CommentService {
 
     public Comment addComment(ContentObjDto commentRequest, int postId) {
         Comment comment = new Comment(
-                    commentRequest.getAuthorId(),
-                    commentRequest.getContent(),
-                    postId,
-                    commentRequest.getReplyToCommentId()
-            );
+                commentRequest.getAuthorId(),
+                commentRequest.getContent(),
+                postId,
+                commentRequest.getReplyToCommentId()
+        );
+        commentRepository.save(comment);
         postService.changeCommentsCount(postId, 1);
         if (comment.getReplyToCommentId() != -1 &&
                 comment.getAuthorId() != getCommentById(comment.getReplyToCommentId()).getAuthorId()) {
@@ -53,7 +55,7 @@ public class CommentService {
             notificationService.saveNotification(notification);
             notificationController.notifyUserAboutReply(originalCommentAuthorId, notification);
         }
-        return commentRepository.save(comment);
+        return comment;
     }
 
     public void deleteComment(int id) {
@@ -79,6 +81,10 @@ public class CommentService {
             comments.sort(Comparator.comparing(Comment::getCreationTime));
             return comments;
         }
+    }
+
+    public List<Comment> getCommentsAfterId(int postId, int prevId, int size) {
+        return commentRepository.findByPostIdAndIdGreaterThan(postId, prevId, PageRequest.of(0, size));
     }
 
     public List<Comment> getCommentsByAuthorId(int authorId) {
