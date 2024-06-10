@@ -284,6 +284,7 @@ public class PostService {
         Post post = getPostById(postId);
         if (post != null) {
             post.setCommentsCount(post.getCommentsCount() + delta);
+            postRepository.save(post);
         }
     }
 
