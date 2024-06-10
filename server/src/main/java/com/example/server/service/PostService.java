@@ -106,12 +106,14 @@ public class PostService {
     }
 
     public List<Post> getPosts(int size) {
+        if (size == -1) {
+             var posts = postRepository.findAll();
+             posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
+             return posts;
+        }
         Pageable paging = PageRequest.of(0, size, Sort.by("id").descending());
         Page<Post> pagedResult = postRepository.findAll(paging);
         return pagedResult.getContent();
-        // var posts = postRepository.findAll();
-        // posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
-        // return posts;
     }
 
     public List<Post> getPostsAfterId(int id, int size) {
@@ -130,6 +132,11 @@ public class PostService {
 //        return posts;
     }
 
+    public List<Post> getPostsByUserTagsAfterId(int userId, int id, int size) {
+        User user = userService.getUser(userId);
+        return getPostsBySelectedTagsAfterId(user.getTags(), id, size);
+    }
+
     public List<Post> getPostsBySelectedTagsAfterId(String tags, int id, int size) {
         String template = tags.replaceAll("0", "_");
         List<Post> posts;
@@ -143,10 +150,10 @@ public class PostService {
         return posts;
     }
 
-    /* public List<Post> getPostsBySelectedTags(String tags) {
-        List<Post> posts = getPosts();
-        return filterPostsByTags(posts, tags);
-    }*/
+//    public List<Post> getPostsBySelectedTags(String tags) {
+//        List<Post> posts = getPosts();
+//        return filterPostsByTags(posts, tags);
+//    }
 
     public static List<Post> filterPostsByTags(List<Post> posts, String tags) {
         if (tags.indexOf('0') != -1) {
@@ -285,6 +292,12 @@ public class PostService {
     }
 
     public List<Post> getPostsByContentAndTags(String content, String tags) {
-        return filterPostsByTags(getPostsByContentUsingTrigram(content), tags);
+        List<Post> posts;
+        if (content == null || content.isEmpty()) {
+            posts = getPosts(-1);
+        } else {
+            posts = getPostsByContentUsingTrigram(content);
+        }
+        return filterPostsByTags(posts, tags);
     }
 }
