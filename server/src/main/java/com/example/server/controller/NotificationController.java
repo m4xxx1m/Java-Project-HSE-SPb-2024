@@ -6,10 +6,7 @@ import com.example.server.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,5 +31,11 @@ public class NotificationController {
     @GetMapping(value = "/{userId}")
     ResponseEntity<List<Notification>> getUserNotifications(@PathVariable Integer userId) {
         return ResponseEntity.ok(notificationService.getNotificationsForUser(userId));
+    }
+
+    @DeleteMapping(value = "/{notificationId}/delete")
+    ResponseEntity<Void> deleteNotification(@PathVariable Integer notificationId) {
+        notificationService.deleteNotification(notificationId);
+        return ResponseEntity.ok().build();
     }
 }

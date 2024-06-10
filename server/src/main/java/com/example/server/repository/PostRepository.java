@@ -16,6 +16,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     Optional<Post> findById(int id);
     List<Post> findByIdLessThan(int id, Pageable pageable);
+    List<Post> findByTagsLike(String tags, Pageable pageable);
+    List<Post> findByIdLessThanAndTagsLike(int id, String tags, Pageable pageable);
 
     @Query(value = "SELECT * FROM content_obj " +
             "WHERE (content @@ :content OR title @@ :content) " +

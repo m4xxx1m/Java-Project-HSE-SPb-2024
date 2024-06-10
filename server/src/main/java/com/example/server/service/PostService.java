@@ -138,13 +138,16 @@ public class PostService {
     }
 
     public List<Post> getPostsBySelectedTagsAfterId(String tags, int id, int size) {
+        String template = tags.replaceAll("0", "_");
         List<Post> posts;
         if (id == -1) {
-            posts = postRepository.findAll(PageRequest.of(0, size, Sort.by("id").descending())).getContent();
+            posts = postRepository.findByTagsLike(template,
+                    PageRequest.of(0, size, Sort.by("id").descending()));
         } else {
-            posts = postRepository.findByIdLessThan(id, PageRequest.of(0, size, Sort.by("id").descending()));
+            posts = postRepository.findByIdLessThanAndTagsLike(id, template,
+                    PageRequest.of(0, size, Sort.by("id").descending()));
         }
-        return filterPostsByTags(posts, tags);
+        return posts;
     }
 
 //    public List<Post> getPostsBySelectedTags(String tags) {
