@@ -179,11 +179,18 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @GET("/post/getForUser")
     fun getPostsForUser(@Query("userId") userId: Int): Call<List<Post>>
-    
+
     @Headers("Content-Type:application/json")
     @GET("/post/getForUser")
     fun getMorePostsForUser(
         @Query("userId") userId: Int,
         @Query("prevId") prevId: Int
     ): Call<List<Post>>
+
+    @Headers("Content-Type:application/json")
+    @GET("/post/{postId}/comments")
+    fun getMoreComments(
+        @Path("postId") postId: Int,
+        @Query("prevId") prevId: Int
+    ): Call<List<Comment>>
 }

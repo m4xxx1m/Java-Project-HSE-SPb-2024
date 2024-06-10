@@ -34,11 +34,13 @@ class ConnectionErrorScreen : Screen {
         if (isConnectionError.value) {
             ConnectionErrorUi()
         }
+        LaunchedEffect(Tag.Companion::class.java) {
+            Tag.initTags()
+        }
         tryConnect()
     }
 
     private fun tryConnect() {
-        Tag.initTags()
         navigator?.let {
             val authManager = AuthManager()
             authManager.tryLogin(

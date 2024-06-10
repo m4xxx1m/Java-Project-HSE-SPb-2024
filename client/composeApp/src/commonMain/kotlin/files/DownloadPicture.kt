@@ -1,5 +1,6 @@
 package files
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.graphics.ImageBitmap
 import network.RetrofitClient
 import okhttp3.ResponseBody
@@ -8,7 +9,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 object AvatarsDownloader {
-    val ProfilePictures = mutableMapOf<Int, ImageBitmap?>()
+    val ProfilePictures = mutableStateMapOf<Int, ImageBitmap?>()
     
     fun downloadProfilePicture(userId: Int) {
         if (ProfilePictures.containsKey(userId)) {

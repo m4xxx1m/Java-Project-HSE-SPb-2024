@@ -29,10 +29,10 @@ fun RefreshableContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     if (initialized?.value != true) {
+        initialized?.value = true
         coroutineScope.launch {
             refreshHelper.value?.load()
         }
-        initialized?.value = true
     }
     val onRefresh: () -> Unit = {
         coroutineScope.launch {
