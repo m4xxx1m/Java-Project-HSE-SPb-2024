@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import files.AvatarsDownloader.ProfilePictures
 import files.AvatarsDownloader.downloadProfilePicture
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.Post
@@ -67,8 +68,8 @@ object HomeTab : Tab {
             }
         }
 
-        val refreshHelper = remember { mutableStateOf(RefreshHomeHelper(posts, users)) }
         val coroutineScope = rememberCoroutineScope()
+        val refreshHelper = remember { mutableStateOf(RefreshHomeHelper(posts, users, coroutineScope)) }
 
         DisposableEffect(scrollState) {
             onDispose {
@@ -118,7 +119,8 @@ object HomeTab : Tab {
 
 private class RefreshHomeHelper(
     val posts: SnapshotStateList<Post> = mutableStateListOf(),
-    val users: SnapshotStateMap<Int, User> = mutableStateMapOf()
+    val users: SnapshotStateMap<Int, User> = mutableStateMapOf(),
+    val coroutineScope: CoroutineScope
 ) : Refreshable() {
 
     private fun getUsersList(userIds: Set<Int>) {
@@ -128,11 +130,13 @@ private class RefreshHomeHelper(
                     call: Call<List<network.User>>,
                     response: Response<List<network.User>>
                 ) {
-                    response.body()?.let {
-                        it.forEach { user ->
-                            users[user.userId] = user.convertUser()
-                            if (!ProfilePictures.containsKey(user.userId)) {
-                                downloadProfilePicture(user.userId)
+                    coroutineScope.launch {
+                        response.body()?.let {
+                            it.forEach { user ->
+                                users[user.userId] = user.convertUser()
+                                if (!ProfilePictures.containsKey(user.userId)) {
+                                    downloadProfilePicture(user.userId)
+                                }
                             }
                         }
                     }
@@ -199,19 +203,17 @@ private class RefreshHomeHelper(
                 } else {
                     println("wrong code on getting more posts")
                 }
-                isRefreshing = false
             }
 
             override fun onFailure(call: Call<List<network.Post>>, t: Throwable) {
                 println("error on getting more posts")
-                isRefreshing = false
             }
 
         })
     }
 
     override fun load() {
-        isRefreshing = true
+//        isRefreshing = true
         getAllPosts()
     }
 }

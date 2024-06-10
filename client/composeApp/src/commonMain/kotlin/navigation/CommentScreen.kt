@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -21,7 +22,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +39,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import files.AvatarsDownloader.ProfilePictures
 import files.AvatarsDownloader.downloadProfilePicture
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.Comment
@@ -59,8 +63,26 @@ class CommentScreen(private val postId: Int) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.current
         commentText = remember { mutableStateOf("") }
+
+        val lazyListState = rememberLazyListState()
+        val reachedBottom = remember {
+            derivedStateOf {
+                val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+                lastVisibleItem?.index != 0 && lastVisibleItem?.index ==
+                        lazyListState.layoutInfo.totalItemsCount - 1
+            }
+        }
+
         val refreshHelper = remember { mutableStateOf(RefreshCommentsHelper()) }
         val coroutineScope = rememberCoroutineScope()
+
+        LaunchedEffect(reachedBottom.value) {
+            while (reachedBottom.value) {
+                refreshHelper.value.loadMore()
+                delay(2000)
+            }
+        }
+
         Scaffold(
             topBar = {
                 Row(Modifier.fillMaxWidth()) {
@@ -121,7 +143,8 @@ class CommentScreen(private val postId: Int) : Screen {
                         contentPadding = PaddingValues(
                             top = 10.dp,
                             bottom = 10.dp
-                        )
+                        ),
+                        state = lazyListState
                     ) {
                         item {
                             refreshHelper.value.post.value?.let { post ->
@@ -262,6 +285,36 @@ class CommentScreen(private val postId: Int) : Screen {
                         isRefreshing = false
                     }
                 })
+        }
+
+        fun loadMore() {
+            RetrofitClient.retrofitCall.getMoreComments(
+                postId,
+                comments.lastOrNull()?.id ?: -1
+            ).enqueue(object : Callback<List<network.Comment>> {
+                override fun onResponse(
+                    call: Call<List<network.Comment>>,
+                    response: Response<List<network.Comment>>
+                ) {
+                    if (response.code() == 200) {
+                        response.body()?.let {
+                            val userIds = mutableSetOf<Int>()
+                            comments.addAll(it.map { comment ->
+                                userIds.add(comment.authorId)
+                                comment.convertComment()
+                            })
+                            getUsersList(userIds)
+                        }
+                    } else {
+                        println("wrong code on getting more comments")
+                    }
+                }
+
+                override fun onFailure(call: Call<List<network.Comment>>, t: Throwable) {
+                    println("failure on getting more comments")
+                }
+
+            })
         }
 
         override fun load() {
