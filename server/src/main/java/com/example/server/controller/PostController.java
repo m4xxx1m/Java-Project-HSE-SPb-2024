@@ -55,7 +55,19 @@ public class PostController {
         }
     }
 
-    @RequestMapping("/post/getAll")
+    @GetMapping("/post/getForUser")
+    ResponseEntity<List<Post>> getPostsByUserTags(@RequestParam("userId") int userId,
+                                              @RequestParam(defaultValue = "-1") int prevId,
+                                              @RequestParam(defaultValue = "10") int size) {
+        List<Post> list = postService.getPostsByUserTagsAfterId(userId, prevId, size);
+        if (list == null) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping("/post/getByTags")
     ResponseEntity<List<Post>> getPostsByTags(@RequestParam("tags") String tags,
                                               @RequestParam(defaultValue = "-1") int prevId,
                                               @RequestParam(defaultValue = "10") int size) {
