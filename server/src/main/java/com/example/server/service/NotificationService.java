@@ -20,4 +20,8 @@ public class NotificationService {
     public List<Notification> getNotificationsForUser(int userId) {
         return notificationRepository.findByOriginalCommentAuthorId(userId);
     }
+
+    public void deleteNotification(int notificationId) {
+        notificationRepository.deleteById(notificationId);
+    }
 }
