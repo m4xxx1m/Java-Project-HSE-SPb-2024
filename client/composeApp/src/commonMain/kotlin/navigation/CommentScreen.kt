@@ -1,7 +1,9 @@
 package navigation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,17 +11,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Reply
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,8 +39,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -58,6 +68,7 @@ import ui.PostCard
 
 class CommentScreen(private val postId: Int) : Screen {
     private var commentText: MutableState<String>? = null
+    private val replyTo = mutableStateOf<Comment?>(null)
 
     @Composable
     override fun Content() {
@@ -68,7 +79,7 @@ class CommentScreen(private val postId: Int) : Screen {
         val reachedBottom = remember {
             derivedStateOf {
                 val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
-                lastVisibleItem?.index != 0 && lastVisibleItem?.index ==
+                lastVisibleItem?.index ==
                         lazyListState.layoutInfo.totalItemsCount - 1
             }
         }
@@ -79,7 +90,7 @@ class CommentScreen(private val postId: Int) : Screen {
         LaunchedEffect(reachedBottom.value) {
             while (reachedBottom.value) {
                 refreshHelper.value.loadMore()
-                delay(2000)
+                delay(1000)
             }
         }
 
@@ -94,10 +105,54 @@ class CommentScreen(private val postId: Int) : Screen {
                 }
             },
             bottomBar = {
-                Box(
+                Column(
                     modifier = Modifier.fillMaxWidth().background(Color.White).padding(7.dp),
-                    contentAlignment = Alignment.BottomCenter
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    replyTo.value?.let { reply ->
+                        Row(
+                            modifier = Modifier
+                                .widthIn(max = 500.dp)
+                                .clip(RoundedCornerShape(7.dp))
+                                .background(MaterialTheme.colors.background)
+                                .padding(6.dp)
+                        ) {
+                            Icon(
+                                Icons.Rounded.Reply,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(7.dp))
+                                    .background(MaterialTheme.colors.primaryVariant)
+                                    .padding(3.dp),
+                                tint = AppTheme.black
+                            )
+                            Spacer(Modifier.width(13.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    refreshHelper.value.users[reply.authorId]?.name ?: "",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = AppTheme.black
+                                )
+                                Text(
+                                    reply.text,
+                                    maxLines = 1,
+                                    fontSize = 12.sp,
+                                    color = AppTheme.black
+                                )
+                            }
+                            Icon(
+                                Icons.Rounded.Close,
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.primaryVariant,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        replyTo.value = null
+                                    }.padding(2.dp)
+                            )
+                        }
+                    }
                     Row(
                         modifier = Modifier.widthIn(max = 500.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -169,7 +224,31 @@ class CommentScreen(private val postId: Int) : Screen {
                                 },
                                 isFirstInList = index == 0,
                                 isLastInList = index == refreshHelper.value.comments.size - 1,
-                                profilePicture = ProfilePictures[comment.authorId]
+                                profilePicture = ProfilePictures[comment.authorId],
+                                onReply = {
+                                    replyTo.value = comment
+                                },
+                                reply = if (comment.replyToCommentId == null ||
+                                    comment.replyToCommentId == -1
+                                ) {
+                                    null
+                                } else {
+                                    val replyComment = refreshHelper.value.comments[
+                                        refreshHelper.value.idByComment[comment.replyToCommentId]!!
+                                    ]
+                                    Pair(
+                                        refreshHelper.value.users[replyComment.authorId]?.name
+                                            ?: "",
+                                        replyComment.text
+                                    )
+                                },
+                                onReplyClick = {
+                                    refreshHelper.value.idByComment[comment.replyToCommentId]?.let {
+                                        coroutineScope.launch {
+                                            lazyListState.scrollToItem(it + 1)
+                                        }
+                                    }
+                                }
                             )
                         }
                     }
@@ -181,6 +260,7 @@ class CommentScreen(private val postId: Int) : Screen {
     inner class RefreshCommentsHelper : Refreshable() {
         val post = mutableStateOf<Post?>(null)
         val comments = mutableStateListOf<Comment>()
+        val idByComment = mutableStateMapOf<Int, Int>()
         val users = mutableStateMapOf<Int, User>()
 
         fun sendComment() {
@@ -189,7 +269,11 @@ class CommentScreen(private val postId: Int) : Screen {
             }
             RetrofitClient.retrofitCall.addComment(
                 postId,
-                CommentCreate(AuthManager.currentUser.id, commentText?.value ?: "")
+                CommentCreate(
+                    AuthManager.currentUser.id,
+                    commentText?.value ?: "",
+                    replyTo.value?.id ?: -1
+                )
             ).enqueue(object : Callback<network.Comment> {
                 override fun onResponse(
                     call: Call<network.Comment>,
@@ -197,7 +281,8 @@ class CommentScreen(private val postId: Int) : Screen {
                 ) {
                     if (response.code() == 200) {
                         commentText?.value = ""
-                        load()
+                        replyTo.value = null
+//                        load()
                     } else {
                         println("sending comment wrong code")
                     }
@@ -271,10 +356,12 @@ class CommentScreen(private val postId: Int) : Screen {
                     ) {
                         if (response.code() == 200) {
                             comments.clear()
+                            idByComment.clear()
                             val userIds = mutableSetOf<Int>()
                             response.body()?.let {
-                                comments.addAll(it.map { comment ->
+                                comments.addAll(it.mapIndexed { index, comment ->
                                     userIds.add(comment.authorId)
+                                    idByComment[comment.id] = index
                                     comment.convertComment()
                                 })
                             }
@@ -299,8 +386,10 @@ class CommentScreen(private val postId: Int) : Screen {
                     if (response.code() == 200) {
                         response.body()?.let {
                             val userIds = mutableSetOf<Int>()
-                            comments.addAll(it.map { comment ->
+                            val commentsCnt = comments.size
+                            comments.addAll(it.mapIndexed { index, comment ->
                                 userIds.add(comment.authorId)
+                                idByComment[comment.id] = commentsCnt + index
                                 comment.convertComment()
                             })
                             getUsersList(userIds)

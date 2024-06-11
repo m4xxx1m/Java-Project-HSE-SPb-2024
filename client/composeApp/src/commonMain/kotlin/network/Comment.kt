@@ -10,7 +10,8 @@ data class Comment(
     val creationTime: Date,
     val content: String,
     val rating: Int,
-    val postId: Int
+    val postId: Int,
+    val replyToCommentId: Int?
 ) {
     fun convertComment(): Comment {
         return Comment(
@@ -20,7 +21,8 @@ data class Comment(
             content,
             emptyList(),
             rating,
-            postId
+            postId,
+            replyToCommentId
         )
     }
 }
