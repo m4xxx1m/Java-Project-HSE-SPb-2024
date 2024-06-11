@@ -224,7 +224,7 @@ fun PostCard(
                                     .clip(RoundedCornerShape(7.dp))
                                     .background(MaterialTheme.colors.primaryVariant)
                                     .padding(3.dp),
-//                                tint = Color.White
+                                tint = AppTheme.black
                             )
                             Spacer(Modifier.size(7.dp))
                             Text(post.fileName, color = AppTheme.black)

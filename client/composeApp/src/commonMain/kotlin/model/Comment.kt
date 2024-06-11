@@ -9,7 +9,8 @@ data class Comment(
     val text: String,
     val imagesUrl: List<String>,
     val likesCount: Int,
-    val postId: Int
+    val postId: Int,
+    val replyToCommentId: Int?
 ) {
     var user: User? = null
 }

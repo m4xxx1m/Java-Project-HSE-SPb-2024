@@ -5,9 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -57,7 +60,10 @@ fun CommentCard(
     afterDeleteComment: (() -> Unit)? = null,
     isFirstInList: Boolean = false,
     isLastInList: Boolean = false,
-    profilePicture: ImageBitmap? = null
+    profilePicture: ImageBitmap? = null,
+    onReply: (() -> Unit)? = null,
+    reply: Pair<String, String>? = null,
+    onReplyClick: (() -> Unit)? = null
 ) {
     val shape = RoundedCornerShape(
         topStart = if (isFirstInList) 10.dp else 0.dp,
@@ -113,6 +119,45 @@ fun CommentCard(
                                 fontWeight = FontWeight.SemiBold,
                                 color = AppTheme.black
                             )
+                            if (reply != null) {
+                                Spacer(Modifier.height(4.dp))
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(IntrinsicSize.Max)
+                                        .clip(RoundedCornerShape(7.dp))
+                                        .background(MaterialTheme.colors.background)
+                                        .clickable { 
+                                            onReplyClick?.invoke()
+                                        }
+                                        .padding(6.dp)
+                                ) {
+                                    Box(
+                                       Modifier
+                                           .fillMaxHeight()
+                                           .width(4.dp)
+                                           .clip(RoundedCornerShape(2.dp))
+                                           .background(MaterialTheme.colors.primaryVariant)
+                                    )
+                                    Spacer(Modifier.width(5.dp))
+                                    Column {
+                                        Text(
+                                            reply.first,
+                                            maxLines = 1,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = AppTheme.black
+                                        )
+                                        Text(
+                                            reply.second,
+                                            maxLines = 1,
+                                            fontSize = 12.sp,
+                                            color = AppTheme.black
+                                        )
+                                    }
+                                }
+                                Spacer(Modifier.height(3.dp))
+                            }
                             Text(comment.text, fontSize = 14.sp, color = AppTheme.black)
                         }
                         Column {
@@ -168,7 +213,9 @@ fun CommentCard(
                         Icon(
                             Icons.Rounded.Reply, contentDescription = "Answer",
                             modifier = Modifier.size(30.dp).clip(CircleShape)
-                                .clickable { }.padding(5.dp),
+                                .clickable {
+                                    onReply?.invoke()
+                                }.padding(5.dp),
                             tint = AppTheme.black
                         )
                         Icon(
@@ -194,11 +241,13 @@ fun CommentCard(
                 }
             }
             if (!isLastInList) {
-                Divider(Modifier
-                    .fillMaxWidth()
-                    .padding(start = 50.dp/*95.dp*/, end = 20.dp, bottom = 5.dp), 
+                Divider(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 50.dp/*95.dp*/, end = 20.dp, bottom = 5.dp),
                     color = Color.LightGray,
-                    thickness = 0.5.dp)
+                    thickness = 0.5.dp
+                )
             }
         }
     }
