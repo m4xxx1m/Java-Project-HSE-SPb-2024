@@ -1,5 +1,11 @@
 package ui
 
+import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,11 +38,14 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Reply
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
@@ -63,7 +72,8 @@ fun CommentCard(
     profilePicture: ImageBitmap? = null,
     onReply: (() -> Unit)? = null,
     reply: Pair<String, String>? = null,
-    onReplyClick: (() -> Unit)? = null
+    onReplyClick: (() -> Unit)? = null,
+    highlightedCommentId: MutableState<Int?>? = null
 ) {
     val shape = RoundedCornerShape(
         topStart = if (isFirstInList) 10.dp else 0.dp,
@@ -73,10 +83,33 @@ fun CommentCard(
     )
     val rating = remember { mutableStateOf(comment.likesCount) }
     val navigator = LocalNavigator.current
+
+    val cardModifier = if (comment.id == highlightedCommentId?.value) {
+        val primaryColor = MaterialTheme.colors.primary
+        val infiniteTransition = rememberInfiniteTransition()
+        val alpha by infiniteTransition.animateFloat(
+            initialValue = 0.0f,
+            targetValue = 0.3f,
+            animationSpec = InfiniteRepeatableSpec(
+                animation = tween(durationMillis = 400, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse
+            )
+        )
+
+        Modifier.drawWithContent {
+            drawContent()
+            drawRect(
+                color = primaryColor.copy(alpha = alpha),
+                topLeft = Offset(0f, -9f),
+                size = size.copy(height = size.height)
+            )
+        }
+    } else Modifier
+    
     Card(
         elevation = 0.dp,
         shape = shape,
-        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth()
+        modifier = cardModifier.widthIn(max = 500.dp).fillMaxWidth()
     ) {
         Column {
             Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {

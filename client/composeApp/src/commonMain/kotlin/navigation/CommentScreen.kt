@@ -74,6 +74,7 @@ class CommentScreen(private val postId: Int) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.current
         commentText = remember { mutableStateOf("") }
+        val highlightedCommentId = remember { mutableStateOf<Int?>(null) }
 
         val lazyListState = rememberLazyListState()
         val reachedBottom = remember {
@@ -246,9 +247,13 @@ class CommentScreen(private val postId: Int) : Screen {
                                     refreshHelper.value.idByComment[comment.replyToCommentId]?.let {
                                         coroutineScope.launch {
                                             lazyListState.scrollToItem(it + 1)
+                                            highlightedCommentId.value = comment.replyToCommentId
+                                            delay(800)
+                                            highlightedCommentId.value = null
                                         }
                                     }
-                                }
+                                },
+                                highlightedCommentId = highlightedCommentId
                             )
                         }
                     }
