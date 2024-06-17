@@ -42,6 +42,9 @@ public class PostService {
     private RatedObjectService ratedObjectService;
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -94,6 +97,7 @@ public class PostService {
                 fileInfoService.delete(id, fileInfoService.findById(picInfoId), DIRECTORY_PATH + id + "\\");
             }
         }
+        notificationService.deleteNotificationsByPostId(id);
         postRepository.deleteById(id);
     }
 
@@ -107,9 +111,9 @@ public class PostService {
 
     public List<Post> getPosts(int size) {
         if (size == -1) {
-             var posts = postRepository.findAll();
-             posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
-             return posts;
+            var posts = postRepository.findAll();
+            posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
+            return posts;
         }
         Pageable paging = PageRequest.of(0, size, Sort.by("id").descending());
         Page<Post> pagedResult = postRepository.findAll(paging);
@@ -138,13 +142,12 @@ public class PostService {
     }
 
     public List<Post> getPostsBySelectedTagsAfterId(String tags, int id, int size) {
-        String template = tags.replaceAll("0", "_");
         List<Post> posts;
         if (id == -1) {
-            posts = postRepository.findByTagsLike(template,
+            posts = postRepository.findByTagsLike(tags,
                     PageRequest.of(0, size, Sort.by("id").descending()));
         } else {
-            posts = postRepository.findByIdLessThanAndTagsLike(id, template,
+            posts = postRepository.findByIdLessThanAndTagsLike(id, tags,
                     PageRequest.of(0, size, Sort.by("id").descending()));
         }
         return posts;

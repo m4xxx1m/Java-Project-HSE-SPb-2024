@@ -42,4 +42,19 @@ public class NotificationService {
     public void deleteNotification(int notificationId) {
         notificationRepository.deleteById(notificationId);
     }
+
+    public void deleteNotificationsByPostId(int id) {
+        List<Notification> notifications = notificationRepository.findByPostId(id);
+        notificationRepository.deleteAll(notifications);
+    }
+
+    public void deleteNotificationsByReplyCommentId(int id) {
+        List<Notification> notifications = notificationRepository.findByReplyCommentId(id);
+        notificationRepository.deleteAll(notifications);
+    }
+
+    public void deleteNotificationsByOriginalCommentId(int id) {
+        List<Notification> notifications = notificationRepository.findByOriginalCommentId(id);
+        notificationRepository.deleteAll(notifications);
+    }
 }
