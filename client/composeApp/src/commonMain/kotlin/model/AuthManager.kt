@@ -15,6 +15,8 @@ class AuthManager {
         private var currentUser_: User? = null
         val currentUser: User
             get() = currentUser_!!
+        
+        var refreshHomeTab = true
     }
 
     fun tryLogin(navigator: Navigator, onFailure: (() -> Unit)?, onError: (() -> Unit)?) {
@@ -64,6 +66,7 @@ class AuthManager {
     }
 
     fun logOut(navigator: Navigator) {
+        refreshHomeTab = true
         AuthStorage.clearToken()
         currentUser_ = null
         navigator.popAll()
