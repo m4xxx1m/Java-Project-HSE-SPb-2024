@@ -9,4 +9,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     List<Notification> findByOriginalCommentAuthorId(int originalCommentAuthorId);
 
     List<Notification> findByOriginalCommentAuthorIdOrderByReplyCommentIdDesc(int originalCommentAuthorId);
+    List<Notification> findByPostId(int postId);
+    List<Notification> findByReplyCommentId(int replyCommentId);
+    List<Notification> findByOriginalCommentId(int originalCommentId);
 }

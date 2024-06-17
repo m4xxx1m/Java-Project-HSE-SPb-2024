@@ -10,6 +10,7 @@ import com.example.server.model.RatedObject;
 import com.example.server.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -65,6 +66,8 @@ public class CommentService {
         if (comment != null) {
             postService.changeCommentsCount(comment.getPostId(), -1);
         }
+        notificationService.deleteNotificationsByReplyCommentId(id);
+        notificationService.deleteNotificationsByOriginalCommentId(id);
         commentRepository.deleteById(id);
     }
 
@@ -84,7 +87,8 @@ public class CommentService {
     }
 
     public List<Comment> getCommentsAfterId(int postId, int prevId, int size) {
-        return commentRepository.findByPostIdAndIdGreaterThan(postId, prevId, PageRequest.of(0, size));
+        return commentRepository.findByPostIdAndIdGreaterThan(postId, prevId,
+                PageRequest.of(0, size, Sort.by("id").ascending()));
     }
 
     public List<Comment> getCommentsByAuthorId(int authorId) {
