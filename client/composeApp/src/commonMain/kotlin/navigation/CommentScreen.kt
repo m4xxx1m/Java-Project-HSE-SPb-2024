@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Reply
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
@@ -49,6 +50,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import files.AvatarsDownloader.ProfilePictures
 import files.AvatarsDownloader.downloadProfilePicture
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import model.AuthManager
@@ -69,6 +71,8 @@ import ui.PostCard
 class CommentScreen(private val postId: Int) : Screen {
     private var commentText: MutableState<String>? = null
     private val replyTo = mutableStateOf<Comment?>(null)
+    private var coroutineScope: CoroutineScope? = null
+    private var initialized = false
 
     @Composable
     override fun Content() {
@@ -76,22 +80,31 @@ class CommentScreen(private val postId: Int) : Screen {
         commentText = remember { mutableStateOf("") }
         val highlightedCommentId = remember { mutableStateOf<Int?>(null) }
 
+        DisposableEffect(null) {
+            onDispose {
+                initialized = false
+            }
+        }
+
         val lazyListState = rememberLazyListState()
         val reachedBottom = remember {
             derivedStateOf {
                 val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
                 lastVisibleItem?.index ==
-                        lazyListState.layoutInfo.totalItemsCount - 1
+                        lazyListState.layoutInfo.totalItemsCount - 1 &&
+                        initialized
             }
         }
 
         val refreshHelper = remember { mutableStateOf(RefreshCommentsHelper()) }
-        val coroutineScope = rememberCoroutineScope()
+        coroutineScope = rememberCoroutineScope()
 
         LaunchedEffect(reachedBottom.value) {
-            while (reachedBottom.value) {
-                refreshHelper.value.loadMore()
-                delay(1000)
+            coroutineScope?.launch {
+                while (reachedBottom.value) {
+                    refreshHelper.value.loadMore()
+                    delay(1000)
+                }
             }
         }
 
@@ -171,7 +184,7 @@ class CommentScreen(private val postId: Int) : Screen {
                         )
                         IconButton(
                             onClick = {
-                                coroutineScope.launch {
+                                coroutineScope?.launch {
                                     refreshHelper.value.sendComment()
                                 }
                             },
@@ -245,7 +258,7 @@ class CommentScreen(private val postId: Int) : Screen {
                                 },
                                 onReplyClick = {
                                     refreshHelper.value.idByComment[comment.replyToCommentId]?.let {
-                                        coroutineScope.launch {
+                                        coroutineScope?.launch {
                                             lazyListState.scrollToItem(it + 1)
                                             highlightedCommentId.value = comment.replyToCommentId
                                             delay(800)
@@ -369,6 +382,7 @@ class CommentScreen(private val postId: Int) : Screen {
                                     idByComment[comment.id] = index
                                     comment.convertComment()
                                 })
+                                initialized = true
                             }
                             getPost(postId, userIds)
                         } else {
@@ -380,35 +394,37 @@ class CommentScreen(private val postId: Int) : Screen {
         }
 
         fun loadMore() {
-            RetrofitClient.retrofitCall.getMoreComments(
-                postId,
-                comments.lastOrNull()?.id ?: -1
-            ).enqueue(object : Callback<List<network.Comment>> {
-                override fun onResponse(
-                    call: Call<List<network.Comment>>,
-                    response: Response<List<network.Comment>>
-                ) {
-                    if (response.code() == 200) {
-                        response.body()?.let {
-                            val userIds = mutableSetOf<Int>()
-                            val commentsCnt = comments.size
-                            comments.addAll(it.mapIndexed { index, comment ->
-                                userIds.add(comment.authorId)
-                                idByComment[comment.id] = commentsCnt + index
-                                comment.convertComment()
-                            })
-                            getUsersList(userIds)
+            coroutineScope?.launch {
+                RetrofitClient.retrofitCall.getMoreComments(
+                    postId,
+                    comments.lastOrNull()?.id ?: -1
+                ).enqueue(object : Callback<List<network.Comment>> {
+                    override fun onResponse(
+                        call: Call<List<network.Comment>>,
+                        response: Response<List<network.Comment>>
+                    ) {
+                        if (response.code() == 200) {
+                            response.body()?.let {
+                                val userIds = mutableSetOf<Int>()
+                                val commentsCnt = comments.size
+                                comments.addAll(it.mapIndexed { index, comment ->
+                                    userIds.add(comment.authorId)
+                                    idByComment[comment.id] = commentsCnt + index
+                                    comment.convertComment()
+                                })
+                                getUsersList(userIds)
+                            }
+                        } else {
+                            println("wrong code on getting more comments")
                         }
-                    } else {
-                        println("wrong code on getting more comments")
                     }
-                }
 
-                override fun onFailure(call: Call<List<network.Comment>>, t: Throwable) {
-                    println("failure on getting more comments")
-                }
+                    override fun onFailure(call: Call<List<network.Comment>>, t: Throwable) {
+                        println("failure on getting more comments")
+                    }
 
-            })
+                })
+            }
         }
 
         override fun load() {

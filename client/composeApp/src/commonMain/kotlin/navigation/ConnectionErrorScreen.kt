@@ -17,7 +17,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
 import model.AuthManager
-import model.Tag
 import ui.SignInScreen
 
 class ConnectionErrorScreen : Screen {
@@ -33,9 +32,6 @@ class ConnectionErrorScreen : Screen {
         navigator = LocalNavigator.currentOrThrow
         if (isConnectionError.value) {
             ConnectionErrorUi()
-        }
-        LaunchedEffect(Tag.Companion::class.java) {
-            Tag.initTags()
         }
         tryConnect()
     }
