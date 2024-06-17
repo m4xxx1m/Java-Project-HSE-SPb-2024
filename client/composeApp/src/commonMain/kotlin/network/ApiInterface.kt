@@ -5,6 +5,7 @@ import okhttp3.MultipartBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
@@ -193,4 +194,12 @@ interface ApiInterface {
         @Path("postId") postId: Int,
         @Query("prevId") prevId: Int
     ): Call<List<Comment>>
+
+    @Headers("Content-Type:application/json")
+    @GET("/notifications/{userId}/get")
+    fun getNotificationsForUser(@Path("userId") userId: Int): Call<List<Notification>>
+
+    @Headers("Content-Type:application/json")
+    @DELETE("/notifications/{notificationId}/delete")
+    fun deleteNotification(@Path("notificationId") notificationId: Int): Call<Unit>
 }

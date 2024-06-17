@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import files.AvatarsDownloader
 import files.AvatarsDownloader.ProfilePictures
-import files.AvatarsDownloader.downloadProfilePicture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import model.AuthManager
@@ -69,7 +69,8 @@ object HomeTab : Tab {
         }
 
         val coroutineScope = rememberCoroutineScope()
-        val refreshHelper = remember { mutableStateOf(RefreshHomeHelper(posts, users, coroutineScope)) }
+        val refreshHelper =
+            remember { mutableStateOf(RefreshHomeHelper(posts, users, coroutineScope)) }
 
         DisposableEffect(scrollState) {
             onDispose {
@@ -130,15 +131,19 @@ private class RefreshHomeHelper(
                     call: Call<List<network.User>>,
                     response: Response<List<network.User>>
                 ) {
-                    coroutineScope.launch {
-                        response.body()?.let {
-                            it.forEach { user ->
-                                users[user.userId] = user.convertUser()
-                                if (!ProfilePictures.containsKey(user.userId)) {
-                                    downloadProfilePicture(user.userId)
+                    if (response.code() == 200) {
+                        coroutineScope.launch {
+                            response.body()?.let {
+                                it.forEach { user ->
+                                    users[user.userId] = user.convertUser()
+                                    if (!ProfilePictures.containsKey(user.userId)) {
+                                        AvatarsDownloader.downloadProfilePicture(user.userId)
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        println("wrong code on getting user list")
                     }
                 }
 

@@ -13,6 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
+import model.AuthManager
 
 abstract class Refreshable {
     var isRefreshing = false
@@ -28,8 +29,9 @@ fun RefreshableContent(
     content: @Composable () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    if (initialized?.value != true) {
+    if (AuthManager.refreshHomeTab || initialized?.value != true) {
         initialized?.value = true
+        AuthManager.refreshHomeTab = false
         coroutineScope.launch {
             refreshHelper.value?.load()
         }

@@ -16,3 +16,18 @@ data class Post(
 ) {
     var user: User? = null
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

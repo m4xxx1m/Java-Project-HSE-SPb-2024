@@ -95,27 +95,25 @@ fun main() = application {
 //        NotificationWidget(
 //            Notification(
 //                0,
-//                Post(
+//                Comment(
 //                    0,
 //                    0,
 //                    LocalDateTime.MIN,
-//                    emptyList(),
-//                    "Post title",
 //                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
 //                    emptyList(),
 //                    1000,
-//                    100
+//                    100,
+//                    0
 //                ),
-//                Post(
+//                Comment(
 //                    0,
 //                    0,
 //                    LocalDateTime.MIN,
-//                    emptyList(),
-//                    "Post title",
 //                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
 //                    emptyList(),
 //                    1000,
-//                    100
+//                    100,
+//                    -1
 //                )
 //            )
 //        )
