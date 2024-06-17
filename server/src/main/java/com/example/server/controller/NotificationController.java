@@ -1,6 +1,7 @@
 package com.example.server.controller;
 
 
+import com.example.server.dto.NotificationDto;
 import com.example.server.model.Notification;
 import com.example.server.service.NotificationService;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,11 @@ public class NotificationController {
 
     @GetMapping(value = "/{userId}")
     ResponseEntity<List<Notification>> getUserNotifications(@PathVariable Integer userId) {
+        return ResponseEntity.ok(notificationService.getUserNotifications(userId));
+    }
+
+    @GetMapping(value = "/{userId}/get")
+    ResponseEntity<List<NotificationDto>> getNotificationsForUser(@PathVariable Integer userId) {
         return ResponseEntity.ok(notificationService.getNotificationsForUser(userId));
     }
 
