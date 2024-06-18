@@ -4,7 +4,6 @@ import com.example.server.model.Subscription;
 import com.example.server.model.User;
 import com.example.server.repository.SubscriptionRepository;
 import com.example.server.repository.UserRepository;
-import com.example.server.service.SubscriptionService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
