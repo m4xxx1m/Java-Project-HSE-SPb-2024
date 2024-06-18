@@ -209,7 +209,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/user/{id}/resume/create")
-    ResponseEntity<?> createResume(@PathVariable Integer id, @ModelAttribute("resumeDto") String resumeDto) {
+    ResponseEntity<?> createResume(@PathVariable Integer id, @RequestBody ResumeDto resumeDto) {
         try {
             resumeService.createResume(resumeDto, id);
         } catch (Exception e) {

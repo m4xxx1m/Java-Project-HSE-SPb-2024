@@ -24,8 +24,8 @@ public class ResumeService {
 
     private final UserService userService;
 
-    public void createResume(String resumeDto, int userId) throws IOException, InterruptedException {
-        ResumeDto resumeDtoStruct = new Gson().fromJson(resumeDto, ResumeDto.class);
+    public void createResume(ResumeDto resumeDtoStruct, int userId) throws IOException, InterruptedException {
+//        ResumeDto resumeDtoStruct = new Gson().fromJson(resumeDto, ResumeDto.class);
         String tex = generateText(resumeDtoStruct);
         File tempFile = File.createTempFile("temp", ".tex");
         Writer writer = new OutputStreamWriter(new FileOutputStream(tempFile), StandardCharsets.UTF_8);
@@ -148,7 +148,7 @@ public class ResumeService {
         }
         tex.append("\\end{center}\n\n\n");
         if (!resumeDto.getEducations().isEmpty()) {
-            tex.append("%-----------EDUCATION-----------\n" + "\\section{Образование}\n" + "  \\resumeSubHeadingListStart\n");
+            tex.append("%-----------EDUCATION-----------\n" + "\\section{Education}\n" + "  \\resumeSubHeadingListStart\n");
             for (int i = 0; i < resumeDto.getEducations().size(); i++) {
                 ResumeDto.Education education = resumeDto.getEducations().get(i);
                 tex.append("    \\resumeSubheading\n" + "{").append(education.getOrganization()).append("}{").append(education.getLocation()).append("}\n").append("{").append(education.getMajor()).append(", ").append(education.getDegree()).append("}{").append(education.getStudyPeriod()).append("}\n");
@@ -156,7 +156,7 @@ public class ResumeService {
             tex.append("\\resumeSubHeadingListEnd\n\n\n");
         }
         if (!resumeDto.getExperiences().isEmpty()) {
-            tex.append("%-----------EXPERIENCE-----------\n" + "\\section{Опыт работы}\n" + "  \\resumeSubHeadingListStart\n" + "\n");
+            tex.append("%-----------EXPERIENCE-----------\n" + "\\section{Experience}\n" + "  \\resumeSubHeadingListStart\n" + "\n");
             for (int i = 0; i < resumeDto.getExperiences().size(); i++) {
                 ResumeDto.Experience experience = resumeDto.getExperiences().get(i);
                 tex.append("    \\resumeSubheading\n" + "{").append(experience.getPosition()).append("}{").append(experience.getWorkPeriod()).append("}\n").append("{").append(experience.getOrganization()).append("}{").append(experience.getLocation()).append("}\n").append("\\resumeItemListStart\n");
@@ -168,7 +168,7 @@ public class ResumeService {
             tex.append("  \\resumeSubHeadingListEnd\n" + "\n" + "\n");
         }
         if (!resumeDto.getProjects().isEmpty()) {
-            tex.append("%-----------PROJECTS-----------\n" + "\\section{Проекты}\n" + "    \\resumeSubHeadingListStart\n");
+            tex.append("%-----------PROJECTS-----------\n" + "\\section{Projects}\n" + "    \\resumeSubHeadingListStart\n");
             for (ResumeDto.Project project : resumeDto.getProjects()) {
                 tex.append("\\resumeProjectHeading\n" + "{\\textbf{").append(project.getProjectName()).append("} $|$ \\emph{").append(project.getUsedTechnologies()).append("}}{").append(project.getWorkPeriod()).append("}\n").append("\\resumeItemListStart\n");
                 for (String task : project.getTasks()) {
@@ -178,19 +178,19 @@ public class ResumeService {
             }
             tex.append("\\resumeSubHeadingListEnd\n\n\n");
         }
-        tex.append("%-----------PROGRAMMING SKILLS-----------\n" + "\\section{Технические навыки}\n" + " \\begin{itemize}[leftmargin=0.15in, label={}]\n" + "    \\small{\\item{\n" + "     \\textbf{Языки программирования}{: ");
+        tex.append("%-----------PROGRAMMING SKILLS-----------\n" + "\\section{Programming skills}\n" + " \\begin{itemize}[leftmargin=0.15in, label={}]\n" + "    \\small{\\item{\n" + "     \\textbf{Programming languages}{: ");
         for (int i = 0; i < resumeDto.getProgrammingLanguages().size(); i++) {
             tex.append(i == 0 ? "" : ", ").append(resumeDto.getProgrammingLanguages().get(i));
         }
-        tex.append("}\\\\\n" + "     \\textbf{Фреймворки}{: ");
+        tex.append("}\\\\\n" + "     \\textbf{Frameworks}{: ");
         for (int i = 0; i < resumeDto.getFrameworks().size(); i++) {
             tex.append(i == 0 ? "" : ", ").append(resumeDto.getFrameworks().get(i));
         }
-        tex.append("}\\\\\n" + "     \\textbf{Технологии}{: ");
+        tex.append("}\\\\\n" + "     \\textbf{Technologies}{: ");
         for (int i = 0; i < resumeDto.getTechnologies().size(); i++) {
             tex.append(i == 0 ? "" : ", ").append(resumeDto.getTechnologies().get(i));
         }
-        tex.append("}\\\\\n" + "     \\textbf{Библиотеки}{: ");
+        tex.append("}\\\\\n" + "     \\textbf{Libraries}{: ");
         for (int i = 0; i < resumeDto.getLibraries().size(); i++) {
             tex.append(i == 0 ? "" : ", ").append(resumeDto.getLibraries().get(i));
         }
