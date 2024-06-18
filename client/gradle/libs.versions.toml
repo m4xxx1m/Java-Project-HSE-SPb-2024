@@ -19,6 +19,7 @@ okhttp = "4.9.1"
 voyager = "1.0.0"
 retrofit = "2.9.0"
 coroutines-swing = "1.6.0"
+kotlinx-serialization-json = "1.6.3"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -43,10 +44,10 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit"}
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit"}
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines-swing" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
- 

@@ -17,7 +17,6 @@ data class User(
         retrofitCall.getUser(id).enqueue(object: Callback<User> {
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.code() == 200) {
-                    println("successfully got user profile")
                     response.body()?.let {
                         userProfile.value = UserProfile(
                             user = this@User,

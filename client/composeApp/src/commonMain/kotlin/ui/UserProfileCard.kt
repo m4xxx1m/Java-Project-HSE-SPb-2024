@@ -71,6 +71,7 @@ import model.User
 import model.UserProfile
 import navigation.Refreshable
 import navigation.RefreshableContent
+import navigation.ResumeFormScreen
 import navigation.TagSelectionScreen
 import network.RetrofitClient
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -402,7 +403,7 @@ class UserProfileCard(private val user: User, private val navigator: Navigator?)
                             }
                             if (thisUser) {
                                 IconButton(onClick = {
-
+                                    navigator?.push(ResumeFormScreen())
                                 }) {
                                     Icon(
                                         Icons.Rounded.Edit, contentDescription = null,
