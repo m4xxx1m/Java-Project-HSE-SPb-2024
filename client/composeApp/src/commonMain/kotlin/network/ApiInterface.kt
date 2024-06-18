@@ -202,4 +202,8 @@ interface ApiInterface {
     @Headers("Content-Type:application/json")
     @DELETE("/notifications/{notificationId}/delete")
     fun deleteNotification(@Path("notificationId") notificationId: Int): Call<Unit>
+
+    @Headers("Content-Type:application/json")
+    @POST("/user/{userId}/resume/create")
+    fun createResume(@Path("userId") userId: Int, @Body resumeDto: ResumeDto): Call<Unit>
 }

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 kotlin {
@@ -46,6 +47,8 @@ kotlin {
             implementation(libs.okhttp)
             
             api(compose.materialIconsExtended)
+            
+            implementation(libs.kotlinx.serialization.json)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
