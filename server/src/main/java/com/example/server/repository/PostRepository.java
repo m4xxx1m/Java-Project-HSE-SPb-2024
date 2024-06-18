@@ -17,15 +17,15 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Optional<Post> findById(int id);
     List<Post> findByIdLessThan(int id, Pageable pageable);
 
-    @Query(value = "SELECT * FROM content_obj WHERE CAST(CAST(tags AS bit(32)) AS integer) " +
-            "& CAST(CAST(:tags AS bit(32)) AS integer) > 0" +
+    @Query(value = "SELECT * FROM content_obj WHERE CAST(CAST(tags AS bit(63)) AS bigint) " +
+            "& CAST(CAST(:tags AS bit(63)) AS bigint) > 0" +
             " AND dtype = 'Post'",
             nativeQuery = true)
     List<Post> findByTagsLike(@Param("tags") String tags, Pageable pageable);
 
     @Query(value = "SELECT * FROM content_obj WHERE id < :id " +
-            "AND CAST(CAST(tags AS bit(32)) AS integer) " +
-            "& CAST(CAST(:tags AS bit(32)) AS integer) > 0" +
+            "AND CAST(CAST(tags AS bit(63)) AS bigint) " +
+            "& CAST(CAST(:tags AS bit(63)) AS bigint) > 0" +
             " AND dtype = 'Post'",
             nativeQuery = true)
     List<Post> findByIdLessThanAndTagsLike(@Param("id") int id, @Param("tags") String tags, Pageable pageable);
