@@ -1,5 +1,7 @@
 package com.example.server.controller;
 
+import com.example.server.dto.ContentObjDto;
+import com.example.server.model.Comment;
 import com.example.server.model.Post;
 import com.example.server.model.SavedObject;
 import com.example.server.repository.CommentRepository;
@@ -152,6 +154,19 @@ public class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(post))));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testAddPost() throws Exception {
+        Post post = new Post(1, "title", "content", "tags", 0);
+        when(postService.addPost(any(com.example.server.dto.PostDto.class))).thenReturn(post);
+        mockMvc.perform(MockMvcRequestBuilders.post("/post/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new com.example.server.dto.PostDto(1, "title", "content", "tags", 0, false)))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(post)));
     }
 
 }
