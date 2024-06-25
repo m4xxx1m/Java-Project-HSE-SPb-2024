@@ -584,6 +584,8 @@ private class RefreshUserProfileHelper(private val user: User) : Refreshable() {
         downloadProfilePicture(user.id)
         user.setProfile(userProfile)
         getUserPosts()
-        getSavedPosts()
+        if (user.id == AuthManager.currentUser.id) {
+            getSavedPosts()
+        }
     }
 }

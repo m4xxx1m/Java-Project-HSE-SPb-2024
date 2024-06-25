@@ -31,6 +31,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import files.AvatarsDownloader
 import files.AvatarsDownloader.ProfilePictures
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import model.AuthManager
 import model.Post
@@ -67,6 +68,12 @@ object HomeTab : Tab {
                         lazyListState.layoutInfo.totalItemsCount - 1
             }
         }
+        val reachedTop = remember {
+            derivedStateOf {
+                lazyListState.firstVisibleItemIndex == 0 &&
+                        lazyListState.firstVisibleItemScrollOffset == 0
+            }
+        }
 
         val coroutineScope = rememberCoroutineScope()
         val refreshHelper =
@@ -83,13 +90,24 @@ object HomeTab : Tab {
             }
         }
 
-        LaunchedEffect(reachedBottom.value) {
+        LaunchedEffect(reachedTop.value) {
+            coroutineScope.launch {
+                while (reachedTop.value && initialized.value) {
+                    refreshHelper.value.load()
+                    delay(2000)
+                }
+            }
+        }
+
+        LaunchedEffect(reachedBottom.value)
+        {
             if (reachedBottom.value) {
                 refreshHelper.value.loadMore()
             }
         }
 
-        RefreshableContent(refreshHelper, initialized) {
+        RefreshableContent(refreshHelper, initialized)
+        {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
