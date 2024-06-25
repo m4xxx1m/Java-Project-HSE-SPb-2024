@@ -4,3 +4,4 @@ src/main/resources/resume
 .gradle
 .idea
 build
+*.env

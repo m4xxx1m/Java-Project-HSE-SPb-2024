@@ -13,6 +13,9 @@ import com.example.server.service.SubscriptionService;
 import com.example.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -146,13 +150,21 @@ public class UserController {
     }
 
     @PostMapping("/users/{userId}/updateContacts")
-    public void updateContacts(@PathVariable Integer userId, @RequestParam("contacts") String contacts) {
+    public ResponseEntity<Void> updateContacts(@PathVariable Integer userId, @RequestParam("contacts") String contacts) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         userService.updateUserContacts(userId, contacts);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/users/{userId}/updateBio")
-    public void updateBio(@PathVariable Integer userId, @RequestParam("bio") String bio) {
+    public ResponseEntity<Void> updateBio(@PathVariable Integer userId, @RequestParam("bio") String bio) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         userService.updateUserBio(userId, bio);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/users/{userId}/updateTags")
@@ -189,11 +201,6 @@ public class UserController {
     @PostMapping("/users/{userId}/updateProfilePictureUrl")
     public void updateProfilePictureUrl(@PathVariable Integer userId, @RequestParam("profilePictureUrl") String profilePictureUrl) {
         userService.updateProfilePictureUrl(userId, profilePictureUrl);
-    }
-
-    @PostMapping("/users/{userId}/updateResumeUrl")
-    public void updateResumeUrl(@PathVariable Integer userId, @RequestParam("resumeUrl") String resumeUrl) {
-        userService.updateResumeUrl(userId, resumeUrl);
     }
 
     @PostMapping("/users/{userId}/updateRole")
@@ -249,5 +256,4 @@ public class UserController {
         }
         return getResume(id);
     }
-
 }

@@ -212,13 +212,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void updateResumeUrl(Integer userId, String resumeUrl) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setResumeUrl(resumeUrl);
-        userRepository.save(user);
-    }
-
     public void updateRole(Integer userId, Role role) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
