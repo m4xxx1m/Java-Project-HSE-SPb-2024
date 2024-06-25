@@ -28,7 +28,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import model.AuthManager
 import model.SignInManager
 import navigation.MainNavigation
 
@@ -37,8 +36,6 @@ class SignInScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         SignInForm(navigator)
-        val authManager = AuthManager()
-        authManager.tryLogin(navigator)
     }
 }
 
@@ -70,7 +67,7 @@ fun SignInForm(navigator: Navigator) {
                         )
                     }
                 },
-                label = { Text("Email or username") },
+                label = { Text("Логин") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 isError = isErrorUsername.value
@@ -91,7 +88,7 @@ fun SignInForm(navigator: Navigator) {
                         )
                     }
                 },
-                label = { Text("Password") },
+                label = { Text("Пароль") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
@@ -112,12 +109,14 @@ fun SignInForm(navigator: Navigator) {
                     emailOrUsername.value.trim(),
                     password.value.trim()
                 )
-                signInManager.signIn {
-                    navigator.popAll()
-                    navigator.replace(MainNavigation())
-                }
+                signInManager.signIn(
+                    onSuccess = {
+                        navigator.popAll()
+                        navigator.replace(MainNavigation())
+                    }
+                )
             }, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
-                Text("Sign in")
+                Text("Войти в аккаунт")
             }
             Button(
                 onClick = {
@@ -125,7 +124,7 @@ fun SignInForm(navigator: Navigator) {
                 },
                 modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()
             ) {
-                Text("Register")
+                Text("Зарегистрироваться")
             }
         }
     }

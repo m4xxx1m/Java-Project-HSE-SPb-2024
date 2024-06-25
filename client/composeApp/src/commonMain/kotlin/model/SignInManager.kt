@@ -1,33 +1,43 @@
 package model
 
-import network.ApiInterface
-import network.RetrofitClient
+import network.AuthenticationResponse
+import network.RetrofitClientPreAuth
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class SignInManager(
-    private val username: String, 
+    private val username: String,
     private val password: String
 ) {
-    fun signIn(onSuccess: () -> Unit) {
-        val call = RetrofitClient.retrofit.create(ApiInterface::class.java)
+    fun signIn(
+        onFailure: (() -> Unit)? = null,
+        onError: (() -> Unit)? = null,
+        onSuccess: () -> Unit
+    ) {
+        val retrofitCall = RetrofitClientPreAuth.retrofitCall
         val registerInfo = UserSignInBody(username, password)
-        call.loginUser(registerInfo).enqueue(object : Callback<network.User> {
-            override fun onFailure(call: Call<network.User>, t: Throwable) {
+        retrofitCall.loginUser(registerInfo).enqueue(object : Callback<AuthenticationResponse> {
+            override fun onFailure(call: Call<AuthenticationResponse>, t: Throwable) {
                 println("failure")
+                onFailure?.invoke()
             }
-            override fun onResponse(call: Call<network.User>, response: Response<network.User>) {
+
+            override fun onResponse(
+                call: Call<AuthenticationResponse>,
+                response: Response<AuthenticationResponse>
+            ) {
                 if (response.code() == 200) {
-                    println("success")
                     var user: User?
-                    response.body().let { 
-                        user = it?.convertUser()
+                    response.body().let {
+                        user = it?.user?.convertUser()
                     }
-                    AuthManager().saveAuthData(username, password, user)
+                    val token = response.body()!!.token
+                    AuthManager().saveAuthData(user, token)
                     onSuccess()
                 } else {
                     println("response but wrong code")
+                    onError?.invoke()
                 }
             }
         })

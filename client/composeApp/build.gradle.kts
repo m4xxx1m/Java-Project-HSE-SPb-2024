@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 kotlin {
@@ -42,9 +43,17 @@ kotlin {
             // Retrofit
             implementation(libs.retrofit)
             implementation(libs.retrofit.converter.gson)
+            
+            implementation(libs.okhttp)
+            
+            api(compose.materialIconsExtended)
+            
+            implementation(libs.kotlinx.serialization.json)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+            
+            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }
@@ -89,9 +98,20 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
+            modules("java.instrument", "java.prefs", "java.sql", "jdk.unsupported")
             packageName = "ru.hse.project"
             packageVersion = "1.0.0"
+            
+//            macOS {
+//                iconFile.set(project.file("icon/internfon_logo.icns"))
+//            }
+//            windows {
+//                iconFile.set(project.file("icon/internfon_logo.ico"))
+//            }
+//            linux {
+//                iconFile.set(project.file("icon/internfon_logo.png"))
+//            }
         }
     }
 }

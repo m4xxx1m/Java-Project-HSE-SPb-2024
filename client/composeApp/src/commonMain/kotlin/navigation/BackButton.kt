@@ -1,12 +1,12 @@
 package navigation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
+import ui.AppTheme
 
 @Composable
 fun BackButton(navigator: Navigator) {
@@ -26,15 +27,17 @@ fun BackButton(navigator: Navigator) {
                 navigator.pop()
             }.padding(5.dp)
     ) {
-        Image(
+        Icon(
             Icons.Rounded.KeyboardArrowLeft, contentDescription = "Back button",
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
+            tint = AppTheme.black
         )
         Spacer(Modifier.size(4.dp))
         Text(
-            "Back",
+            "Назад",
             fontSize = 14.sp,
-            modifier = Modifier.padding(end = 4.dp)
+            modifier = Modifier.padding(end = 4.dp),
+            color = AppTheme.black
         )
     }
 }

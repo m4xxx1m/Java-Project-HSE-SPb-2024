@@ -3,17 +3,20 @@ package platform_depended
 import java.util.prefs.Preferences
 
 actual object AuthStorage {
-    private val prefs = Preferences.userRoot().node("ru.hse.auth")
+    private const val PATH_NAME = "ru.hse.internfon.auth"
+    private const val KEY = "ru.hse.internfon.auth.token.key"
+
+    private val prefs = Preferences.userRoot().node(PATH_NAME)
 
     actual fun saveToken(token: String) {
-        prefs.put("authToken", token)
+        prefs.put(KEY, token)
     }
 
     actual fun getToken(): String? {
-        return prefs.get("authToken", null)
+        return prefs.get(KEY, null)
     }
 
     actual fun clearToken() {
-        prefs.remove("authToken")
+        prefs.remove(KEY)
     }
 }

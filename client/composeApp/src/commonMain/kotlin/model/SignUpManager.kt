@@ -1,7 +1,7 @@
 package model
 
-import network.ApiInterface
-import network.RetrofitClient
+import network.AuthenticationResponse
+import network.RetrofitClientPreAuth
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,23 +16,27 @@ class SignUpManager(private val email: String) {
     }
 
     fun signUp(onSuccess: () -> Unit) {
-        val call = RetrofitClient.retrofit.create(ApiInterface::class.java)
+        val retrofitCall = RetrofitClientPreAuth.retrofitCall
         val registerInfo = UserSignUpBody(userName, email, password)
-        call.registerUser(registerInfo).enqueue(object : Callback<network.User> {
-            override fun onFailure(call: Call<network.User>, t: Throwable) {
-                println("failure")
+        retrofitCall.registerUser(registerInfo).enqueue(object : Callback<AuthenticationResponse> {
+            override fun onFailure(call: Call<AuthenticationResponse>, t: Throwable) {
+                println("failure on registration")
             }
-            override fun onResponse(call: Call<network.User>, response: Response<network.User>) {
+
+            override fun onResponse(
+                call: Call<AuthenticationResponse>,
+                response: Response<AuthenticationResponse>
+            ) {
                 if (response.code() == 200) {
-                    println("success")
                     var user: User?
                     response.body().let {
-                        user = it?.convertUser()
+                        user = it?.user?.convertUser()
                     }
-                    AuthManager().saveAuthData(userName, password, user)
+                    val token = response.body()!!.token
+                    AuthManager().saveAuthData(user, token)
                     onSuccess()
                 } else {
-                    println("response but wrong code")
+                    println("wrong code on registration")
                 }
             }
         })

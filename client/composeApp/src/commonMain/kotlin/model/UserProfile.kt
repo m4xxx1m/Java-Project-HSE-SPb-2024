@@ -1,20 +1,21 @@
 package model
 
+import androidx.compose.runtime.MutableState
+
 data class UserProfile(
     val user: User,
     val contacts: String,
     val about: String,
-    val subscriptions: List<User>,
-    val tags: List<Tag>,
-    val cvId: Int
+    val tags: String,
+    val cvFileName: String?
 ) {
-    companion object {
-        private var instance: UserProfile? = null
-        fun getInstance(): UserProfile? {
-            return instance
+    fun getTagsList(list: MutableState<ArrayList<String>?>) {
+        val newList = ArrayList<String>()
+        tags.forEachIndexed { index, c ->
+            if (c == '1') {
+                newList.add(Tag.tags[index])
+            }
         }
-        fun setInstanceFromServer() {
-            
-        }
+        list.value = newList
     }
 }

@@ -30,7 +30,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import model.SignUpManager
 import navigation.BackButton
-import navigation.MainNavigation
+import navigation.TagSelectionScreen
 
 class SignUpUserDataScreen(private val signUpManager: SignUpManager) : Screen {
     @Composable
@@ -70,8 +70,8 @@ fun SignUpUserDataForm(navigator: Navigator, signUpManager: SignUpManager) {
                         )
                     }
                 },
-                label = { Text("Username") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                label = { Text("Имя пользователя") },
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true
             )
             OutlinedTextField(
@@ -90,7 +90,7 @@ fun SignUpUserDataForm(navigator: Navigator, signUpManager: SignUpManager) {
                         )
                     }
                 },
-                label = { Text("Password") },
+                label = { Text("Пароль") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true
@@ -110,7 +110,7 @@ fun SignUpUserDataForm(navigator: Navigator, signUpManager: SignUpManager) {
                         )
                     }
                 },
-                label = { Text("Repeat password") },
+                label = { Text("Повторите пароль") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true
@@ -122,7 +122,7 @@ fun SignUpUserDataForm(navigator: Navigator, signUpManager: SignUpManager) {
                 }
                 val usernameTrimmed = username.value.trim()
                 if (usernameTrimmed.isEmpty() || !usernameTrimmed.matches(Regex(
-                        "^[a-zA-Z0-9_\\-]{4,50}$"
+                        "^[a-zA-Zа-яА-Я0-9_\\- ]{4,50}$"
                 ))) {
                     isErrorUsername.value = true
                 }
@@ -138,10 +138,10 @@ fun SignUpUserDataForm(navigator: Navigator, signUpManager: SignUpManager) {
                 signUpManager.initData(usernameTrimmed, password.value.trim())
                 signUpManager.signUp {
                     navigator.popAll()
-                    navigator.push(MainNavigation())
+                    navigator.push(TagSelectionScreen())
                 }
             }, modifier = Modifier.widthIn(max = 300.dp).fillMaxWidth()) {
-                Text("Next")
+                Text("Далее")
             }
         }
     }
