@@ -40,6 +40,9 @@ public class CommentController {
 
     @RequestMapping("/post/{postId}/addComment")
     ResponseEntity<Comment> addComment(@PathVariable int postId, @RequestBody ContentObjDto commentRequest) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), commentRequest.getAuthorId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         Comment comment = commentService.addComment(commentRequest, postId);
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
@@ -69,12 +72,18 @@ public class CommentController {
 
     @RequestMapping(value = "/post/{postId}/comments/{commentId}/like")
     ResponseEntity<Integer> likeComment(@PathVariable Integer commentId, @RequestParam("userId") int userId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         int rating = commentService.incrementCommentRating(commentId, userId);
         return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/post/{postId}/comments/{commentId}/dislike")
     ResponseEntity<Integer> dislikeComment(@PathVariable Integer commentId, @RequestParam("userId") int userId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         int rating = commentService.decrementCommentRating(commentId, userId);
         return new ResponseEntity<>(rating, HttpStatus.OK);
     }
