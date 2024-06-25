@@ -1,31 +1,38 @@
 package com.example.server.service;
 
-import com.example.server.dto.UserLoginDto;
-import com.example.server.dto.UserRegistrationDto;
 import com.example.server.dto.UserUpdateDto;
 import com.example.server.model.Role;
+import com.example.server.model.FileInfo;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.io.*;
 
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
 public class UserService {
 
+    private static final String PIC_DIRECTORY_PATH = "src\\main\\resources\\profile_pic\\";
+
+    private static final String RESUME_DIRECTORY_PATH = "src\\main\\resources\\resume\\";
+
     private final UserRepository userRepository;
 
+    private final FileInfoService fileInfoService;
+
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, FileInfoService fileInfoService) {
         this.userRepository = userRepository;
+        this.fileInfoService = fileInfoService;
     }
 
 //    public User registerUser(UserRegistrationDto registrationDto) {
@@ -65,19 +72,47 @@ public class UserService {
 //        }
 //    }
 
-    public User updateUser(Integer userId, UserUpdateDto updateDto) {
+    public User updateUser(Integer userId, UserUpdateDto updateDto) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setUsername(updateDto.getUsername());
         user.setEmail(updateDto.getEmail());
         user.setPassword(updateDto.getPassword());
-        user.setProfilePictureUrl(updateDto.getProfilePictureUrl());
         user.setContacts(updateDto.getContacts());
         user.setBio(updateDto.getBio());
-        user.setResumeUrl(updateDto.getResumeUrl());
         user.setTags(updateDto.getTags());
 
+        return userRepository.save(user);
+    }
+
+    public User uploadUserProfilePicture(Integer userId, MultipartFile profilePicture) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String extension = FilenameUtils.getExtension(profilePicture.getOriginalFilename());
+        String key = FileInfoService.generateKey(profilePicture.getOriginalFilename());
+        String newProfilePictureUrl = PIC_DIRECTORY_PATH + userId + "\\" + key + "." + extension;
+        try {
+            FileInfoService.uploadFileData(profilePicture.getBytes(), newProfilePictureUrl);
+        } catch (Exception e) {
+            throw new IOException("Can't upload profile picture");
+        }
+
+        String profilePictureUrl = user.getProfilePictureUrl();
+        if (profilePictureUrl != null && !Objects.equals(profilePictureUrl, "")) {
+            deleteUserProfilePicture(userId);
+        }
+
+        user.setProfilePictureUrl(newProfilePictureUrl);
+
+        return userRepository.save(user);
+    }
+
+    public User deleteUserProfilePicture(Integer userId) throws IOException {
+        User user = getUser(userId);
+        Files.deleteIfExists(Paths.get(user.getProfilePictureUrl()));
+        user.setProfilePictureUrl(null);
         return userRepository.save(user);
     }
 
@@ -113,6 +148,18 @@ public class UserService {
         return userRepository.findAllById(userIds);
     }
 
+    public byte[] getUserProfilePicture(Integer userId) throws IOException {
+        User user = getUser(userId);
+        try {
+            if (user.getProfilePictureUrl() == null || Objects.equals(user.getProfilePictureUrl(), "")) {
+                return null;
+            }
+            return Files.readAllBytes((Paths.get(user.getProfilePictureUrl())));
+        } catch (IOException e) {
+            throw new IOException("Can't download file");
+        }
+    }
+  
     public User save(User user) {
         return userRepository.save(user);
     }
@@ -178,4 +225,29 @@ public class UserService {
         user.setRole(role);
         userRepository.save(user);
     }
+
+    public User uploadResume(int id, MultipartFile resume) throws IOException {
+        User user = getUser(id);
+        FileInfo resumeInfo = fileInfoService.upload(resume, id, RESUME_DIRECTORY_PATH + id + "\\");
+        if (user.getResumeInfoId() != null) {
+            fileInfoService.delete(id, fileInfoService.findById(user.getResumeInfoId()), RESUME_DIRECTORY_PATH + id + "\\");
+        }
+        resumeInfo.setFileName("cv_" + user.getUsername());
+        user.setResumeInfoId(resumeInfo.getId());
+        user.setResumeFileName(resumeInfo.getFileName());
+        return userRepository.save(user);
+    }
+
+    public User deleteResume(int id) throws IOException {
+        User user = getUser(id);
+        fileInfoService.delete(id, fileInfoService.findById(user.getResumeInfoId()),
+                RESUME_DIRECTORY_PATH + id + "\\");
+        user.setResumeInfoId(null);
+        return userRepository.save(user);
+    }
+
+    public byte[] getResumeData(String key) throws IOException {
+        return FileInfoService.download(key, RESUME_DIRECTORY_PATH);
+    }
+
 }
