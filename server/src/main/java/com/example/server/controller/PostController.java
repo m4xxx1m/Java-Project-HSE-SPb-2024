@@ -85,6 +85,9 @@ public class PostController {
 
     @PostMapping("/post/add")
     ResponseEntity<Post> addPost(@RequestBody PostDto postDto) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), postDto.getAuthorId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         Post post;
         try {
             post = postService.addPost(postDto);
@@ -124,6 +127,10 @@ public class PostController {
 
     @PutMapping(value = "/post/{id}/file/add")
     ResponseEntity<Post> addPostFile(@PathVariable Integer id, @ModelAttribute MultipartFile file) {
+        Post post = postService.getPostById(id);
+        if (!Objects.equals(AuthController.getCurrentUserId(), post.getAuthorId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             return ResponseEntity.ok(postService.uploadFile(id, file));
         } catch (Exception e) {
@@ -205,12 +212,18 @@ public class PostController {
 
     @RequestMapping(value = "/post/{id}/like")
     ResponseEntity<Integer> likePost(@PathVariable Integer id, @RequestParam("userId") int userId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         int rating = postService.incrementPostRating(id, userId);
         return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/post/{id}/dislike")
     ResponseEntity<Integer> dislikePost(@PathVariable Integer id, @RequestParam("userId") int userId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         int rating = postService.decrementPostRating(id, userId);
         return new ResponseEntity<>(rating, HttpStatus.OK);
     }
