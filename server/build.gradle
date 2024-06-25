@@ -16,10 +16,32 @@ repositories {
 }
 
 dependencies {
+	implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+	implementation group: 'javax.transaction', name: 'jta', version: '1.1'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'commons-io:commons-io:2.16.1'
 	runtimeOnly 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok:1.18.32'
+	annotationProcessor 'org.projectlombok:lombok:1.18.32'
+	testCompileOnly 'org.projectlombok:lombok:1.18.32'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+	implementation 'io.jsonwebtoken:jjwt:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+	implementation 'io.swagger.core.v3:swagger-annotations:2.0.0'
+	implementation 'org.apache.commons:commons-lang3'
+
+	implementation 'org.springframework:spring-test'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.google.code.gson:gson:2.11.0'
+
+	testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '6.3.0'
 }
 
 

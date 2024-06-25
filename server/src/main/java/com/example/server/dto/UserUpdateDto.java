@@ -1,20 +1,16 @@
 package com.example.server.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Date;
 
 public class UserUpdateDto {
     private String username;
     private String email;
     private String password;
-    private String profilePictureUrl;
-    private String firstName;
-    private String secondName;
-    private Date dateOfBirth;
-    private String country;
-    private String city;
-    private String education;
+    private String contacts;
     private String bio;
-    private String resumeUrl;
+    private String tags;
 
     public String getUsername() {
         return username;
@@ -40,60 +36,12 @@ public class UserUpdateDto {
         this.password = password;
     }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
+    public String getContacts() {
+        return contacts;
     }
 
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getSecondName() {
-        return secondName;
-    }
-
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getEducation() {
-        return education;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
+    public void setContacts(String contacts) {
+        this.contacts = contacts;
     }
 
     public String getBio() {
@@ -104,11 +52,11 @@ public class UserUpdateDto {
         this.bio = bio;
     }
 
-    public String getResumeUrl() {
-        return resumeUrl;
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
-    public void setResumeUrl(String resumeUrl) {
-        this.resumeUrl = resumeUrl;
+    public String getTags() {
+        return tags;
     }
 }

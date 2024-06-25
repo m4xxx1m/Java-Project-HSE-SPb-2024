@@ -1,13 +1,21 @@
 package com.example.server.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Date;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
-public class User {
-
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
@@ -24,31 +32,27 @@ public class User {
     @Column(length = 2000)
     private String profilePictureUrl;
 
-    @Column(length = 50)
-    private String firstName;
-
-    @Column(length = 50)
-    private String secondName;
-
-    @Temporal(TemporalType.DATE)
-    private Date dateOfBirth;
-
-    @Column(length = 50)
-    private String country;
-
-    @Column(length = 100)
-    private String city;
-
+    @Builder.Default
     @Column(length = 200)
-    private String education;
+    private String contacts = "";
 
+    @Builder.Default
     @Column(length = 200)
-    private String bio;
+    private String bio = "";
 
     @Column(length = 2000)
-    private String resumeUrl;
+    private Integer resumeInfoId;
 
-    // Геттеры и сеттеры для каждого поля
+    @Column(length = 200)
+    private String resumeFileName;
+
+    @Builder.Default
+    @Column(length = 2000)
+    private String tags = Tag.defaultTags;
+
+    @Column()
+    private Role role;
+
     public Integer getUserId() {
         return userId;
     }
@@ -89,52 +93,12 @@ public class User {
         this.profilePictureUrl = profilePictureUrl;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getContacts() {
+        return contacts;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getSecondName() {
-        return secondName;
-    }
-
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getEducation() {
-        return education;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
+    public void setContacts(String contacts) {
+        this.contacts = contacts;
     }
 
     public String getBio() {
@@ -145,11 +109,60 @@ public class User {
         this.bio = bio;
     }
 
-    public String getResumeUrl() {
-        return resumeUrl;
+    public Integer getResumeInfoId() {
+        return resumeInfoId;
     }
 
-    public void setResumeUrl(String resumeUrl) {
-        this.resumeUrl = resumeUrl;
+    public void setResumeInfoId(Integer resumeInfoId) {
+        this.resumeInfoId = resumeInfoId;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public String getResumeFileName() {
+        return resumeFileName;
+    }
+
+    public void setResumeFileName(String resumeFileName) {
+        this.resumeFileName = resumeFileName;
     }
 }
