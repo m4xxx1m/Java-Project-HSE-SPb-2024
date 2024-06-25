@@ -13,8 +13,7 @@ import com.example.server.model.Role;
 import java.io.IOException;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -203,5 +202,49 @@ public class UserServiceTest {
         assertEquals(2, result.size());
         assertTrue(result.contains(user1));
         assertTrue(result.contains(user2));
+    }
+
+    @Test
+    public void testGetUserNotFound() {
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+        User result = userService.getUser(1);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testCreateUserWithExistingUsername() {
+        User user = new User();
+        user.setUsername("existingUsername");
+        when(userRepository.existsByUsername(user.getUsername())).thenReturn(true);
+
+        assertThrows(RuntimeException.class, () -> userService.create(user));
+    }
+
+    @Test
+    public void testCreateUserWithExistingEmail() {
+        User user = new User();
+        user.setEmail("existingEmail");
+        when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
+
+        assertThrows(RuntimeException.class, () -> userService.create(user));
+    }
+
+    @Test
+    public void testGetByUsernameNotFound() {
+        when(userRepository.findByUsername("nonExistingUsername")).thenReturn(null);
+
+        User result = userService.getByUsername("nonExistingUsername");
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testUpdateNonExistingUser() {
+        UserUpdateDto updateDto = new UserUpdateDto();
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> userService.updateUser(1, updateDto));
     }
 }

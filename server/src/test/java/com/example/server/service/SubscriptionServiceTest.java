@@ -65,4 +65,43 @@ public class SubscriptionServiceTest {
 
         assertTrue(result);
     }
+
+    @Test
+    public void testSubscribeWithNonExistingUser() {
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> subscriptionService.subscribe(1, 2));
+    }
+
+    @Test
+    public void testUnsubscribeWithNonExistingSubscription() {
+        User subscriber = new User();
+        User subscribeTo = new User();
+        when(userRepository.findById(1)).thenReturn(Optional.of(subscriber));
+        when(userRepository.findById(2)).thenReturn(Optional.of(subscribeTo));
+        when(subscriptionRepository.findBySubscriberAndSubscribeTo(subscriber, subscribeTo)).thenReturn(Optional.empty());
+
+        assertDoesNotThrow(() -> subscriptionService.unsubscribe(1, 2));
+    }
+
+    @Test
+    public void testCheckSubscriptionWithNonExistingUser() {
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> subscriptionService.checkSubscription(1, 2));
+    }
+
+    @Test
+    public void testGetSubscriptionsWithNonExistingUser() {
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> subscriptionService.getSubscriptions(1));
+    }
+
+    @Test
+    public void testGetPostsFromSubscriptionsWithNonExistingUser() {
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> subscriptionService.getPostsFromSubscriptions(1));
+    }
 }

@@ -1,5 +1,7 @@
 package com.example.server.controller;
 
+import com.example.server.dto.UserUpdateDto;
+import com.example.server.model.Role;
 import com.example.server.model.Subscription;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
@@ -18,6 +20,8 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -78,21 +82,6 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void testGetUser() throws Exception {
-        User user = new User();
-        user.setUsername("user1");
-
-        when(userService.getUser(1)).thenReturn(user);
-
-        mockMvc.perform(get("/users/getUser/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(user)));
-    }
-
-
-    @Test
-    @WithMockUser(roles = "ADMIN")
     public void testSubscribe() throws Exception {
         Subscription subscription = new Subscription();
 
@@ -102,5 +91,49 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(subscription)));
+    }
+
+    @Test
+    public void testGetUser() throws Exception {
+        User user = new User();
+        user.setUserId(1);
+        user.setUsername("testUser");
+        user.setEmail("test@example.com");
+        user.setPassword("testPassword");
+        user.setRole(Role.ROLE_USER);
+
+        when(userService.getUser(1)).thenReturn(user);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/getUser/1"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("testUser"));
+    }
+
+    @Test
+    public void testUpdateUser() throws Exception {
+        UserUpdateDto updateDto = new UserUpdateDto();
+        updateDto.setUsername("newUsername");
+        updateDto.setEmail("newEmail");
+        updateDto.setPassword("newPassword");
+        updateDto.setContacts("newContacts");
+        updateDto.setBio("newBio");
+        updateDto.setTags("newTags");
+
+        User user = new User();
+        user.setUserId(1);
+        user.setUsername(updateDto.getUsername());
+        user.setEmail(updateDto.getEmail());
+        user.setPassword(updateDto.getPassword());
+        user.setContacts(updateDto.getContacts());
+        user.setBio(updateDto.getBio());
+        user.setTags(updateDto.getTags());
+
+        when(userService.updateUser(1, updateDto)).thenReturn(user);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/update/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"newUsername\",\"email\":\"newEmail\",\"password\":\"newPassword\",\"contacts\":\"newContacts\",\"bio\":\"newBio\",\"tags\":\"newTags\"}"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("newUsername"));
     }
 }
