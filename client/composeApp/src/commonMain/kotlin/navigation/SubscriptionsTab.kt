@@ -138,7 +138,6 @@ private class RefreshSubscriptionsHelper : Refreshable() {
                     response: Response<List<network.Post>>
                 ) {
                     if (response.code() == 200) {
-                        println("refresh subscriptions tab success")
                         posts.clear()
                         val userIds = mutableSetOf<Int>()
                         response.body()?.let {
