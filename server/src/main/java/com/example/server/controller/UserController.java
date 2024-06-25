@@ -68,6 +68,9 @@ public class UserController {
     //                                    ^ user id here
     @PutMapping("/users/update/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable Integer userId, @ModelAttribute UserUpdateDto updateDto) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             return ResponseEntity.ok(userService.updateUser(userId, updateDto));
         } catch (IOException e) {
@@ -76,16 +79,23 @@ public class UserController {
     }
 
     @PostMapping("/users/{subscriberId}/subscribe/{subscribeToId}")
-    public Subscription subscribe(
+    public ResponseEntity<Subscription> subscribe(
             @PathVariable Integer subscriberId,
             @PathVariable Integer subscribeToId
     ) {
-        return subscriptionService.subscribe(subscriberId, subscribeToId);
+        if (!Objects.equals(AuthController.getCurrentUserId(), subscriberId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(subscriptionService.subscribe(subscriberId, subscribeToId));
     }
 
     @PostMapping("/users/{subscriberId}/unsubscribe/{subscribeToId}")
-    public void unsubscribe(@PathVariable Integer subscriberId, @PathVariable Integer subscribeToId) {
+    public ResponseEntity<Void> unsubscribe(@PathVariable Integer subscriberId, @PathVariable Integer subscribeToId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), subscriberId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         subscriptionService.unsubscribe(subscriberId, subscribeToId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/users/{subscriberId}/checkSubscription/{subscribeToId}")
@@ -128,6 +138,9 @@ public class UserController {
             @PathVariable Integer userId,
             @ModelAttribute("profilePicture") MultipartFile profilePicture
     ) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             return ResponseEntity.ok(userService.uploadUserProfilePicture(userId, profilePicture));
         } catch (IOException e) {
@@ -137,6 +150,9 @@ public class UserController {
 
     @GetMapping("/users/picture/{userId}/delete")
     public ResponseEntity<User> deleteUserProfilePicture(@PathVariable Integer userId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             return ResponseEntity.ok(userService.deleteUserProfilePicture(userId));
         } catch (IOException e) {
@@ -168,8 +184,12 @@ public class UserController {
     }
 
     @PostMapping("/users/{userId}/updateTags")
-    public void updateTags(@PathVariable Integer userId, @RequestParam("tags") String tags) {
+    public ResponseEntity<Void> updateTags(@PathVariable Integer userId, @RequestParam("tags") String tags) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         userService.updateUserTags(userId, tags);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/users/{userId}/getPostsFromSubscriptions")
@@ -230,6 +250,9 @@ public class UserController {
     @PutMapping(value = "/user/{id}/resume/add")
     ResponseEntity<User> addResume(@PathVariable Integer id,
                                    @ModelAttribute("resume") MultipartFile resume) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             return ResponseEntity.ok(userService.uploadResume(id, resume));
         } catch (Exception e) {
@@ -239,6 +262,9 @@ public class UserController {
 
     @GetMapping(value = "/user/{id}/resume/delete")
     ResponseEntity<User> deleteResume(@PathVariable Integer id) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             return ResponseEntity.ok(userService.deleteResume(id));
         } catch (IOException e) {
@@ -248,6 +274,9 @@ public class UserController {
 
     @PostMapping(value = "/user/{id}/resume/create")
     ResponseEntity<?> createResume(@PathVariable Integer id, @RequestBody ResumeDto resumeDto) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             resumeService.createResume(resumeDto, id);
         } catch (Exception e) {

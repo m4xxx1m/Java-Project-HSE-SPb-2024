@@ -4,6 +4,7 @@ import com.example.server.dto.ContentObjDto;
 import com.example.server.model.Comment;
 import com.example.server.model.SavedObject;
 import com.example.server.service.CommentService;
+import com.example.server.service.PostService;
 import com.example.server.service.SavedObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class CommentController {
@@ -44,6 +46,9 @@ public class CommentController {
 
     @RequestMapping("/post/{postId}/comments/{commentId}/delete")
     ResponseEntity<Void> deleteComment(@PathVariable int commentId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), commentService.getCommentById(commentId).getAuthorId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         commentService.deleteComment(commentId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -51,6 +56,9 @@ public class CommentController {
     @RequestMapping("/post/{postId}/comments/{commentId}/edit")
     ResponseEntity<Comment> editComment(@PathVariable int commentId, @RequestParam String content) {
         Comment comment = commentService.getCommentById(commentId);
+        if (!Objects.equals(AuthController.getCurrentUserId(), comment.getAuthorId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         if (comment == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
@@ -73,6 +81,9 @@ public class CommentController {
 
     @RequestMapping(value = "/saved/comments")
     ResponseEntity<List<Comment>> getSavedComments(@RequestParam("userId") int userId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         List<Integer> savedCommentIds = savedObjectService.getSavedObjectByUserId(userId, SavedObject.Type.COMMENT);
         List<Comment> savedComments = commentService.getCommentsByCommentIds(savedCommentIds);
         if (savedComments == null) {
