@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class PostController {
@@ -59,6 +60,9 @@ public class PostController {
     ResponseEntity<List<Post>> getPostsByUserTags(@RequestParam("userId") int userId,
                                               @RequestParam(defaultValue = "-1") int prevId,
                                               @RequestParam(defaultValue = "10") int size) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         List<Post> list = postService.getPostsByUserTagsAfterId(userId, prevId, size);
         if (list == null) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -175,6 +179,9 @@ public class PostController {
     @RequestMapping("/post/{id}/edit")
     ResponseEntity<Post> editPost(@PathVariable Integer id, @RequestBody PostDto postDto) {
         Post post = postService.getPostById(id);
+        if (!Objects.equals(AuthController.getCurrentUserId(), post.getAuthorId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         if (post == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
@@ -185,6 +192,9 @@ public class PostController {
 
     @PostMapping("/post/{id}/delete")
     ResponseEntity<Void> deletePost(@PathVariable Integer id) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), postService.getPostById(id).getAuthorId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             postService.deletePost(id);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -207,12 +217,18 @@ public class PostController {
 
     @RequestMapping(value = "/post/{id}/save")
     ResponseEntity<Void> savePost(@PathVariable Integer id, @RequestParam("userId") int userId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         savedObjectService.saveObject(userId, id, SavedObject.Type.POST);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/saved/posts")
     ResponseEntity<List<Post>> getSavedPost(@RequestParam("userId") int userId) {
+        if (!Objects.equals(AuthController.getCurrentUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         List<Integer> savedPostIds = savedObjectService.getSavedObjectByUserId(userId, SavedObject.Type.POST);
         List<Post> savedPosts = postService.getPostsByPostIds(savedPostIds);
         if (savedPosts == null) {

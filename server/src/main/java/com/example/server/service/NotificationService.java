@@ -57,4 +57,8 @@ public class NotificationService {
         List<Notification> notifications = notificationRepository.findByOriginalCommentId(id);
         notificationRepository.deleteAll(notifications);
     }
+
+    public Notification getNotificationById(int id) {
+        return notificationRepository.findById(id).orElse(null);
+    }
 }
