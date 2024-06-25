@@ -6,8 +6,18 @@ import com.example.server.model.*;
 import com.example.server.repository.CommentRepository;
 import com.example.server.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +26,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PostService {
+
+    private static final String DIRECTORY_PATH = "src\\main\\resources\\files\\";
 
     @Autowired
     private PostRepository postRepository;
@@ -29,13 +41,40 @@ public class PostService {
     @Autowired
     private RatedObjectService ratedObjectService;
 
-    public Post addPost(PostDto postDto) {
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    FileInfoService fileInfoService;
+
+    public Post addPost(PostDto postDto) throws IOException {
         Post post = new Post(postDto.getAuthorId(), postDto.getTitle(),
                 postDto.getContent(), postDto.getTags(), postDto.getCommentsCount());
+        postRepository.save(post);
+        if (postDto.isResumeNeeded()) {
+            User author = userService.getUser(postDto.getAuthorId());
+            FileInfo resumeInfo = fileInfoService.findById(author.getResumeInfoId());
+            MultipartFile multipartFile = null;
+            try {
+                multipartFile = new MockMultipartFile(resumeInfo.getFileName(), userService.getResumeData(postDto.getAuthorId() + "\\" + resumeInfo.getKey()));
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new IOException();
+            }
+            uploadFile(post.getId(), multipartFile);
+            FileInfo fileInfo = fileInfoService.findById(post.getFileInfoId());
+            fileInfo.setFileName(resumeInfo.getFileName());
+            fileInfo.setFileType(resumeInfo.getFileType());
+            post.setFileName(resumeInfo.getFileName());
+            fileInfoService.saveFileInfo(fileInfo);
+        }
         return postRepository.save(post);
     }
 
-    public void deletePost(int id) {
+    public void deletePost(int id) throws IOException {
         List<Comment> comments = commentRepository.findByPostId(id);
         for (Comment comment : comments) {
             ratedObjectService.deleteRatingsOfObject(comment.getId());
@@ -44,6 +83,21 @@ public class PostService {
         }
         ratedObjectService.deleteRatingsOfObject(id);
         savedObjectService.deleteSavedObjectForAllUsers(id);
+        Post post = getPostById(id);
+        FileInfo fileInfo = null;
+        if (post.getFileInfoId() != null) {
+            fileInfo = fileInfoService.findById(post.getFileInfoId());
+        }
+        if (fileInfo != null) {
+            fileInfoService.delete(id, fileInfo, DIRECTORY_PATH + id + "\\");
+        }
+        List<Integer> picInfoIds = post.getPicInfoIds();
+        if (picInfoIds != null) {
+            for (Integer picInfoId : picInfoIds) {
+                fileInfoService.delete(id, fileInfoService.findById(picInfoId), DIRECTORY_PATH + id + "\\");
+            }
+        }
+        notificationService.deleteNotificationsByPostId(id);
         postRepository.deleteById(id);
     }
 
@@ -55,10 +109,22 @@ public class PostService {
         return postRepository.findByAuthorId(authorId);
     }
 
-    public List<Post> getPosts() {
-        var posts = postRepository.findAll();
-        posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
-        return posts;
+    public List<Post> getPosts(int size) {
+        if (size == -1) {
+            var posts = postRepository.findAll();
+            posts.sort(Comparator.comparing(Post::getCreationTime, Comparator.reverseOrder()));
+            return posts;
+        }
+        Pageable paging = PageRequest.of(0, size, Sort.by("id").descending());
+        Page<Post> pagedResult = postRepository.findAll(paging);
+        return pagedResult.getContent();
+    }
+
+    public List<Post> getPostsAfterId(int id, int size) {
+        if (id == -1) {
+            return postRepository.findAll(PageRequest.of(0, size, Sort.by("id").descending())).getContent();
+        }
+        return postRepository.findByIdLessThan(id, PageRequest.of(0, size, Sort.by("id").descending()));
     }
 
     public List<Post> getPostsByPostIds(List<Integer> postIds) {
@@ -70,14 +136,39 @@ public class PostService {
 //        return posts;
     }
 
-    public List<Post> getPostsBySelectedTags(String tags) {
-        List<Integer> tagIds = Tag.tagsToTagIds(tags);
-        List<Post> posts = getPosts();
-        return posts.stream()
-                .filter(post -> Tag.tagsToTagIds(post.getTags())
-                        .stream()
-                        .anyMatch(tagIds::contains))
-                .collect(Collectors.toList());
+    public List<Post> getPostsByUserTagsAfterId(int userId, int id, int size) {
+        User user = userService.getUser(userId);
+        return getPostsBySelectedTagsAfterId(user.getTags(), id, size);
+    }
+
+    public List<Post> getPostsBySelectedTagsAfterId(String tags, int id, int size) {
+        List<Post> posts;
+        if (id == -1) {
+            posts = postRepository.findByTagsLike(tags,
+                    PageRequest.of(0, size, Sort.by("id").descending()));
+        } else {
+            posts = postRepository.findByIdLessThanAndTagsLike(id, tags,
+                    PageRequest.of(0, size, Sort.by("id").descending()));
+        }
+        return posts;
+    }
+
+//    public List<Post> getPostsBySelectedTags(String tags) {
+//        List<Post> posts = getPosts();
+//        return filterPostsByTags(posts, tags);
+//    }
+
+    public static List<Post> filterPostsByTags(List<Post> posts, String tags) {
+        if (tags.indexOf('0') != -1) {
+            List<Integer> tagIds = Tag.tagsToTagIds(tags);
+            return posts.stream()
+                    .filter(post -> Tag.tagsToTagIds(post.getTags())
+                            .stream()
+                            .anyMatch(tagIds::contains))
+                    .collect(Collectors.toList());
+        } else {
+            return posts;
+        }
     }
 
     public List<String> getPostTags(int id) {
@@ -131,19 +222,86 @@ public class PostService {
     }
 
     public void editPost(Post post, PostDto postDto) {
+        post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setTags(postDto.getTags());
         postRepository.save(post);
+    }
+
+    public Post deleteFile(int id) throws IOException {
+        Post post = getPostById(id);
+        fileInfoService.delete(id, fileInfoService.findById(post.getFileInfoId()),
+                DIRECTORY_PATH + id + "\\");
+        post.setFileInfoId(null);
+        return postRepository.save(post);
+    }
+
+    public Post uploadFile(int id, MultipartFile file) throws IOException {
+        Post post = getPostById(id);
+        FileInfo fileInfo = fileInfoService.upload(file, id, DIRECTORY_PATH + id + "\\");
+        if (post.getFileInfoId() != null) {
+            fileInfoService.delete(id,
+                    fileInfoService.findById(post.getFileInfoId()), DIRECTORY_PATH + id + "\\");
+        }
+        post.setFileInfoId(fileInfo.getId());
+        post.setFileName(fileInfo.getFileName());
+        return postRepository.save(post);
+    }
+
+    public Post deletePicture(int postId, int picNumber) throws IOException {
+        Post post = getPostById(postId);
+        List<Integer> picInfoIds = post.getPicInfoIds();
+        FileInfo picInfo = fileInfoService.findById(picInfoIds.get(picNumber));
+        fileInfoService.delete(postId, picInfo, DIRECTORY_PATH + postId + "\\");
+        picInfoIds.remove(picNumber);
+        post.setPicInfoIds(picInfoIds);
+        return postRepository.save(post);
+    }
+
+    public void uploadPicture(int postId, MultipartFile pic) throws IOException {
+        Post post = getPostById(postId);
+        List<Integer> picInfoIds;
+        if (post.getPicInfoIds() == null) {
+            picInfoIds = new ArrayList<>();
+        } else {
+            picInfoIds = post.getPicInfoIds();
+        }
+        FileInfo fileInfo = fileInfoService.upload(pic, postId, DIRECTORY_PATH + postId + "\\");
+        picInfoIds.add(fileInfo.getId());
+        post.setPicInfoIds(picInfoIds);
+        postRepository.save(post);
+    }
+
+    public Post uploadPictures(int postId, List<MultipartFile> pics) throws IOException {
+        for (MultipartFile pic : pics) {
+            uploadPicture(postId, pic);
+        }
+        return getPostById(postId);
+    }
+
+    public byte[] getFileData(String key) throws IOException {
+        return FileInfoService.download(key, DIRECTORY_PATH);
     }
 
     public void changeCommentsCount(int postId, int delta) {
         Post post = getPostById(postId);
         if (post != null) {
             post.setCommentsCount(post.getCommentsCount() + delta);
+            postRepository.save(post);
         }
     }
 
     public List<Post> getPostsByContentUsingTrigram(String content) {
         return postRepository.findByContentUsingTrigram(content);
+    }
+
+    public List<Post> getPostsByContentAndTags(String content, String tags) {
+        List<Post> posts;
+        if (content == null || content.isEmpty()) {
+            posts = getPosts(-1);
+        } else {
+            posts = getPostsByContentUsingTrigram(content);
+        }
+        return filterPostsByTags(posts, tags);
     }
 }
