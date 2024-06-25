@@ -1,6 +1,7 @@
 package com.example.server.service;
 
 import com.example.server.dto.UserUpdateDto;
+import com.example.server.model.Role;
 import com.example.server.model.FileInfo;
 import com.example.server.model.User;
 import com.example.server.repository.UserRepository;
@@ -181,6 +182,48 @@ public class UserService {
 
     public UserDetailsService userDetailsService() {
         return this::getByUsername;
+    }
+
+    public void updateUsername(Integer userId, String username) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setUsername(username);
+        userRepository.save(user);
+    }
+
+    public void updateEmail(Integer userId, String email) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setEmail(email);
+        userRepository.save(user);
+    }
+
+    public void updatePassword(Integer userId, String password) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPassword(password);
+        userRepository.save(user);
+    }
+
+    public void updateProfilePictureUrl(Integer userId, String profilePictureUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setProfilePictureUrl(profilePictureUrl);
+        userRepository.save(user);
+    }
+
+    public void updateResumeUrl(Integer userId, String resumeUrl) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setResumeUrl(resumeUrl);
+        userRepository.save(user);
+    }
+
+    public void updateRole(Integer userId, Role role) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRole(role);
+        userRepository.save(user);
     }
 
     public User uploadResume(int id, MultipartFile resume) throws IOException {

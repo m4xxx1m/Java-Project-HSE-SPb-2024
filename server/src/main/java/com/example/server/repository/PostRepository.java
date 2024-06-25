@@ -17,6 +17,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Optional<Post> findById(int id);
     List<Post> findByIdLessThan(int id, Pageable pageable);
 
+    // @Query(value = "SELECT * FROM content_obj WHERE word_similarity(content, :content) > 0.4", nativeQuery = true)
+    // List<Post> findByContentUsingTrigram(@Param("content") String content);}
+
     @Query(value = "SELECT * FROM content_obj WHERE CAST(CAST(tags AS bit(63)) AS bigint) " +
             "& CAST(CAST(:tags AS bit(63)) AS bigint) > 0" +
             " AND dtype = 'Post'",
